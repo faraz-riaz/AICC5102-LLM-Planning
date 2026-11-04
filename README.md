@@ -79,6 +79,34 @@ uv run --frozen pytest -q
 
 `uv` reads `.python-version` and obtains Python 3.12.12 when it is unavailable locally. `--frozen` prevents an unnoticed dependency-lock update. Neither setup nor planning requires an LLM API key.
 
+## Optional LLM provider configuration
+
+External model calls are only needed when deliberately generating a heuristic or running the inherited end-to-end LLM interface. Copy `.env.example` to `.env`, select `LLM_PROVIDER`, and fill in only that provider's credentials. `.env` is ignored by Git, and values already exported by the shell or CI take precedence.
+
+For the Gemini Developer API, set `GEMINI_API_KEY`. The alternate `GOOGLE_API_KEY` name is also supported and takes precedence if both are present. For Google Cloud, leave the API-key fields empty and configure Vertex AI with Application Default Credentials:
+
+```bash
+gcloud auth application-default login
+```
+
+Then set these values in `.env`:
+
+```dotenv
+LLM_PROVIDER=gemini
+GEMINI_MODEL=gemini-3.8-flash
+GOOGLE_GENAI_USE_VERTEXAI=true
+GOOGLE_CLOUD_PROJECT=your-project-id
+GOOGLE_CLOUD_LOCATION=global
+```
+
+Validate the effective model and credential source without sending a prompt or printing a secret:
+
+```bash
+uv run --frozen python tools/check_llm_config.py --provider gemini
+```
+
+`GEMINI_MODEL`, `OPENAI_MODEL`, `DEEPSEEK_MODEL`, and `NVIDIA_MODEL` provide provider-specific defaults, so changing `--framework` cannot accidentally retain another provider's model. The tested aliases are in `src/llm_heuristics/models.py`; an exact provider model ID can also be supplied with `--model` for newer releases. Availability and account access still depend on the provider. Automated tests mock all API calls and never spend quota.
+
 ## Run the original GBFS + hFF smoke test
 
 From the repository root on Windows or Linux:

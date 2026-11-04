@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_locked_dependencies_import() -> None:
-    for module in ("click", "google.genai", "lab", "openai", "pandas"):
+    for module in ("click", "dotenv", "google.genai", "lab", "openai", "pandas"):
         importlib.import_module(module)
 
 

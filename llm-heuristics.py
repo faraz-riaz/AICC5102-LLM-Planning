@@ -50,15 +50,15 @@ def validate_top_p(ctx, param, value):
 )
 @click.option(
     "--framework",
-    default="gemini",
-    type=click.Choice(["gemini", "deepseek", "nvidia", "openai"]),
-    help="Framework used to run LLMs.",
+    default=None,
+    type=click.Choice(models.PROVIDERS),
+    help="Provider used to run LLMs (defaults to LLM_PROVIDER or gemini).",
 )
 @click.option(
     "--model",
     "-m",
-    default="gemini-2.5-flash",
-    help="LLM Model used.",
+    default=None,
+    help="Provider model alias or exact model ID (defaults to <PROVIDER>_MODEL).",
 )
 @click.option(
     "--heuristic-name",
@@ -109,6 +109,8 @@ def validate_top_p(ctx, param, value):
     help="Idea for heuristic generation.",
 )
 def main(domain, model, framework, heuristic_name, heuristic_file, prompt_format, temperature, top_p, idea, ablation):
+    framework = models.resolve_provider_name(framework)
+    model = models.resolve_model_name(framework, model)
     logging.info(f"Python version: {sys.version}.")
     logging.info(f"Using suite {domain}.")
     suite = SUITES[domain]
@@ -124,14 +126,7 @@ def main(domain, model, framework, heuristic_name, heuristic_file, prompt_format
 
     logging.info(f"Using model {model} with framework {framework}.")
 
-    if framework == "gemini":
-        answer = models.run_gemini(model, prompt, temperature, top_p)
-    elif framework == "deepseek":
-        answer = models.run_deepseek(model, prompt, temperature, top_p)
-    elif framework == "nvidia":
-        answer = models.run_nvidia(model, prompt, temperature, top_p)
-    elif framework == "openai":
-        answer = models.run_openai(model, prompt, temperature, top_p)
+    answer = models.run_model(framework, model, prompt, temperature, top_p)
 
     logging.info("LLM Answer:")
     print(answer)
