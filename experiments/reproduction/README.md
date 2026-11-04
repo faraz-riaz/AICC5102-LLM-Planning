@@ -8,6 +8,7 @@ Results and caveats: [DISCREPANCIES.md](DISCREPANCIES.md).
 | File | Role |
 |---|---|
 | `run_reproduction.py` | Shared runner. One child process per run, hard time and memory limit, plan validation, one schema-valid JSON record per run. |
+| `run_search_algorithms.py` | Same runner for A*, Weighted A* and IDA*. Starts Faraz's `search_worker.py` under the same time and memory limits, validates the plan and writes the same record. Reuses code from `run_reproduction.py`. |
 | `summarize_results.py` | Turns the records into `baseline_runs.csv`, `coverage.csv`, `reproduction.csv`, `plan_quality.csv` and `coverage.png`. |
 | `DISCREPANCIES.md` | What matches the paper, what differs and why. |
 
@@ -43,6 +44,16 @@ uv run --frozen python experiments/reproduction/run_reproduction.py --batch bw-t
 Other options: `--domain a,b` `--difficulty easy|medium|hard` `--limit N` `--time-limit S` `--memory-limit MiB` `--workers N` `--summary-csv FILE`.
 Defaults come from `configs/experiment.v2.toml` (60 s, 4096 MiB). Runs are sequential; `--workers > 1` makes runs compete for CPU and inflates wall times.
 
+A*, Weighted A* and IDA* (needs Faraz's search code from branch `feature/faraz-search`):
+
+```bash
+uv run --frozen python experiments/reproduction/run_search_algorithms.py --batch astar-hmax --algorithm astar --heuristic hmax --domain blocksworld
+uv run --frozen python experiments/reproduction/run_search_algorithms.py --batch wastar-llm --algorithm weighted_astar --weight 1.5 --heuristic llm-upstream --domain blocksworld
+uv run --frozen python experiments/reproduction/run_search_algorithms.py --batch ida-llm --algorithm ida_star --heuristic llm-upstream --domain blocksworld
+```
+
+`--weight` is required for `weighted_astar` and not allowed for the others. The other options are the same as above.
+
 Summaries:
 
 ```bash
@@ -58,7 +69,7 @@ It refuses to overwrite existing outputs. To regenerate, delete `results/derived
 3. Runs `python src/pyperplan/pyperplan.py -s gbfs_early_goal_test -H <heuristic> <task>` with `PYTHONHASHSEED` fixed from the run seed (SHA-256 of base seed 5102 and the run fields).
 4. Windows: the child runs in a Job Object (hard memory cap on the whole process tree, process tree killed at the time limit). Linux/macOS: `RLIMIT_AS` and process-group kill, peak memory not measured.
 5. Validates every plan with `tools/validate_plan.py`.
-6. Writes `results/raw/pre-experiment-v2/<run_id>.json` (all 40 fields of `configs/result.schema.json`), the raw log in `logs/`, solved plans in `plans/`, and a batch file in `batches/`. Existing files are never overwritten. `results/raw` is git-ignored.
+6. Writes `results/raw/pre-experiment-v2/<run_id>.json` (all required fields of `configs/result.schema.json`), the raw log in `logs/`, solved plans in `plans/`, and a batch file in `batches/`. Existing files are never overwritten. `results/raw` is git-ignored.
 
 Statuses the runner can write: `success`, `unsolved`, `timeout`, `memory_limit`, `invalid_plan`, `planner_error`, `validator_error`. Our 270 real runs produced only `success` and `timeout`.
 
@@ -80,6 +91,6 @@ Full batch coverage (30 tasks per domain, 60 s): Blocksworld hFF 5, hmax 2, LLM 
 
 ## Limits
 
-- GBFS only. A*, Weighted A* and IDA* run through `experiments/search_algorithms/search_adapters.py` and are not connected to this runner yet.
+- `run_reproduction.py` runs GBFS only (the authors' original command). A*, Weighted A* and IDA* run through `run_search_algorithms.py`.
 - Windows peak memory is the Job Object's peak committed memory (`platform_native_process_tree_bytes`), not the working set named in the config.
 - A few timed-out runs were killed late (66 to 139 s of wall time); they are counted as unsolved.

@@ -21,6 +21,7 @@
   "plan_valid": true,
   "plan_length": 30,
   "plan_cost": 30.0,
+  "nodes_generated": null,
   "nodes_expanded": 52,
   "wall_time_s": 0.97,
   "peak_memory_mib": 11.5,
