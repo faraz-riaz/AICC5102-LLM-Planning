@@ -1,31 +1,67 @@
 # Shared experiment protocol
 
-This document establishes conventions only; Amina will implement the full shared runner later.
+This document freezes pre-experiment decisions. It does not implement the member-owned algorithms, generation trials, exact-cost solver, or full shared runner.
 
-## Data boundary
+## Data boundary and heuristic trials
 
-Use `benchmarks/manifest.json` to enumerate all evaluations. Training PDDL and example-state/static assets may be used for heuristic generation and selection. Test PDDL may be used only for the final fixed evaluation. Generated-heuristic prompts, repairs, rankings, or parameter choices must not inspect test performance.
+Use `benchmarks/manifest.json` for every evaluation. The frozen 90-problem test selection is unchanged. Training PDDL and example assets may be used for generation and selection; test PDDL must not influence prompts, repairs, ranking, or tuning.
 
-## Pilot resources
+Generate and select exactly three independent heuristic sets per domain, identified as `trial-01`, `trial-02`, and `trial-03`. Selection uses training data only. Freeze each selected file and its SHA-256 before any test evaluation. All compared algorithms must use the identical frozen heuristic sets on the identical manifest instances.
 
-- Time limit: 60 seconds per problem
-- Memory limit: 4096 MiB per process
-- Status vocabulary: `success`, `unsolved`, `timeout`, `memory_limit`, `invalid_plan`, `error`
+The three files in `artifacts/upstream/deepseek-r1/` are the paper's original selected reproduction baselines. They do not count as the project's three new generation trials.
 
-These values are provisional. The team must run a pilot, agree on final values, version the config, and avoid changing limits mid-comparison. Record both configured limits and enforcement method. A timeout is not an unsolved proof; a memory kill is not a generic error.
+## Comparison matrix
 
-## IDs and seeds
+The main algorithm identifiers are `gbfs`, `astar`, `weighted_astar`, and `ida_star`. Weighted A* uses weights `1.0`, `1.5`, and `2.0`; weight 1.0 is the correctness-equivalence check against A*. A heuristic weight is null for algorithms where it does not apply.
 
-Use stable lowercase identifiers from `configs/experiment.v1.toml`. A run ID must uniquely identify config, problem, algorithm, heuristic/trial, weight, and seed. Derive any per-run random seed from canonical fields and base seed 5102 with SHA-256; never use `hash()`.
+Only inherited GBFS is exercised in this foundation. A*, Weighted A*, and IDA* remain Faraz's pending implementations and must be validated before experiments. Do not treat upstream `ids` as IDA*.
 
-Record the exact Git commit and a machine ID. Use an ISO 8601 timestamp with timezone. For deterministic algorithms, still record the agreed seed to make the policy explicit.
+## Exact optimal-cost references
 
-## Result records
+Generate references with exact A* using admissible hmax under the unit-action-cost model. A reference is `proven` only when search proves optimality and the returned plan validates. Before accepting the reference implementation, cross-check it with uniform-cost search on all 10 selected easy tasks per domain.
 
-Every record must satisfy `configs/result.schema.json`. Unknown or unavailable measurements use JSON `null` only where the schema permits it; do not use sentinel numbers. `plan_valid` is true only after a validator or reliable applicability-and-goal replay succeeds. `optimality_proven` is distinct from “matches a known cost.”
+Store reference outcomes independently from the main run status:
 
-Raw records go to `results/raw/<config_id>/`, derived tables to `results/derived/<config_id>/`, and figures to `results/figures/<config_id>/`. Never edit an existing raw record after collection.
+- `proven`: non-null cost, `optimality_proven=true`, and a valid reference plan.
+- `unknown_timeout`, `unknown_memory`, or `unknown_error`: null cost and `optimality_proven=false`.
+- `cross_check_mismatch`: null cost until the discrepancy is resolved.
+- `not_requested`: no reference was attempted.
 
-## Algorithms in this foundation
+Never infer an optimum from the best observed plan. A successful main-algorithm run may legitimately have an unknown reference cost.
 
-The only exercised experimental path in this initial setup is the inherited `gbfs_early_goal_test` plus built-in `hff`. Names for future A*, Weighted A*, and iterative-deepening work are reserved in configuration, but no new implementation or comparison is part of this foundation.
+## Pilot resources and monitoring
+
+- Wall-time limit: 60 seconds per problem, provisional.
+- Memory cap: 4096 MiB over the process tree, provisional.
+- Clock: monotonic wall clock.
+- Sampling interval: 0.1 seconds.
+- Linux backend/metric: `/proc` process tree and summed RSS bytes.
+- Windows backend/metric: Job Object process tree and summed working-set bytes.
+- Fallback: portable process-tree polling; record that the cap may be sampling-based rather than hard.
+
+Always record the backend, memory metric, whether timeout and memory caps were actually enforced, and peak MiB. Linux RSS and Windows working set are operationally comparable resource indicators but are not identical OS measurements.
+
+Run `uv run --frozen python tools/capture_machine_profile.py` on each machine. Its stable `machine-<12 hex>` identifier hashes normalized OS-family/hardware fields and excludes hostnames and usernames. Store the emitted profile with experiment metadata.
+
+## Run IDs, seeds, and statuses
+
+Use identifiers from `configs/experiment.v2.toml`. A run ID must uniquely encode config, problem, algorithm, heuristic set/trial, weight, and seed. Derive seeds from canonical fields and base seed 5102 using SHA-256; never use `hash()`.
+
+Run statuses have these meanings:
+
+- `success`: a plan was returned and validated.
+- `unsolved`: exhaustive search terminated without a plan; not a timeout.
+- `timeout` / `memory_limit`: the applicable resource cap terminated the process tree.
+- `invalid_plan`: a returned plan failed replay/validation.
+- `planner_error` / `validator_error`: the named component failed.
+- `configuration_error`: required config, artifact, or manifest input was invalid.
+- `reference_error`: the exact-reference procedure itself failed.
+- `interrupted`: external cancellation not covered above.
+
+Put a concise machine-readable explanation in `failure_detail`; do not collapse failures into a generic `error` status.
+
+## Result records and review
+
+Every record must satisfy `configs/result.schema.json`. Use JSON null only where permitted; do not use sentinel costs or times. Raw records go to `results/raw/<config_id>/`, derived tables to `results/derived/<config_id>/`, and figures to `results/figures/<config_id>/`. Raw records are immutable.
+
+All experiment changes use member feature branches and reviewed pull requests into `main`. Configuration, schema, benchmark, shared planner, and monitoring changes require cross-workstream review and passing CI.

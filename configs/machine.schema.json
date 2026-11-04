@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/aicc5102/machine.schema.json",
+  "title": "AICC5102 privacy-preserving machine profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_version",
+    "machine_id",
+    "captured_at",
+    "os_family",
+    "os_release",
+    "architecture",
+    "processor",
+    "logical_cpu_count",
+    "total_memory_mib",
+    "python_version",
+    "recommended_monitor_backend"
+  ],
+  "properties": {
+    "profile_version": {"const": "1.0"},
+    "machine_id": {"type": "string", "pattern": "^machine-[0-9a-f]{12}$"},
+    "captured_at": {"type": "string", "format": "date-time"},
+    "os_family": {"type": "string", "minLength": 1},
+    "os_release": {"type": "string", "minLength": 1},
+    "architecture": {"type": "string", "minLength": 1},
+    "processor": {"type": "string", "minLength": 1},
+    "logical_cpu_count": {"type": "integer", "minimum": 1},
+    "total_memory_mib": {"type": ["integer", "null"], "minimum": 1},
+    "python_version": {"type": "string", "minLength": 1},
+    "recommended_monitor_backend": {
+      "enum": ["procfs_process_tree", "job_object_process_tree", "portable_process_tree_polling"]
+    }
+  }
+}

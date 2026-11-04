@@ -8,7 +8,10 @@
 | Benchmark | `aicc5102-90-v1` |
 | Selection script | `1.0.0` |
 | Selection seed | `5102` |
-| Experiment configuration | `1.0.0` / `pilot-v1` |
+| Experiment configuration | `2.0.0` / `pre-experiment-v2` |
+| Result schema | `2.0` |
+| Machine profile | `1.0` |
+| Original DeepSeek R1 set | `zenodo-17400964-deepseek-r1-selected` |
 | Python | `3.12.12` |
 | uv | `0.12.10` |
 | Dependency lock | `uv.lock` |
@@ -42,8 +45,28 @@ uv run --frozen pytest -q
 
 Tests call the original planner interface with GBFS/hFF, then replay its plans without depending on the optional external VAL executable. No LLM API calls occur.
 
+## Original selected heuristics
+
+The verified Zenodo v1 ZIP was inspected directly. Only the explicit selected DeepSeek R1 files for Blocksworld, Miconic, and Transport were copied into `artifacts/upstream/deepseek-r1/`. `provenance.json` records their SHA-256 hashes, original generation-log hashes and parameters, selection script/properties hashes, training scores, and the Miconic tie behavior. The 200 MB ZIP, full prompts/responses, and 11.5 MB raw training properties remain retrievable but untracked.
+
+Verify these compact artifacts through the automated tests. To independently retrieve the source archive:
+
+```bash
+uv run --frozen python tools/fetch_zenodo_archive.py
+```
+
+The expected archive is 200,032,733 bytes with MD5 `8e20619169553ec6eb8b5f10e262a2d9`.
+
 ## Platform notes
 
 The repository uses POSIX-style relative paths in manifests; Python resolves them on Windows and Linux. File hashes are calculated from raw bytes, so line endings in PDDL must not be normalized or rewritten.
 
-Linux and Windows do not enforce memory limits the same way. A later runner should use an OS-appropriate hard limit (for example, a Linux resource/cgroup/job supervisor or a Windows Job Object), record the mechanism, and treat sampled RSS as measurement rather than proof of enforcement. The provisional limits remain configurable in `configs/experiment.v1.toml`.
+Linux and Windows do not expose identical memory metrics. Configuration v2 standardizes process-tree scope, monotonic timing, 0.1-second sampling, backend/metric recording, Linux summed RSS, and Windows summed working set. The future runner must record whether each cap was hard-enforced or sampling-enforced. The provisional limits remain configurable in `configs/experiment.v2.toml`.
+
+Capture a machine profile with:
+
+```bash
+uv run --frozen python tools/capture_machine_profile.py
+```
+
+The stable identifier excludes hostname and username. Keep the complete emitted profile with run metadata so hardware and platform differences remain auditable.

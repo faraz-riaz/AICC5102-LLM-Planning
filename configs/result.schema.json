@@ -1,61 +1,132 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.invalid/aicc5102/result.schema.json",
-  "title": "AICC5102 planning result record",
+  "title": "AICC5102 planning result record v2",
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "schema_version",
     "run_id",
     "timestamp",
     "git_commit",
     "config_id",
+    "benchmark_version",
     "domain",
     "problem_id",
     "difficulty",
     "algorithm",
     "heuristic_id",
+    "heuristic_set_id",
     "heuristic_trial_id",
     "heuristic_weight",
     "seed",
     "status",
+    "failure_detail",
+    "exit_code",
     "solved",
     "plan_valid",
     "plan_length",
     "plan_cost",
     "nodes_expanded",
     "wall_time_s",
-    "peak_memory_mb",
+    "peak_memory_mib",
     "time_limit_s",
-    "memory_limit_mb",
+    "memory_limit_mib",
+    "timeout_enforced",
+    "memory_limit_enforced",
+    "monitor_backend",
+    "memory_metric",
+    "process_scope",
     "optimal_cost",
+    "optimal_cost_status",
     "optimality_proven",
+    "optimal_reference_run_id",
+    "optimal_reference_algorithm",
+    "optimal_reference_heuristic",
+    "optimal_reference_plan_valid",
     "machine_id"
   ],
   "properties": {
+    "schema_version": {"const": "2.0"},
     "run_id": {"type": "string", "minLength": 1},
     "timestamp": {"type": "string", "format": "date-time"},
-    "git_commit": {"type": "string", "minLength": 7},
+    "git_commit": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"},
     "config_id": {"type": "string", "minLength": 1},
+    "benchmark_version": {"const": "aicc5102-90-v1"},
     "domain": {"enum": ["blocksworld", "miconic", "transport"]},
     "problem_id": {"type": "string", "minLength": 1},
     "difficulty": {"enum": ["easy", "medium", "hard"]},
-    "algorithm": {"type": "string", "minLength": 1},
+    "algorithm": {"enum": ["gbfs", "astar", "weighted_astar", "ida_star", "uniform_cost"]},
     "heuristic_id": {"type": "string", "minLength": 1},
+    "heuristic_set_id": {"type": ["string", "null"]},
     "heuristic_trial_id": {"type": ["string", "null"]},
-    "heuristic_weight": {"type": ["number", "null"]},
+    "heuristic_weight": {"type": ["number", "null"], "minimum": 0},
     "seed": {"type": "integer"},
-    "status": {"enum": ["success", "unsolved", "timeout", "memory_limit", "invalid_plan", "error"]},
+    "status": {
+      "enum": [
+        "success",
+        "unsolved",
+        "timeout",
+        "memory_limit",
+        "invalid_plan",
+        "planner_error",
+        "validator_error",
+        "configuration_error",
+        "reference_error",
+        "interrupted"
+      ]
+    },
+    "failure_detail": {"type": ["string", "null"]},
+    "exit_code": {"type": ["integer", "null"]},
     "solved": {"type": "boolean"},
     "plan_valid": {"type": ["boolean", "null"]},
     "plan_length": {"type": ["integer", "null"], "minimum": 0},
     "plan_cost": {"type": ["number", "null"], "minimum": 0},
     "nodes_expanded": {"type": ["integer", "null"], "minimum": 0},
     "wall_time_s": {"type": "number", "minimum": 0},
-    "peak_memory_mb": {"type": ["number", "null"], "minimum": 0},
+    "peak_memory_mib": {"type": ["number", "null"], "minimum": 0},
     "time_limit_s": {"type": "number", "exclusiveMinimum": 0},
-    "memory_limit_mb": {"type": "integer", "exclusiveMinimum": 0},
+    "memory_limit_mib": {"type": "integer", "exclusiveMinimum": 0},
+    "timeout_enforced": {"type": "boolean"},
+    "memory_limit_enforced": {"type": "boolean"},
+    "monitor_backend": {
+      "enum": ["procfs_process_tree", "job_object_process_tree", "portable_process_tree_polling"]
+    },
+    "memory_metric": {"enum": ["rss_sum_bytes", "working_set_sum_bytes", "platform_native_process_tree_bytes"]},
+    "process_scope": {"const": "process_tree"},
     "optimal_cost": {"type": ["number", "null"], "minimum": 0},
+    "optimal_cost_status": {
+      "enum": [
+        "not_requested",
+        "proven",
+        "unknown_timeout",
+        "unknown_memory",
+        "unknown_error",
+        "cross_check_mismatch"
+      ]
+    },
     "optimality_proven": {"type": "boolean"},
-    "machine_id": {"type": "string", "minLength": 1}
-  }
+    "optimal_reference_run_id": {"type": ["string", "null"]},
+    "optimal_reference_algorithm": {"type": ["string", "null"]},
+    "optimal_reference_heuristic": {"type": ["string", "null"]},
+    "optimal_reference_plan_valid": {"type": ["boolean", "null"]},
+    "machine_id": {"type": "string", "pattern": "^machine-[0-9a-f]{12}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"optimal_cost_status": {"const": "proven"}}},
+      "then": {
+        "properties": {
+          "optimal_cost": {"type": "number"},
+          "optimality_proven": {"const": true},
+          "optimal_reference_plan_valid": {"const": true}
+        }
+      },
+      "else": {
+        "properties": {
+          "optimality_proven": {"const": false}
+        }
+      }
+    }
+  ]
 }

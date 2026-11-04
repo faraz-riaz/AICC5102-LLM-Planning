@@ -1,0 +1,97 @@
+schema_version = "2.0"
+config_id = "pre-experiment-v2"
+experiment_configuration_version = "2.0.0"
+benchmark_version = "aicc5102-90-v1"
+benchmark_manifest = "benchmarks/manifest.json"
+selected_domains = ["blocksworld", "miconic", "transport"]
+
+[resources]
+provisional = true
+time_limit_s = 60
+memory_limit_mib = 4096
+scope = "process_tree"
+
+[seed_policy]
+base_seed = 5102
+strategy = "sha256-derived-per-run"
+description = "Derive stable run seeds from the base seed and canonical run fields; never use hash()."
+
+[heuristics]
+built_in_identifiers = ["hff", "hmax"]
+generated_trials_per_domain = 3
+generated_trial_ids = ["trial-01", "trial-02", "trial-03"]
+independently_generated = true
+selection_split = "training"
+freeze_before_test_evaluation = true
+reuse_identical_frozen_sets_across_algorithms = true
+original_deepseek_r1_provenance = "artifacts/upstream/deepseek-r1/provenance.json"
+
+[algorithms]
+comparison_identifiers = ["gbfs", "astar", "weighted_astar", "ida_star"]
+require_common_benchmark_instances = true
+require_common_heuristic_sets = true
+gbfs_implementation = "upstream:gbfs_early_goal_test"
+astar_implementation = "pending:faraz"
+weighted_astar_implementation = "pending:faraz"
+ida_star_implementation = "pending:faraz"
+
+[algorithms.weighted_astar]
+weights = [1.0, 1.5, 2.0]
+correctness_check_weight = 1.0
+
+[optimality_reference]
+cost_model = "unit_action_cost"
+primary_algorithm = "astar"
+primary_heuristic = "hmax"
+heuristic_must_be_admissible = true
+require_plan_validation = true
+cross_check_algorithm = "uniform_cost"
+cross_check_difficulties = ["easy"]
+cross_check_max_per_domain = 10
+cross_check_required_before_accepting_reference_implementation = true
+unknown_cost_policy = "store_null_cost_and_explicit_unknown_status"
+
+[monitoring]
+scope = "process_tree"
+clock = "monotonic"
+sample_interval_s = 0.1
+include_descendants = true
+record_backend = true
+record_memory_metric = true
+linux_backend = "procfs_process_tree"
+linux_memory_metric = "rss_sum_bytes"
+windows_backend = "job_object_process_tree"
+windows_memory_metric = "working_set_sum_bytes"
+fallback_backend = "portable_process_tree_polling"
+machine_profile_command = "uv run --frozen python tools/capture_machine_profile.py"
+
+[outputs]
+raw = "results/raw/{config_id}/{run_id}.json"
+derived = "results/derived/{config_id}/"
+figures = "results/figures/{config_id}/"
+
+[statuses]
+run = [
+    "success",
+    "unsolved",
+    "timeout",
+    "memory_limit",
+    "invalid_plan",
+    "planner_error",
+    "validator_error",
+    "configuration_error",
+    "reference_error",
+    "interrupted",
+]
+optimal_cost = [
+    "not_requested",
+    "proven",
+    "unknown_timeout",
+    "unknown_memory",
+    "unknown_error",
+    "cross_check_mismatch",
+]
+
+[schema]
+result_record = "configs/result.schema.json"
+machine_profile = "configs/machine.schema.json"

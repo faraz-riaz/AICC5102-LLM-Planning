@@ -9,6 +9,7 @@ The research project will first reproduce the authors' greedy best-first search 
 - Upstream source snapshot: [`4c3deabc058e3ab181250a742181412507920d18`](https://github.com/abcorrea/llm-generated-heuristics/commit/4c3deabc058e3ab181250a742181412507920d18)
 - Benchmark version: `aicc5102-90-v1`
 - Selection seed: `5102`
+- Pre-experiment configuration: `2.0.0` / `pre-experiment-v2`
 - Python: `3.12.12`
 - Environment manager: `uv 0.12.10`; every dependency version is frozen in `uv.lock`
 - Pilot limits: 60 seconds and 4096 MiB per process (provisional and configurable)
@@ -101,19 +102,20 @@ No expensive experiments or external LLM calls run in CI.
 
 ```text
 src/                         imported shared planner and LLM interfaces
+artifacts/upstream/           checksummed selected upstream heuristics
 benchmarks/
   ipc2023-learning/
     training/                full training assets for the three domains
     testing/                 only the frozen 90 selected test tasks
   manifest.csv               tabular source of truth
   manifest.json              metadata plus source-of-truth records
-configs/                     pilot conventions and result schema
+configs/                     experiment, result, and machine-profile schemas
 experiments/
   reproduction/              Amina
   search_algorithms/         Faraz
   heuristic_reliability/     Ranem
 tests/                       benchmark, config, import, and planner checks
-tools/                       selection, verification, replay, archive retrieval
+tools/                       selection, verification, replay, provenance utilities
 results/{raw,derived,figures}/
 docs/                        protocol and reproducibility documentation
 ```
@@ -136,9 +138,15 @@ Use `results/raw/<config_id>/` for immutable run records, `results/derived/<conf
 
 ## Reproducibility conventions
 
-Shared conventions live in [configs/experiment.v1.toml](configs/experiment.v1.toml), and standard result fields are defined by [configs/result.schema.json](configs/result.schema.json). The experiment configuration and benchmark version must be recorded with every run.
+Shared conventions live in [configs/experiment.v2.toml](configs/experiment.v2.toml), and standard result fields are defined by [configs/result.schema.json](configs/result.schema.json). The fixed comparison is GBFS, A*, Weighted A* at weights 1.0/1.5/2.0, and IDA* over the same benchmark and frozen heuristic sets. Three independently generated-and-selected trials are required per domain. The imported original DeepSeek R1 selections and their provenance are under [artifacts/upstream/deepseek-r1](artifacts/upstream/deepseek-r1/README.md).
 
-The 60-second/4096-MiB pilot budget is provisional. Time limits are portable, but memory enforcement is not identical: Linux can use process/resource or job-level limits; Windows requires a Job Object or external supervisor, and simple RSS monitoring is not a hard limit. Record the actual enforcement mechanism and observed peak memory. See [docs/EXPERIMENT_PROTOCOL.md](docs/EXPERIMENT_PROTOCOL.md).
+The 60-second/4096-MiB process-tree pilot budget remains provisional. Monitoring uses a monotonic clock, 100 ms sampling, and explicit Linux/Windows backend and memory-metric fields. Capture the privacy-preserving machine identifier before a run:
+
+```bash
+uv run --frozen python tools/capture_machine_profile.py
+```
+
+Exact cost references require validated exact A* with admissible hmax and uniform-cost cross-checks on all selected easy tasks. Unknown reference costs remain `null` with an explicit reason status. See [docs/EXPERIMENT_PROTOCOL.md](docs/EXPERIMENT_PROTOCOL.md).
 
 Benchmark changes require an explicit version bump and review. The selection tool is dry-run by default and refuses to overwrite the frozen manifests without `--write --force`. Verify before every experiment:
 

@@ -15,15 +15,30 @@ VALIDATOR = ROOT / "tools" / "validate_plan.py"
 
 
 @pytest.mark.parametrize(
-    ("domain", "problem"),
+    ("domain", "problem", "heuristic"),
     [
-        ("blocksworld", "easy-p03.pddl"),
-        ("miconic", "easy-p02.pddl"),
-        ("transport", "easy-p01.pddl"),
+        ("blocksworld", "easy-p03.pddl", "hff"),
+        ("miconic", "easy-p02.pddl", "hff"),
+        ("transport", "easy-p01.pddl", "hff"),
+        (
+            "blocksworld",
+            "easy-p03.pddl",
+            "artifacts/upstream/deepseek-r1/blocksworld9_10.py",
+        ),
+        (
+            "miconic",
+            "easy-p02.pddl",
+            "artifacts/upstream/deepseek-r1/miconic11_10.py",
+        ),
+        (
+            "transport",
+            "easy-p01.pddl",
+            "artifacts/upstream/deepseek-r1/transport7_10.py",
+        ),
     ],
 )
-def test_original_gbfs_hff_returns_replayable_plan(
-    tmp_path: Path, domain: str, problem: str
+def test_original_gbfs_returns_replayable_plan(
+    tmp_path: Path, domain: str, problem: str, heuristic: str
 ) -> None:
     case_dir = tmp_path / domain
     case_dir.mkdir()
@@ -39,7 +54,7 @@ def test_original_gbfs_hff_returns_replayable_plan(
             "-s",
             "gbfs_early_goal_test",
             "-H",
-            "hff",
+            heuristic,
             str(domain_file),
             str(problem_file),
         ],

@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0",
+  "artifact_set_id": "zenodo-17400964-deepseek-r1-selected",
+  "retrieved_on": "2026-11-04",
+  "source": {
+    "doi": "10.5281/zenodo.17400964",
+    "record_id": "17400964",
+    "record_version": "v1",
+    "archive_name": "correa-et-al-neurips2025.zip",
+    "archive_size_bytes": 200032733,
+    "archive_md5": "8e20619169553ec6eb8b5f10e262a2d9"
+  },
+  "generation": {
+    "batch": "2025-03-10-deepseek-r1",
+    "model": "deepseek-r1",
+    "temperature": 1.0,
+    "top_p": 0.5,
+    "prompt_format": "reordered",
+    "python_version": "3.13.2",
+    "candidates_per_domain": 25,
+    "training_tasks_per_domain": 99,
+    "training_time_limit_s": 300,
+    "training_memory_limit_mib": 8192
+  },
+  "selection": {
+    "training_experiment_path": "experiments/2025-03-13-A-deepseek-temp10-ipc2023-training.py",
+    "training_experiment_sha256": "3ae955f79c4017cf21cbaae0ab4892bb575817bbed5bca828ef5fb7beb0be5bd",
+    "training_properties_path": "experiments/data/2025-03-13-A-deepseek-temp10-ipc2023-training-eval/properties",
+    "training_properties_sha256": "2703df061e5b23de2165d701b0a52ace2a89dcaa2e38660f30fb51e89cc258c6",
+    "selector_path": "experiments/get-best-heuristics.py",
+    "selector_sha256": "d034e45abd7ddc50fd8c4898c86ae38e6649b9f269110e7d535951b6b2930898",
+    "criterion_order": [
+      "maximum coverage",
+      "maximum summed expansion score",
+      "maximum summed agile score"
+    ],
+    "tie_behavior": "Strict greater-than comparisons retain the first encountered exact tie; no explicit final stable tie-break is defined.",
+    "published_testing_experiment_path": "experiments/2025-03-20-A-deepseek-ipc2023-testing-pypy3.py",
+    "published_testing_experiment_sha256": "6e4fc073fbf745981668abd03379f58bc09a78d00e76c98b97eb5ec76f972e1d"
+  },
+  "heuristics": [
+    {
+      "domain": "blocksworld",
+      "heuristic_id": "deepseek-r1-original-selected",
+      "filename": "blocksworld9_10.py",
+      "archive_selected_path": "archive-heuristics/selected-heuristics/deepseek-r1/blocksworld9_10.py",
+      "archive_generated_path": "archive-heuristics/2025-03-10-deepseek-r1/blocksworld9_10.py",
+      "sha256": "106d55bfa8968f65cc88e26019a9c2163a2a74e408997c83e6a91d69293c5079",
+      "source_entries_identical": true,
+      "generation_log_path": "logs/2025-03-10-deepseek-r1/blocksworld9_10.log",
+      "generation_log_sha256": "f4c0104ace26197b947d401dcefffca34bbe37169c04a7ae1bc1b95bd821a87e",
+      "training_coverage": 99,
+      "training_expansion_score_sum": 83.89268896691155,
+      "training_agile_score_sum": 99.0,
+      "exact_metric_ties": ["deepseek9_10"]
+    },
+    {
+      "domain": "miconic",
+      "heuristic_id": "deepseek-r1-original-selected",
+      "filename": "miconic11_10.py",
+      "archive_selected_path": "archive-heuristics/selected-heuristics/deepseek-r1/miconic11_10.py",
+      "archive_generated_path": "archive-heuristics/2025-03-10-deepseek-r1/miconic11_10.py",
+      "sha256": "10c099e50edec42b1139285639b22b900c56a5ba581d135d8361e12d07b63cf9",
+      "source_entries_identical": true,
+      "generation_log_path": "logs/2025-03-10-deepseek-r1/miconic11_10.log",
+      "generation_log_sha256": "bef3c6e4a849c10424b4ab993be05070aa4a76e778f86a9cd3b83b8819500abb",
+      "training_coverage": 99,
+      "training_expansion_score_sum": 99.0,
+      "training_agile_score_sum": 99.0,
+      "exact_metric_ties": [
+        "deepseek11_10",
+        "deepseek12_10",
+        "deepseek14_10",
+        "deepseek19_10",
+        "deepseek1_10",
+        "deepseek21_10",
+        "deepseek22_10",
+        "deepseek25_10",
+        "deepseek7_10"
+      ]
+    },
+    {
+      "domain": "transport",
+      "heuristic_id": "deepseek-r1-original-selected",
+      "filename": "transport7_10.py",
+      "archive_selected_path": "archive-heuristics/selected-heuristics/deepseek-r1/transport7_10.py",
+      "archive_generated_path": "archive-heuristics/2025-03-10-deepseek-r1/transport7_10.py",
+      "sha256": "36b883d5f14d08dcb32af30e00d05fa4d44b371a9481fe82005a71f8f14bb290",
+      "source_entries_identical": true,
+      "generation_log_path": "logs/2025-03-10-deepseek-r1/transport7_10.log",
+      "generation_log_sha256": "8970f7a32a3aeec2db4fbccfc8c43218b8d03a144259029c0106b4d05bee8721",
+      "training_coverage": 99,
+      "training_expansion_score_sum": 94.04590047063999,
+      "training_agile_score_sum": 98.90165299967694,
+      "exact_metric_ties": ["deepseek7_10"]
+    }
+  ],
+  "omitted_from_git": [
+    {
+      "kind": "generation_logs",
+      "reason": "Prompts and full responses are large and retrievable by checksum from the Zenodo archive."
+    },
+    {
+      "kind": "training_properties",
+      "size_bytes": 11486800,
+      "reason": "The full raw selection table is not needed to execute the frozen selected heuristics."
+    },
+    {
+      "kind": "zenodo_zip",
+      "size_bytes": 200032733,
+      "reason": "The published archive is immutable, checksummed, and retrieved on demand."
+    }
+  ]
+}

@@ -21,6 +21,7 @@ API_URL = f"https://zenodo.org/api/records/{RECORD_ID}"
 EXPECTED_NAME = "correa-et-al-neurips2025.zip"
 EXPECTED_SIZE = 200_032_733
 EXPECTED_MD5 = "8e20619169553ec6eb8b5f10e262a2d9"
+DOWNLOAD_URL = f"https://zenodo.org/records/{RECORD_ID}/files/{EXPECTED_NAME}?download=1"
 
 
 def md5(path: Path) -> str:
@@ -52,20 +53,28 @@ def main() -> int:
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     destination = args.output_dir / EXPECTED_NAME
-    temporary = destination.with_suffix(".zip.part")
-    print(f"Downloading {item['links']['self']} -> {destination}")
-    with urllib.request.urlopen(item["links"]["self"]) as response, temporary.open("wb") as output:
-        shutil.copyfileobj(response, output, length=1024 * 1024)
-    if temporary.stat().st_size != EXPECTED_SIZE or md5(temporary) != EXPECTED_MD5:
-        temporary.unlink(missing_ok=True)
-        raise SystemExit("downloaded archive failed size or MD5 verification")
-    temporary.replace(destination)
-    print(f"Verified {destination} ({EXPECTED_SIZE} bytes, MD5 {EXPECTED_MD5}).")
+    if destination.is_file() and destination.stat().st_size == EXPECTED_SIZE and md5(destination) == EXPECTED_MD5:
+        print(f"Using verified existing archive {destination}.")
+    else:
+        temporary = destination.with_suffix(".zip.part")
+        print(f"Downloading {DOWNLOAD_URL} -> {destination}", flush=True)
+        with urllib.request.urlopen(DOWNLOAD_URL, timeout=60) as response, temporary.open("wb") as output:
+            shutil.copyfileobj(response, output, length=1024 * 1024)
+        if temporary.stat().st_size != EXPECTED_SIZE or md5(temporary) != EXPECTED_MD5:
+            temporary.unlink(missing_ok=True)
+            raise SystemExit("downloaded archive failed size or MD5 verification")
+        temporary.replace(destination)
+        print(f"Verified {destination} ({EXPECTED_SIZE} bytes, MD5 {EXPECTED_MD5}).")
 
     if args.extract:
         extraction_dir = args.output_dir / "correa-et-al-neurips2025"
         extraction_dir.mkdir(exist_ok=True)
         with zipfile.ZipFile(destination) as archive:
+            root = extraction_dir.resolve()
+            for member in archive.infolist():
+                target = (root / member.filename).resolve()
+                if not target.is_relative_to(root):
+                    raise SystemExit(f"unsafe archive member path: {member.filename}")
             archive.extractall(extraction_dir)
         print(f"Extracted to {extraction_dir}")
     return 0

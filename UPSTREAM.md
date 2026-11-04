@@ -13,7 +13,7 @@ The snapshot contributes the original `src/pyperplan` planner, `src/llm_heuristi
 
 Local foundation changes are limited to project organization, a three-domain curated benchmark distribution, frozen manifests, verification/replay tools, shared configuration/schema, documentation, tests, and CI. The imported planner and LLM-generation Python source has not been refactored. The project Python range and development test group were added to `pyproject.toml`, and the lock is regenerated for this repository.
 
-Although upstream already contains Pyperplan implementations registered as `astar`, `wastar`, and `ids`, this foundation does not add or evaluate A*, Weighted A*, or IDA*. Future member work must distinguish inherited behavior from project extensions.
+Although upstream already contains Pyperplan implementations registered as `astar`, `wastar`, and `ids`, upstream `ids` is not IDA*. This foundation does not add or evaluate the planned A*, Weighted A*, or IDA* comparison implementations. Future member work must distinguish inherited behavior from project extensions.
 
 ## Benchmark provenance
 
@@ -29,7 +29,9 @@ Only Blocksworld, Miconic, and Transport are retained. Their complete training d
 - Size: `200032733` bytes
 - MD5: `8e20619169553ec6eb8b5f10e262a2d9`
 
-Zenodo describes four experimental-data areas: `archived-heuristics` (all generated heuristics, including ablations), `logs` (generation prompts, responses, and extracted code), `benchmarks`, and `experiments` (planning scripts plus HTML reports under `data`). The first, second, and experiment/report areas are absent from the GitHub snapshot imported here. They are useful provenance for later reproduction, but are not required for the no-API-key GBFS/hFF foundation smoke test.
+Zenodo contains four experimental-data areas: `archive-heuristics` (all generated heuristics, including ablations), `logs` (generation prompts, responses, and extracted code), `benchmarks`, and `experiments` (planning scripts plus HTML reports under `data`). The first, second, and experiment/report areas are absent from the GitHub snapshot.
+
+On 2026-11-04 the ZIP's 13,146-entry central directory and relevant contents were inspected after size/MD5 verification. Exact copies of the three files under `archive-heuristics/selected-heuristics/deepseek-r1/` are retained at `artifacts/upstream/deepseek-r1/`. Their provenance record includes source paths, entry/log hashes, generation parameters, training-selection scores, selector behavior, and raw metadata hashes. Full logs, reports, properties, and unrelated heuristic candidates are not committed.
 
 The 200 MB ZIP is intentionally not committed. Retrieve and verify it only when needed:
 
