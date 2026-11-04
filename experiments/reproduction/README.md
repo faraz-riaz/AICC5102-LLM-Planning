@@ -11,6 +11,17 @@ Results and caveats: [DISCREPANCIES.md](DISCREPANCIES.md).
 | `summarize_results.py` | Turns the records into `baseline_runs.csv`, `coverage.csv`, `reproduction.csv`, `plan_quality.csv` and `coverage.png`. |
 | `DISCREPANCIES.md` | What matches the paper, what differs and why. |
 
+## Assets this work uses (M1-02)
+
+| What | Where | Provenance |
+|---|---|---|
+| Authors' selected DeepSeek R1 heuristics | `artifacts/upstream/deepseek-r1/` (`blocksworld9_10.py`, `miconic11_10.py`, `transport7_10.py`) | Zenodo record 17400964, `archive-heuristics/selected-heuristics/deepseek-r1/`; SHA-256 checksums, selection metrics and source-log hashes in `provenance.json`. Selection by the authors: 25 candidates per domain, run on all 99 training tasks (300 s / 8192 MiB), best coverage, then expansion score, then agile score. |
+| Test tasks (30 per domain, 10 easy / 10 medium / 10 hard) | `benchmarks/ipc2023-learning/testing/`, listed in `benchmarks/manifest.csv` | Benchmark `aicc5102-90-v1`, selection seed 5102, byte-for-byte copies from the authors' repository. |
+| Training tasks (99 per domain) | `benchmarks/ipc2023-learning/training/` | Used only by the authors' selection; never for choosing or tuning anything on the test tasks. |
+| Planner and GBFS (`gbfs_early_goal_test`) | `src/pyperplan/` | Authors' source snapshot, commit `4c3deabc058e3ab181250a742181412507920d18`. |
+| Generation logs and training properties | Not in the repo (git-ignored Zenodo download) | Recover with `tools/fetch_zenodo_archive.py`. |
+| Published result we compare against | Paper Table 2, "Pyperplan" group, last column "R1" (DeepSeek R1) and column h^FF; 90 test tasks per domain, 30 min / 8 GiB per test run | Corrêa, Pereira, Seipp, NeurIPS 2025. Code and data: https://doi.org/10.5281/zenodo.17400964 |
+
 ## Run it (from the repository root)
 
 ```bash
@@ -52,6 +63,8 @@ It refuses to overwrite existing outputs. To regenerate, delete `results/derived
 Statuses the runner can write: `success`, `unsolved`, `timeout`, `memory_limit`, `invalid_plan`, `planner_error`, `validator_error`. Our 270 real runs produced only `success` and `timeout`.
 
 ## Known results to check your setup against
+
+One complete record is in [`example_record.json`](example_record.json) (the `hff` run below). Your own records will differ only in `run_id`, `timestamp`, `git_commit`, `wall_time_s`, `peak_memory_mib` and `machine_id`.
 
 Blocksworld `easy-p03`, GBFS, 60 s (wall time includes about 1 s of Python start-up):
 
