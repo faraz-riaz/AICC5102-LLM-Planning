@@ -430,6 +430,7 @@ def execute_run(task: dict, args, ctx: dict) -> dict:
         "plan_valid": plan_valid,
         "plan_length": metrics["plan_length"] if solved else None,
         "plan_cost": float(metrics["plan_length"]) if solved else None,  # unit action cost
+        "nodes_generated": None,  # Pyperplan's GBFS does not report generated nodes
         "nodes_expanded": metrics["nodes_expanded"],
         "wall_time_s": round(outcome["wall_time_s"], 3),
         "peak_memory_mib": None if outcome["peak_memory_mib"] is None else round(outcome["peak_memory_mib"], 1),
