@@ -1,0 +1,57 @@
+# Python and uv
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Downloaded archives, generated heuristics/models, and caches
+external/
+.cache/
+downloads/
+*.zip
+*.tar
+*.tar.gz
+generated-heuristics/
+models/
+
+# Planner output and temporary files
+*.pddl.soln
+*.tmp
+*.temp
+*.part
+logs/
+
+# Experiment outputs (keep directory documentation and compact metadata only)
+results/raw/**
+results/derived/**
+results/figures/**
+!results/raw/README.md
+!results/derived/README.md
+!results/figures/README.md

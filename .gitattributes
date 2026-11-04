@@ -1,0 +1,19 @@
+# Use LF for ordinary text in every checkout.
+* text=auto eol=lf
+
+# Preserve benchmark/source artifacts byte-for-byte on every platform.
+*.pddl binary
+*.soln binary
+*.out binary
+
+# Keep project-authored text deterministic across Windows and Linux.
+*.py text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.csv text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.cff text eol=lf
+*.txt text eol=lf
+*.lock text eol=lf
