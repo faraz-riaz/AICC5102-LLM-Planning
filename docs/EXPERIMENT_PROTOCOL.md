@@ -64,4 +64,20 @@ Put a concise machine-readable explanation in `failure_detail`; do not collapse 
 
 Every record must satisfy `configs/result.schema.json`. Use JSON null only where permitted; do not use sentinel costs or times. Raw records go to `results/raw/<config_id>/`, derived tables to `results/derived/<config_id>/`, and figures to `results/figures/<config_id>/`. Raw records are immutable.
 
+Search implementations must report both generated and expanded nodes. For the
+project A* implementation, generated nodes include the root and every
+applicable successor constructed (including duplicates); expanded nodes are
+best-g non-goal nodes whose successors are enumerated. IDA* counts are
+cumulative over iterations (re-expansions included). The GBFS adapter in
+`experiments/search_algorithms/search_adapters.py` counts one expansion per
+`get_successor_states` call and adds every returned successor to generated.
+
+Pyperplan grounding and the hFF heuristic iterate over Python sets of strings,
+whose order depends on the per-process string-hash seed. Without a fixed
+`PYTHONHASHSEED`, grounded operator order (hence GBFS tie-breaking) and hFF
+values vary between processes, so identical runs can return different plans.
+Every run process must therefore set `PYTHONHASHSEED` explicitly (Faraz's
+tools use the run's SHA-256-derived seed) and record it. *(Proposed in the
+search workstream on 2026-11-04; requires cross-workstream review.)*
+
 All experiment changes use member feature branches and reviewed pull requests into `main`. Configuration, schema, benchmark, shared planner, and monitoring changes require cross-workstream review and passing CI.
