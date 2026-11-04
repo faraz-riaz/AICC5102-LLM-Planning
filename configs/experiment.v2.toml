@@ -32,8 +32,8 @@ require_common_benchmark_instances = true
 require_common_heuristic_sets = true
 gbfs_implementation = "upstream:gbfs_early_goal_test"
 astar_implementation = "project:search.a_star.astar_search"
-weighted_astar_implementation = "pending:faraz"
-ida_star_implementation = "pending:faraz"
+weighted_astar_implementation = "project:search.a_star.weighted_astar_search"
+ida_star_implementation = "project:search.ida_star.ida_star_search"
 
 [algorithms.weighted_astar]
 weights = [1.0, 1.5, 2.0]

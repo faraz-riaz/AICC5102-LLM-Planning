@@ -4,15 +4,23 @@ Living research report for the AICC5102 search-algorithm workstream (branch
 `feature/faraz-search`). Every number below is copied from a file in this
 repository or from a command that was actually run. Nothing here is a final
 paper result unless it is explicitly tagged **[PAPER RESULT]**; at present
-**no item qualifies**, because only tiny validation runs have been performed.
+**no item qualifies**: everything below is a correctness test, a validation
+run, a bounded pilot, or an exact-reference attempt, not the official
+comparison matrix (which is blocked, §22).
 
 Tags used: **[METHODOLOGY]** — a decision that affects how later experiments
 must be run or interpreted; **[BLOCKER]** — something that prevents or
 endangers later work until resolved; **[PAPER RESULT]** — a result intended for
 the final report (none yet).
 
-Status as of 2026-11-04: **M2-01 and M2-02 complete; all work uncommitted on
-`feature/faraz-search` (base commit `eb8f95e`).**
+Report structure: **Part I (§1–§15)** documents M2-01/M2-02 as completed on
+2026-11-04 and is preserved unchanged except for the status table (§2) and a
+note on §15. **Part II (§16–§28)** documents M2-03 … M2-09.
+
+Status as of 2026-11-04 (second session): **M2-01 … M2-06 complete within the
+configured budget; M2-07 pilot done, official matrix BLOCKED; M2-08 and M2-09
+tools complete and applied to pilot data.** M2-01/M2-02 were committed as
+`6316856`; all M2-03 … M2-09 work is uncommitted on `feature/faraz-search`.
 
 ---
 
@@ -37,28 +45,22 @@ inherited search code (M2-01) and a validated, instrumented A* (M2-02).
 
 ## 2. Task status (M2-01 … M2-09)
 
-The repository only defines the IDs M2-01 and M2-02 (in this workstream's
-README and the task brief). The text of M2-03 … M2-09 is **not recorded
-anywhere in the repository**, so those rows are deliberately left undefined
-rather than guessed. Fill them in from the team project plan.
+Task definitions M2-03 … M2-09 come from the second-session task brief
+(2026-11-04); the first session had no written definitions for them.
 
 | ID | Task | Status | Evidence |
 |---|---|---|---|
-| M2-01 | Inspect and document the Pyperplan search architecture | **Complete** | §3 of this report |
-| M2-02 | Implement/adapt A* with correctness tests and validation | **Complete** | `src/pyperplan/search/a_star.py`, `tests/test_astar.py` (33 tests pass), `results/raw/faraz_astar_validation.csv` (12/12 rows pass) |
-| M2-03 … M2-09 | *Definitions not recorded in repo — confirm against the project plan* | Not started (out of scope for this milestone) | — |
+| M2-01 | Inspect and document the Pyperplan search architecture | **Complete** | §3 |
+| M2-02 | Implement/adapt A* with correctness tests and validation | **Complete** | §4–§11; `tests/test_astar.py` (33 tests) |
+| M2-03 | Instrumented Weighted A* (w = 1.0, 1.5, 2.0) | **Complete** | §17; `weighted_astar_search_result`; validation batch 60 runs |
+| M2-04 | Iterative Deepening A* | **Complete** | §18; `src/pyperplan/search/ida_star.py` |
+| M2-05 | Comprehensive validation of A*, WA*, IDA* (+ easy-task reference cross-check) | **Complete** (cross-check limited by budget: 14/30 easy tasks matched, 0 mismatches) | §19; 150 tests pass; mutation checks |
+| M2-06 | Exact optimal-cost references + h*(s) interface | **Complete within the 60 s / 4096 MiB budget**: 17/90 proven (easy 17/30, medium 0/30, hard skipped). h*(s) tool ready, not run (no state inventory) | §21; `results/raw/faraz_optimal_refs.csv` |
+| M2-07 | Search comparison experiments | **Pilot complete (easy tier, 450 runs ×2 batches); official 90-task matrix BLOCKED** | §22 |
+| M2-08 | Optimality-gap and trade-off analysis | **Tooling complete; applied to pilot data (figures R3–R5 stamped PILOT)** | §23 |
+| M2-09 | Failure and guarantee audit | **Tooling complete; applied to pilot data; 0 guarantee violations** | §24 |
 
-Pending workstream scope that the repository *does* record
-(`docs/TEAM_RESPONSIBILITIES.md`, `configs/experiment.v2.toml`), without
-asserting which M2 ID each item maps to:
-
-| Pending item | Recorded in | Status |
-|---|---|---|
-| Weighted A* with weights 1.0 / 1.5 / 2.0 (w=1.0 must equal A*) | `configs/experiment.v2.toml` `[algorithms.weighted_astar]` | `pending:faraz`; not started |
-| IDA* (upstream `ids` is **not** IDA*) | `docs/EXPERIMENT_PROTOCOL.md` | `pending:faraz`; not started |
-| UCS cross-check on all 10 easy tasks per domain | `[optimality_reference]` | Partially covered: 4 of 30 easy tasks validated here |
-| Exact optimal references for the 90 tasks | `[optimality_reference]` | Not started |
-| Search comparisons (GBFS vs A* vs WA* vs IDA*) | `docs/TEAM_RESPONSIBILITIES.md` | Not started; depends on Amina's shared runner |
+The "pending" table that stood here after M2-02 is superseded by this one.
 
 ## 3. Original Pyperplan search architecture (M2-01)
 
@@ -556,7 +558,10 @@ match the CSV.
 - A* rejects negative/NaN heuristic outputs as errors and does not clamp them.
   Report such failures rather than repairing outputs.
 
-## 15. Remaining work and next steps
+## 15. Remaining work and next steps (as of M2-02; superseded by §28)
+
+*Historical note: items 1–4 below were completed in the second session
+(M2-03 … M2-06, §17–§21); item 5 is the blocked M2-07 matrix (§22).*
 
 Completed in this milestone: M2-01 and M2-02. Planned, not done:
 
@@ -575,3 +580,660 @@ Completed in this milestone: M2-01 and M2-02. Planned, not done:
    runner and Ranem's trial freeze.
 6. Get team review of the schema change and the results-archiving question
    (§14), then commit and open a PR from `feature/faraz-search`.
+
+---
+
+# Part II — M2-03 … M2-09
+
+## 16. Chronological progress log (second session, 2026-11-04)
+
+1. Re-read this report, the protocol, config, schema, search code and tests.
+   `git status` was clean on top of `6316856` (M2-01/M2-02 committed). No
+   shared runner exists on any local branch (`experiments/reproduction/` holds
+   only a README); `jsonschema` and `psutil` are not installed.
+2. **M2-03:** added `weighted_astar_search_result` on the unchanged A* core.
+3. **M2-04:** added `src/pyperplan/search/ida_star.py`; `SearchResult` gained
+   optional IDA* fields (backward compatible).
+4. **M2-05:** 45 tests in `tests/test_search_algorithms.py`, all passing on
+   the first run; then five deliberate mutations (§19.3), each caught.
+5. Built the bounded-execution layer (§20). Verified the hard memory cap: a
+   40 MiB job ended `memory_limit` at 41.0 MiB peak.
+6. **M2-06:** staged reference generation `refs-20261104a` (120 bounded runs,
+   1.54 h of process wall time, 4 parallel jobs): 17/90 proven (§21).
+7. **M2-03/M2-04 validation batch** (60 runs) and **M2-07 easy pilot**
+   (450 runs, 6 parallel jobs).
+8. **Finding:** results of GBFS and hFF differ between processes. Root cause:
+   Pyperplan grounding and hFF iterate over Python `set`s of strings, whose
+   order depends on the per-process `PYTHONHASHSEED` (§22.4). Fixed for
+   Faraz's runs by setting `PYTHONHASHSEED` to the protocol-derived run seed;
+   the pilot was rerun seeded and the two batches compared.
+9. M2-08/M2-09 analysis and audit applied to the seeded pilot; figures
+   checked visually and relaid out twice to remove label collisions.
+
+## 17. M2-03 — Weighted A*
+
+**Objective.** An instrumented Weighted A* with f = g + w·h for w ∈ {1.0, 1.5,
+2.0}, sharing A*'s validated machinery.
+
+**Original code / what changed.** Upstream `weighted_astar_search(task, h,
+weight=5)` already passed `ordered_node_weighted_astar(weight)` into the
+generic core, but returned only a plan. Added in `src/pyperplan/search/a_star.py`:
+
+- `validate_weight(weight)`: finite number ≥ 0, else `ValueError` (bool, NaN,
+  ±inf, negative, strings rejected). w = 0 is uniform-cost search.
+- `weighted_astar_search_result(task, heuristic, weight, use_relaxed_plan=False,
+  time_limit_s=None) -> SearchResult`: validates w, then calls
+  `astar_search_result(..., make_open_entry=ordered_node_weighted_astar(w))`.
+- The legacy `weighted_astar_search` is unchanged (keeps the upstream default
+  w = 5 for `-s wastar`); `configs/experiment.v2.toml` now points
+  `weighted_astar_implementation` at it, and `tests/test_config.py` imports
+  every configured implementation.
+
+**Algorithm.** Identical to §4.1 except the heap key:
+
+```
+key(n) = (g(n) + w*h(n), h(n), insertion counter)
+```
+
+Duplicate detection, reopening, stale-entry skipping, goal test on pop, and
+heuristic validation are inherited unchanged.
+
+**Design decisions.**
+- *Reuse, not re-implementation*: one core means WA*'s correctness rests on
+  the already-tested A* code. Because `1.0*h == h` exactly in IEEE
+  arithmetic, w = 1.0 yields bit-identical keys, so WA*(1) **is** A*,
+  not an approximation. This is checked (below), not assumed.
+- *Reopening kept*: with reopening and an admissible h, WA* returns a plan
+  costing ≤ w·C*. **[METHODOLOGY]** This bound is claimed only for zero and hmax;
+  for hFF or LLM heuristics there is no bound at all.
+
+**Tests** (`tests/test_search_algorithms.py`, all pass): f-ordering differs from
+A* in the intended direction; invalid weights rejected (7 cases); w = 1 equals
+A* on 150 random graphs with admissible-but-inconsistent heuristics (status,
+plan, cost, all counters); cost ≤ w·C* on 200 random graphs × 3 weights (vs
+independent Dijkstra); a graph where w = 2 is provably suboptimal (5 vs 4,
+within 2×4); reopening at w = 1; benchmark tasks with hmax and DeepSeek-R1 for
+all weights (valid plans; hmax cost ≤ w·L*; WA*(1) ≡ A* on Blocksworld easy-p03).
+
+**Validation experiment** (`results/raw/faraz_search_validation-wa-ida-20261104.csv`,
+60 runs; 4 tasks × {A*, WA* 1.0/1.5/2.0, IDA*} × {zero, hmax, DeepSeek-R1};
+60 s / 4096 MiB hard limits). 58 success, 2 timeout (both IDA*, §18).
+**WA*(1.0) and A* agree on plan hash, cost, generated and expanded nodes in
+12/12 pairs.** Selected rows (full table in the CSV):
+
+| Task (L*) | Heuristic | A* exp. | WA* 1.5 exp. (cost) | WA* 2.0 exp. (cost) |
+|---|---|---:|---:|---:|
+| BW easy-p03 (20) | hmax | 2600 | 2233 (20) | 1514 (20) |
+| BW easy-p04 (24) | hmax | 27227 | 21403 (24) | 14928 (24) |
+| BW easy-p04 (24) | DeepSeek-R1 | 84 | 84 (24) | 76 (24) |
+| BW easy-p03 (20) | zero | 7013 | 7013 (20) | 7013 (20) |
+
+With zero h, w is irrelevant (w·0 = 0), and the counts confirm it. With hmax,
+larger w expands fewer nodes and, on these four tasks, stays optimal.
+
+## 18. M2-04 — IDA*
+
+**Objective.** Iterative Deepening A* with f-thresholds, distinct from upstream
+`ids` (uninformed iterative deepening on depth).
+
+**New file** `src/pyperplan/search/ida_star.py`:
+`ida_star_search_result(task, heuristic, time_limit_s=None) -> SearchResult`
+and legacy-style `ida_star_search(task, heuristic)` (plan or `None`, raises
+`SearchError` on error). Reuses `_heuristic_value`, `_action_cost`,
+`SearchResult` from `a_star.py`. `SearchResult` gained optional fields
+`iterations`, `iteration_bounds`, `cycles_pruned`; for IDA*
+`nodes_reopened`/`stale_nodes_skipped` are `None` (not applicable) rather
+than a misleading 0.
+
+**Algorithm** (iterative, explicit stack, so long plans cannot hit Python's
+recursion limit):
+
+```
+h0 = h(s0); if h0 == inf: unsolved; if goal(s0): return []
+bound = h0
+loop:
+    record bound; next = inf
+    DFS from s0 with frames [node, sorted successors, index]; on_path = {s0}
+        expanding a frame: successors sorted by operator name; expanded += 1
+        for each successor s' (generated += 1):
+            if s' in on_path: cycles_pruned += 1; skip
+            h' = validated h(child); if h' == inf: dead_end += 1; skip
+            f' = g' + h'
+            if f' > bound: next = min(next, f'); skip
+            if goal(s'): return plan            # goal test inside the bound
+            push frame; on_path.add(s')
+        frame exhausted: pop; on_path.remove(state)
+    if next == inf: unsolved ("search space exhausted")
+    bound = next
+```
+
+**Why it is optimal with admissible h** (presentation argument): if an
+iteration with bound B finds no goal, every path whose nodes all have f ≤ B
+was explored. On an optimal path every node has f ≤ C* (admissibility), so if
+C* ≤ B a goal would have been found; hence the next bound, the smallest
+pruned f, is ≤ C*. A goal found in the iteration with bound B has cost
+g = f ≤ B ≤ C* (h(goal) = 0), so it is optimal. Bounds strictly increase, so
+with a finite state space the cycle-free search terminates.
+
+**Design decisions.**
+- *Path-only cycle detection, no transposition table*: this is the textbook
+  memory profile, O(depth · branching) for the stack and successor lists.
+  **[METHODOLOGY]** It also means IDA* re-expands states reached by different
+  paths, within and across iterations. The low memory is real (seeded pilot:
+  max peak 21.9 MiB for IDA* vs 628.2 MiB for A* over all runs), but it does
+  not make IDA* fast.
+- *Memory guarantee stated honestly*: peak process memory still includes the
+  grounded task and heuristic tables; only the search frontier is small.
+- *Goal test on generation* inside the bound (standard IDA*), root tested
+  before the first iteration.
+
+**Tests** (all pass): exact threshold sequence (0, 2, 3, 4) on a crafted graph;
+first bound = h(s0); 200 random graphs × {zero, admissible-inconsistent h} vs
+independent Dijkstra (optimal costs, unsolvable detection, strictly increasing
+bounds); cycle detection; unsolvable cyclic graph; goal at root; dead-end root
+and successors; invalid h at root and mid-search (6 values); negative action
+costs; cooperative timeout; benchmark tasks with zero/hmax (optimal) and
+DeepSeek-R1 (valid, cost ≥ L*).
+
+**Validation results** (same 60-run batch):
+
+| Task (L*) | Heuristic | IDA* status | cost | iterations | expanded | A* expanded |
+|---|---|---|---:|---:|---:|---:|
+| BW easy-p03 (20) | zero | success | 20 | 21 | 4,669,539 | 7,013 |
+| BW easy-p03 (20) | hmax | success | 20 | 14 | 117,209 | 2,600 |
+| BW easy-p03 (20) | DeepSeek-R1 | success | **40** | 1 | 168 | 26 (cost 20) |
+| BW easy-p04 (24) | zero | timeout (bound reached 19) | — | 20 | 4,780,268 | 65,740 |
+| BW easy-p04 (24) | hmax | timeout (bound reached 20) | — | 13 | 155,330 | 27,227 |
+| BW easy-p04 (24) | DeepSeek-R1 | success | **36** | 1 | 120 | 84 (cost 24) |
+| Miconic easy-p02 (4) | zero / hmax / DeepSeek-R1 | success | 4 / 4 / 4 | 5 / 2 / 1 | 62 / 10 / 4 | 8 / 4 / 4 |
+| Transport easy-p01 (3) | zero / hmax / DeepSeek-R1 | success | 3 / 3 / 3 | 4 / 2 / 1 | 188 / 7 / 3 | 53 / 6 / 3 |
+
+**Interpretation.** (1) Re-expansion cost is severe on Blocksworld:
+666× A*'s expansions with zero h on easy-p03. (2) **IDA* exposes LLM
+inadmissibility far more than A*.** The DeepSeek-R1 Blocksworld heuristic
+gives h(s0) = 42 on easy-p03 (L* = 20), so IDA*'s first bound is 42 and its
+first depth-first pass accepts the first goal path with cost ≤ 42 (cost 40).
+A* with the same heuristic still found the optimum because its best-first
+order kept cheaper paths competitive. Same pattern on easy-p04 (h(s0) = 36,
+IDA* cost 36, L* = 24).
+
+## 19. M2-05 — Comprehensive validation
+
+### 19.1 Test inventory (all executed 2026-11-04)
+
+`uv run --frozen pytest -q` → **151 passed** (7.7 s on this machine).
+
+| File | Tests | Scope |
+|---|---:|---|
+| `tests/test_astar.py` | 33 | A* (unchanged from M2-02) |
+| `tests/test_search_algorithms.py` | 45 | WA*, IDA*, shared guarantees |
+| `tests/test_search_experiment_tools.py` | 28 | adapters, GBFS wrapper, reference policy, h*(s), schema validator, Job Object limits, hash-seed reproducibility |
+| `tests/test_config.py` | 5 | incl. new: configured WA*/IDA* implementations importable |
+| other existing suites | 40 | benchmarks, imports, LLM models, planner smoke (GBFS CLI), artifacts |
+
+### 19.2 Requirement coverage
+
+| Requirement | Where verified |
+|---|---|
+| Optimality under admissible h | random-graph Dijkstra tests (A*, WA* w=1, IDA*); benchmark tasks with zero/hmax |
+| Uniform-cost equivalence | A*+zero vs Dijkstra (M2-02); IDA*+zero vs Dijkstra; WA*+zero ignores w |
+| WA*(1) ≡ A* | 150 random graphs + Blocksworld easy-p03; 12/12 validation pairs |
+| Path costs / reopening / duplicates / stale entries | `test_astar.py` (M2-02) + `test_weighted_astar_reopens_states` |
+| Inconsistent but admissible h | `test_inconsistent_but_admissible_heuristic_still_optimal` (A*, WA*1, IDA*); admissibility checked against backward Dijkstra |
+| Inadmissible h | `test_inadmissible_heuristic_gives_valid_but_suboptimal_plan` (cost 10 vs optimum 2, plan valid) |
+| Goal at root, unsolvable, invalid/non-finite h, timeout | A* (M2-02) and IDA* tests; negative action costs for both |
+| Plan replay / goal satisfaction | `replay_plan` / `graph_plan_cost` in every solving test; every bounded run replays its plan in the worker |
+| Determinism | `test_searches_are_deterministic` (in-process); `test_fixed_hash_seed_makes_gbfs_hff_reproducible_across_processes` (cross-process) |
+| GBFS regression | GBFS wrapper returns the *identical* plan as calling `gbfs_early_goal_test` directly (3 domains); `test_planner_smoke.py` (6 CLI runs) |
+
+### 19.3 Mutation checks (scratch copy outside the repo)
+
+| Injected bug | Caught by |
+|---|---|
+| IDA* next bound = max instead of min | 6 tests (threshold sequence, both random-graph tests, benchmark, inadmissible) |
+| IDA* accepts a goal beyond the bound | caught (first failure under `-x`) |
+| IDA* without path cycle check | caught under `-x`; full suite exceeds 300 s (IDA* loops until timeouts) |
+| WA* ignores w | 2 tests (f-ordering, suboptimal-within-bound) |
+| IDA* first bound 0 instead of h(s0) | `test_ida_star_first_bound_is_initial_heuristic` |
+
+### 19.4 Easy-task reference cross-check (protocol requirement)
+
+The protocol requires A*+hmax to be cross-checked against uniform-cost search
+on all 10 easy tasks per domain. Within 60 s / 4096 MiB per solver:
+**14 tasks matched exactly, 0 mismatched**; 3 tasks were proven only by UCS
+(A*+hmax timed out); on 13 tasks neither solver finished (UCS: 9 timeouts,
+4 memory-limit). **[BLOCKER] (budget, not correctness):** the full 30-task
+cross-check cannot be completed under the provisional 60 s budget; see §21.
+
+## 20. Bounded execution, records, and reproducibility (infrastructure)
+
+No shared runner exists, so Faraz's experiments use a deliberately small,
+clearly scoped layer in `experiments/search_algorithms/` (not `src/`, per
+`docs/TEAM_RESPONSIBILITIES.md`):
+
+| Component | Behaviour |
+|---|---|
+| `bounded_exec.run_bounded` | One child process per run. Windows: child assigned to a **Job Object** with `JOB_OBJECT_LIMIT_JOB_MEMORY` (hard cap on committed memory of the process tree) and kill-on-close; peak from `PeakJobMemoryUsed`. Worker gets the full time budget and stops cooperatively; the parent hard-kills the job 10 s later. Sets `PYTHONHASHSEED` per run. |
+| `search_worker.py` | Parses, grounds, builds the heuristic, runs one search with the *remaining* budget (setup counts against the 60 s), replays the plan, reports h(s0) after the timed search. |
+| `faraz_jobs.execute` | Maps outcomes to protocol statuses; builds a `configs/result.schema.json` record, **validated before writing** by `result_records.validate_record` (subset validator; `jsonschema` is not installed); writes one JSON per run to `results/raw/pre-experiment-v2/<run_id>.json` (1,080 records: 120 reference, 60 validation, 2 × 450 pilot) plus an extended CSV row. |
+| `search_adapters.py` | Runner-facing `run_search(...)`. GBFS = the **unmodified** `gbfs_early_goal_test` behind read-only proxies that count expansions/generations, count +inf values, and raise a cooperative deadline; values are never altered or validated (baseline behaviour preserved). |
+
+**[METHODOLOGY] Measurement definitions.** `wall_time_s` = parent-measured
+process wall time (includes interpreter start, parsing, grounding);
+`search_time_s` = search only. `peak_memory_mib` = Job Object peak
+*committed* memory, recorded as `platform_native_process_tree_bytes`. This is
+not the config's `working_set_sum_bytes`, and the difference is documented. The cap
+is applied a few milliseconds after process start (interpreter boot), before
+any search. POSIX code path (`RLIMIT_AS`) is untested. All writers refuse to
+overwrite existing files.
+
+**Provenance per row.** `git_commit` (`631685638316…`), `git_worktree_dirty =
+True` (work is uncommitted), SHA-256 of each relevant source file and a
+combined `source_bundle_sha256`, problem SHA-256, heuristic file SHA-256,
+`config_id`, protocol seed, `python_hash_seed`, `parallel_jobs`, `machine_id`
+(`machine-f922a64c5235`). The reference batch ran before `search_worker.py`,
+`bounded_exec.py` and `faraz_jobs.py` gained the hash-seed and
+`initial_state` options; `a_star.py` (`328250fb…`) and `relaxation.py`
+(`d2796301…`) are unchanged since then, so the solver code of every reference
+matches the current files.
+
+## 21. M2-06 — Exact optimal-cost references
+
+**Objective.** A reproducible exact-reference table for the 90 tasks, usable
+by Ranem and the shared runner, plus an h*(s) interface.
+
+**Workflow** (`experiments/search_algorithms/generate_optimal_refs.py`):
+
+1. Stage easy: A*+hmax and the independent UCS on every task.
+2. Stages medium/hard: A*+hmax; tasks it leaves unproven get an exact UCS
+   fallback (a completed Dijkstra is itself an optimality certificate). This
+   is an extension of the protocol's primary solver, recorded in `solver`.
+3. If no task of a domain is proven in a stage, the next stage of that domain
+   is skipped and recorded `not_requested` with the reason (no budget spent on
+   searches that cannot finish).
+
+**Status policy [METHODOLOGY].** `proven` only if an exact solver *completed*,
+its plan replays to the goal with the reported cost, and, where both ran to
+completion, A*+hmax and UCS agree (otherwise `cross_check_mismatch`, cost
+null). Timeouts → `unknown_timeout`, memory → `unknown_memory`, errors or
+exhaustion → `unknown_error`; never a cost. A timeout is never read as
+unsolvable; no feasible plan from GBFS/WA*/LLM heuristics is ever a reference.
+Policy unit-tested (10 cases, `test_reference_status_policy`).
+
+**Run:** batch `refs-20261104a`, 60 s / 4096 MiB per solver run (config), 4
+parallel jobs under Job Object caps, 120 runs. Output:
+[`results/raw/faraz_optimal_refs.csv`](../results/raw/faraz_optimal_refs.csv)
+(90 rows, one per task), per-run table `results/raw/faraz_refs_runs_refs-20261104a.csv`,
+120 schema records.
+
+### 21.1 Coverage by difficulty
+
+| Difficulty | Blocksworld | Miconic | Transport | Total proven | Unknown / not requested |
+|---|---:|---:|---:|---:|---|
+| easy | 2/10 | 10/10 | 5/10 | **17/30** | 13 `unknown_timeout` |
+| medium | 0/10 | 0/10 | 0/10 | **0/30** | 30 `unknown_timeout` (A*+hmax and UCS both timed out) |
+| hard | — | — | — | **0/30** | 30 `not_requested` (stage skipped: no medium task proven) |
+
+### 21.2 Proven references
+
+| Task | L* | Solver | Cross-check | A*+hmax expanded | Search s | Peak MiB | UCS expanded |
+|---|---:|---|---|---:|---:|---:|---:|
+| blocksworld easy-p03 | 20 | A*+hmax | match | 2,600 | 0.30 | 17.5 | 7,013 |
+| blocksworld easy-p04 | 24 | A*+hmax | match | 27,227 | 4.13 | 47.8 | 65,740 |
+| miconic easy-p02 | 4 | A*+hmax | match | 4 | 0.0001 | 13.1 | 8 |
+| miconic easy-p07 | 10 | A*+hmax | match | 135 | 0.005 | 14.0 | 182 |
+| miconic easy-p08 | 11 | A*+hmax | match | 147 | 0.005 | 14.0 | 182 |
+| miconic easy-p09 | 10 | A*+hmax | match | 146 | 0.007 | 13.8 | 208 |
+| miconic easy-p11 | 13 | A*+hmax | match | 583 | 0.03 | 14.1 | 714 |
+| miconic easy-p14 | 17 | A*+hmax | match | 2,384 | 0.18 | 15.1 | 2,647 |
+| miconic easy-p17 | 20 | A*+hmax | match | 9,058 | 0.85 | 19.8 | 9,448 |
+| miconic easy-p23 | 26 | A*+hmax | match | 103,940 | 14.98 | 109.5 | 104,926 |
+| miconic easy-p25 | 28 | A*+hmax | match | 333,216 | 55.20 | 302.4 | 334,564 |
+| miconic easy-p27 | 31 | UCS | A* timeout | (316,102 at timeout) | 11.64 (UCS) | 315.0 | 354,257 |
+| transport easy-p01 | 3 | A*+hmax | match | 6 | 0.001 | 14.0 | 53 |
+| transport easy-p03 | 6 | A*+hmax | match | 264 | 0.12 | 14.2 | 2,476 |
+| transport easy-p06 | 13 | A*+hmax | match | 11,336 | 4.12 | 38.5 | 62,998 |
+| transport easy-p07 | 14 | UCS | A* timeout | (91,965 at timeout) | 56.24 (UCS) | 1684.2 | 1,358,493 |
+| transport easy-p08 | 15 | UCS | A* timeout | (99,767 at timeout) | 37.29 (UCS) | 1223.5 | 969,678 |
+
+### 21.3 Interpretation
+
+- **hmax is nearly uninformative in Miconic** (h(s0) = 3 on every Miconic
+  task, L* up to 31): A*+hmax expands about as many nodes as UCS, and each
+  expansion costs ~5× more, so UCS proved easy-p27 where A* timed out.
+- **hmax is extremely expensive per node on larger tasks**: median A*+hmax
+  expansions *within 60 s* on medium tasks were 190 (Blocksworld), 10,590.5
+  (Miconic) and 12 (Transport). UCS on medium tasks exhausted time with peaks
+  up to 3,949 MiB.
+- **[BLOCKER] for M2-08 denominators:** under the provisional 60 s budget only
+  17 easy tasks have proven optima, so gap statistics are limited to them.
+  Options (team decision): a longer offline budget for references only, or a
+  faster exact solver (e.g. Fast Downward A* + LM-cut). Neither was run.
+
+### 21.4 h*(s) interface (ready, not run)
+
+`experiments/search_algorithms/exact_reference.py`:
+`exact_remaining_cost(task, state_facts, time_limit_s=...) -> ExactCost`
+(statuses `proven`, `proven_dead_end`, `unknown_timeout`, `unknown_error`) and a
+batch CLI (`--states <jsonl> --output <csv>`) that runs each state in a bounded
+child process. Tested: along the optimal plan of Transport easy-p01,
+h*(s_k) = 3 − k for every prefix state, each checked against the independent
+Dijkstra from that state. **Not run on real samples: Ranem's frozen state
+inventory does not exist yet, and no samples were invented.**
+
+## 22. M2-07 — Search comparison experiments
+
+### 22.1 Status: official matrix **[BLOCKER]**
+
+The official comparison (90 tasks × {GBFS, A*, WA* 1.5/2.0, IDA*} × the
+team's frozen heuristic sets) is **BLOCKED** and was **not** run:
+
+1. **No shared runner** (Amina) exists on any branch; Faraz must not build a
+   competing one (`docs/TEAM_RESPONSIBILITIES.md`).
+2. **No frozen project heuristic trials** (`trial-01..03`, Ranem) exist; only
+   the archived upstream DeepSeek-R1 baselines are available.
+3. **Resource enforcement for the official matrix** must come from the shared
+   runner's monitor; Faraz's Job Object layer is a stopgap.
+
+### 22.2 What was prepared for integration (interface for Amina)
+
+```python
+# with src/pyperplan and experiments/search_algorithms on sys.path
+from search_adapters import run_search, load_heuristic_class, heuristic_file_for, replay_plan
+h = load_heuristic_class(heuristic_id, heuristic_file_for(heuristic_id, domain))(task)
+result = run_search(algorithm, task, h, weight=w_or_None, time_limit_s=remaining_budget)
+# algorithm in {"gbfs", "astar", "weighted_astar", "ida_star"}; weight only for WA*
+# result: SearchResult(status, plan, plan_cost, nodes_generated, nodes_expanded, ...)
+```
+
+Status mapping used by `faraz_jobs.execute` (reusable as-is): `solved` + valid
+replay + replayed cost = reported cost → `success`; otherwise `invalid_plan`;
+`unsolved`/`timeout` unchanged; `error` → `planner_error` (or `memory_limit` if
+`MemoryError`/peak at cap); missing heuristic file → `configuration_error`.
+The runner must set `PYTHONHASHSEED` per process (§22.4). Records validated
+against `configs/result.schema.json`.
+
+### 22.3 Pilot (bounded, easy tier only, NOT the official matrix)
+
+Matrix: 30 easy tasks × {GBFS, A*, WA* 1.5, WA* 2.0, IDA*} × {archived
+DeepSeek-R1, hmax, hFF} = 450 runs, each in its own process under 60 s / 4096
+MiB hard limits, 6 parallel jobs. Run twice:
+
+| Batch | `PYTHONHASHSEED` | CSV | Outcome |
+|---|---|---|---|
+| `pilot-easy-20261104` | random per process (Python default) | `results/raw/faraz_search_pilot-easy-20261104.csv` | 323 success, 127 timeout |
+| `pilot-easy-seeded-20261104` (**primary**) | run seed (scope `run`) | `results/raw/faraz_search_pilot-easy-seeded-20261104.csv` | 318 success, 132 timeout |
+
+No run ended `invalid_plan`, `planner_error`, `memory_limit`, or was hard-killed
+(all timeouts were cooperative). Coverage, seeded batch (valid plans / 30):
+
+| Heuristic | GBFS | A* | WA* 1.5 | WA* 2.0 | IDA* |
+|---|---:|---:|---:|---:|---:|
+| DeepSeek-R1 | 30 | 30 | 30 | 30 | 23 |
+| hFF | 25 | 19 | 23 | 24 | 16 |
+| hmax | 19 | 13 | 14 | 15 | 7 |
+
+Per domain (BW / Miconic / Transport): DeepSeek-R1 IDA* 6/10/7; hFF A* 3/10/6;
+hmax A* 2/8/3; hmax IDA* 1/4/2; every DeepSeek-R1 best-first method 10/10/10.
+
+**[METHODOLOGY] timing sensitivity.** In the reference batch A*+hmax solved
+Miconic easy-p25 in 55.2 s (4 parallel jobs); in both pilot batches (6 jobs)
+it timed out at ~59.5 s. Runs near the limit can flip with machine load;
+the official matrix should fix the degree of parallelism and report it.
+
+### 22.4 Process-level non-determinism (hash seed) **[METHODOLOGY]** **[BLOCKER for reproduction]**
+
+Pyperplan grounding builds operators from Python `set`s of strings, so the
+grounded operator *order* depends on the per-process string-hash seed; hFF's
+relaxed-plan extraction is also order-dependent. Evidence:
+
+- Same task (Transport easy-p07), `PYTHONHASHSEED` = 1, 2, 3, 4: first grounded
+  operator differs every time; GBFS+DeepSeek-R1 plan cost 14 / 16 / 14 / 16;
+  GBFS+hmax expansions 832 / 714 / 950 / 714; GBFS+hFF cost 14 / 17 / 17 / 15.
+  A*+DeepSeek-R1 was identical (14, 14 expansions) because A* sorts successors
+  by name and the heuristic is order-independent.
+- Paired comparison of the two pilot batches
+  (`results/derived/pre-experiment-v2/faraz-pilot-easy-seeded-20261104/batch_comparison_summary.csv`):
+
+| Heuristic | Method | Both success | Plan differs | Cost differs | Expansions differ | Status differs |
+|---|---|---:|---:|---:|---:|---:|
+| DeepSeek-R1 | GBFS | 30 | 21 | 5 | 18 | 0 |
+| hFF | GBFS | 25 | 18 | 14 | 20 | 2 |
+| hmax | GBFS | 19 | 12 | 1 | 16 | 0 |
+| hFF | WA* 1.5 / WA* 2.0 / A* / IDA* | 23 / 24 / 19 / 16 | 7 / 6 / 2 / 1 | 6 / 5 / 0 / 1 | 7 / 6 / 4 / 3 | 0 / 1 / 0 / 0 |
+| DeepSeek-R1, hmax | A*, WA*, IDA* | — | 0 | 0 | 0 | 0–1 (timing only) |
+
+**Consequence for Amina:** the paper's GBFS is not reproducible run-to-run in
+this codebase unless `PYTHONHASHSEED` is fixed and recorded. Fix in Faraz's
+tools: `bounded_exec.run_bounded(hash_seed=...)`; default scope is now
+`task` (all algorithms/heuristics of a task share one seed, so paired
+comparisons see the identical grounded task). The seeded pilot used scope
+`run` (seed recorded per row in `python_hash_seed`). Protocol note proposed
+in `docs/EXPERIMENT_PROTOCOL.md`.
+
+## 23. M2-08 — Optimality gap and trade-off analysis
+
+**Tool:** `experiments/search_algorithms/analyze_search_results.py`.
+Gap (%) = 100·(L − L*)/L* only for `success` runs on tasks with a `proven`
+reference and L* > 0 (zero-cost tasks counted separately; none occur). Reports
+coverage with denominators, per-method quality on its own solved set, a
+**paired common-solved** comparison per heuristic, and gap histograms.
+
+**Outputs (seeded pilot):** tables in
+`results/derived/pre-experiment-v2/faraz-pilot-easy-seeded-20261104/`
+(`coverage.csv`, `quality.csv`, `common_solved.csv`, `gap_distribution.csv`,
+`summary.md`) and figures in
+`results/figures/pre-experiment-v2/faraz-pilot-easy-seeded-20261104/`
+(`R3_coverage.png`, `R4_gap_distribution.png`, `R5_effort_vs_quality.png`).
+Every figure is stamped "PILOT (not final)". The same analysis of the unseeded
+batch is kept under `.../faraz-pilot-easy-20261104/` for the comparison in §22.4.
+Figure design: fixed colour per algorithm across all figures (reference
+categorical palette, first slots in documented order), direct labels on every
+mark, one y-axis per panel, faceted by heuristic. The palette validator script
+could not be run (Node.js is not installed).
+
+### 23.1 Quality on each method's own solved set (seeded pilot)
+
+Gap statistics use the 17 easy tasks with proven L* (gap n ≤ 17).
+
+| Heuristic | Method | Solved | Gap n | Optimal | Mean gap % | Median gap % | Max gap % | Median expanded |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| DeepSeek-R1 | GBFS | 30 | 17 | 11 | 3.08 | 0 | 16.7 | 29.5 |
+| DeepSeek-R1 | A* | 30 | 17 | 12 | 2.79 | 0 | 16.7 | 29.5 |
+| DeepSeek-R1 | WA* 1.5 | 30 | 17 | 12 | 2.79 | 0 | 16.7 | 29.5 |
+| DeepSeek-R1 | WA* 2.0 | 30 | 17 | 12 | 2.79 | 0 | 16.7 | 29.5 |
+| DeepSeek-R1 | IDA* | 23 | 17 | 2 | 21.8 | 17.6 | 100 | 32 |
+| hFF | GBFS | 25 | 17 | 6 | 8.49 | 6.67 | 30 | 37 |
+| hFF | A* | 19 | 17 | 16 | 0.452 | 0 | 7.69 | 42 |
+| hFF | WA* 1.5 | 23 | 17 | 12 | 2.93 | 0 | 20 | 40 |
+| hFF | WA* 2.0 | 24 | 17 | 5 | 6.92 | 5 | 25 | 37 |
+| hFF | IDA* | 16 | 16 | 15 | 0.481 | 0 | 7.69 | 41.5 |
+| hmax | GBFS | 19 | 16 | 7 | 6.03 | 5.44 | 16.7 | 437 |
+| hmax | A* | 13 | 13 | 13 | 0 | 0 | 0 | 583 |
+| hmax | WA* 1.5 | 14 | 14 | 14 | 0 | 0 | 0 | 1,410 |
+| hmax | WA* 2.0 | 15 | 15 | 13 | 1.62 | 0 | 16.7 | 1,510 |
+| hmax | IDA* | 7 | 7 | 7 | 0 | 0 | 0 | 70,400 |
+
+(Median expanded values ≥ 1,000 are rounded from `summary.md`'s 3-significant-digit output; exact values are in `quality.csv`.)
+
+### 23.2 Paired comparison on common-solved tasks (seeded pilot)
+
+| Heuristic | Common tasks | Method: mean gap % (optimal / gap n), median expanded |
+|---|---:|---|
+| DeepSeek-R1 | 23 | GBFS 3.08 (11/17), 21 · A* 2.79 (12/17), 25 · WA*1.5 2.79 (12/17), 20 · WA*2 2.79 (12/17), 20 · IDA* 21.8 (2/17), 32 |
+| hFF | 16 | GBFS 8.54 (6/16), 21 · A* 0.481 (15/16), 23.5 · WA*1.5 2.88 (12/16), 23.5 · WA*2 7.12 (5/16), 22 · IDA* 0.481 (15/16), 41.5 |
+| hmax | 7 | GBFS 3.81 (5/7), 48 · A* 0 (7/7), 146 · WA*1.5 0 (7/7), 146 · WA*2 2.38 (6/7), 122 · IDA* 0 (7/7), 70,400 |
+
+### 23.3 Interpretation (pilot only, 17 proven easy tasks)
+
+- **DeepSeek-R1 dominates coverage** on the easy tier (30/30 for every
+  best-first method) with tiny search effort, but A* with it is **not
+  optimal**: 5 of 17 proven tasks suboptimal (max gap 16.7 %). A*, WA* 1.5
+  and WA* 2.0 give identical gaps: the LLM values are large relative to g,
+  so A*'s ordering is already nearly greedy, and GBFS is barely worse
+  (3.08 % vs 2.79 %).
+- **IDA* is the worst match for the LLM heuristic** (mean gap 21.8 %, only
+  2/17 optimal, up to 100 %), because a single overestimating h(s0) sets the
+  first bound too high (§18).
+- **hFF**: weight trades quality for coverage monotonically: A* 0.45 % gap /
+  19 solved → WA* 1.5 2.93 % / 23 → WA* 2.0 6.92 % / 24 → GBFS 8.49 % / 25.
+- **hmax**: every optimal-guaranteed method returned L* (0 % gap), WA* stayed
+  within its bound, but hmax is too expensive to scale (13/30 for A*).
+- Solved-only comparisons mislead here (methods solve different subsets),
+  which is why the common-solved table and denominators are reported.
+
+## 24. M2-09 — Failure and guarantee audit
+
+**Tool:** `experiments/search_algorithms/audit_failures.py` (exit code 1 on any
+guarantee violation). Applied to the seeded pilot + validation batch (510 runs);
+outputs `audit_*.csv` and `audit_summary.md` in
+`results/derived/pre-experiment-v2/faraz-pilot-easy-seeded-20261104/`.
+
+### 24.1 Guarantees vs outcomes (510 runs)
+
+| Guarantee class | Runs (method × heuristic) | Violations |
+|---|---|---:|
+| `optimal` (A*, IDA*, WA* w=1 with zero/hmax) | A*+hmax 17 empirically optimal / 17 not solved; IDA*+hmax 10 / 24; WA*1+hmax 4; zero (A* 4, IDA* 3 + 1 not solved, WA*1 4) 11 optimal / 1 not solved | **0** |
+| `bounded_w` (WA* 1.5/2.0 with zero/hmax) | WA*1.5+hmax 18 optimal / 16 not solved; WA*2+hmax 17 optimal, **2 suboptimal within bound** / 15 not solved; zero 8 optimal | **0** |
+| `none` (GBFS; hFF; DeepSeek-R1) | e.g. A*+DeepSeek-R1 16 optimal / 5 suboptimal / 13 no proven ref; IDA*+DeepSeek-R1 4 / 17 / 6 / 7 not solved; GBFS+hFF 6 / 11 / 8 / 5 | n/a |
+
+Run statuses: 132 timeouts in the seeded pilot plus 2 in the validation batch
+(listed with details in `audit_failures.csv`, 134 rows); 0 memory-limit, 0
+invalid plans, 0 heuristic runtime errors, 0 exhausted (`unsolved`) searches,
+0 missing or hash-mismatched heuristic files (all three DeepSeek-R1 files
+match `provenance.json`).
+
+**Inadmissibility certificates.** Comparing h(s0) with proven L*: DeepSeek-R1
+overestimates at the initial state on **15 of 17** proven tasks (median
+h(s0)/L* = 1.18, max 2.1), so it is provably inadmissible on those tasks.
+hFF never exceeded L* at s0 on these tasks (max ratio 1.0), although it is
+inadmissible in general. hmax max ratio 0.75, zero 0, as admissibility requires.
+
+**Unsound pruning check.** No DeepSeek-R1 run returned +inf for any state and
+none ended `unsolved` on a task with a proven plan, so no evidence of
+incorrect dead-end pruning in this pilot.
+
+Exact-reference status (task level): 17 `proven`, 43 `unknown_timeout`, 30
+`not_requested` (§21.1).
+
+### 24.2 Guarantees explained (presentation notes)
+
+| Property | Holds when | Evidence here |
+|---|---|---|
+| **Completeness** (finds a plan if one exists, given enough resources) | A*, WA*, IDA*, GBFS on finite state spaces with truthful +inf | Timeouts are resource failures, not incompleteness; 0 `unsolved` |
+| **Optimality** | A* / IDA* / WA*(w=1) with **admissible** h (zero, hmax) | 0 violations against proven L* |
+| **Bounded suboptimality** cost ≤ w·L* | WA* with admissible h and w ≥ 1 (reopening kept) | WA* 2.0 + hmax: 2 suboptimal runs, both within bound |
+| **Empirically optimal plan** | Observed cost = proven L*; no guarantee implied | A*+DeepSeek-R1: 16 such runs, yet 5 suboptimal |
+| **Proven reference** | Exact solver completed and plan validated | 17/90 tasks |
+| **Failure within resources** | Timeout / memory limit | Says nothing about solvability or optimum |
+
+- *A* with admissible h is optimal:* when the goal is popped, every frontier
+  node has f ≥ the goal's cost, and admissibility makes f a lower bound on any
+  plan through that node (§4.1).
+- *A* with an LLM h has no such guarantee:* the lower-bound argument fails as
+  soon as h overestimates. DeepSeek-R1 does so (15/17 tasks at s0) and A*
+  returned 5 suboptimal plans.
+- *WA* bounds need admissibility (and w ≥ 1):* the proof multiplies an
+  admissible lower bound by w; with an overestimating h there is no bound.
+- *IDA* may be infeasible despite small memory:* no duplicate detection, so
+  transpositions are re-expanded every iteration (4.67 M vs 7,013 expansions
+  on Blocksworld easy-p03; 23/30 hmax runs timed out while peak memory stayed
+  ≤ 21.9 MiB).
+- *An LLM h returning +inf can wrongly prune:* all searches treat +inf as a
+  dead end and never expand it; if the heuristic is wrong, a reachable
+  solution can be cut off and the search can end `unsolved` on a solvable
+  task. The audit checks this explicitly (0 cases observed).
+
+## 25. Files created or modified in Part II (uncommitted)
+
+| File | Change |
+|---|---|
+| `src/pyperplan/search/a_star.py` | `validate_weight`, `weighted_astar_search_result`; `SearchResult` optional IDA* fields; `nodes_reopened` logged with `%s` |
+| `src/pyperplan/search/ida_star.py` (new) | IDA* |
+| `src/pyperplan/search/__init__.py` | exports `weighted_astar_search_result`, `ida_star_search`, `ida_star_search_result` |
+| `configs/experiment.v2.toml` | WA*/IDA* implementation pointers (`pending:faraz` → project functions) |
+| `tests/test_config.py` | asserts pointers; imports every configured implementation |
+| `tests/test_search_algorithms.py` (new) | 45 tests |
+| `tests/test_search_experiment_tools.py` (new) | 28 tests |
+| `docs/EXPERIMENT_PROTOCOL.md` | IDA*/GBFS counter definitions; `PYTHONHASHSEED` requirement (proposed) |
+| `docs/FARAZ_PROGRESS.md` | header, §2 status, §15 note, Part II |
+| `experiments/search_algorithms/README.md` | tool inventory |
+| `experiments/search_algorithms/{search_adapters,bounded_exec,search_worker,faraz_jobs,result_records,generate_optimal_refs,exact_reference,run_faraz_pilot,analyze_search_results,audit_failures,compare_pilot_batches}.py` (new) | §20–§24 |
+| `results/raw/…`, `results/derived/pre-experiment-v2/…`, `results/figures/pre-experiment-v2/…` (git-ignored) | outputs listed in §21–§24 |
+
+Not modified: `search/gbfs.py`, `pyperplan.py`, benchmarks, manifest,
+artifacts, `configs/result.schema.json`, other members' directories.
+
+## 26. Commands to reproduce Part II
+
+```bash
+uv sync --frozen --group dev
+uv run --frozen python tools/verify_benchmarks.py
+uv run --frozen pytest -q                                   # 151 tests
+S=experiments/search_algorithms
+# M2-06 references (writes results/raw/faraz_optimal_refs.csv; refuses to overwrite)
+uv run --frozen python $S/generate_optimal_refs.py --jobs 4 --batch-id refs-20261104a
+# M2-03/M2-04 validation batch
+uv run --frozen python $S/run_faraz_pilot.py --batch-id validation-wa-ida-20261104 \
+  --problems blocksworld:easy-p03 blocksworld:easy-p04 miconic:easy-p02 transport:easy-p01 \
+  --algorithms astar weighted_astar:1.0 weighted_astar:1.5 weighted_astar:2.0 ida_star \
+  --heuristics zero hmax deepseek-r1 --jobs 6
+# M2-07 pilots (the unseeded batch was produced before hash seeding existed;
+# reproduce its behaviour with --no-hash-seed; the seeded batch used scope "run")
+uv run --frozen python $S/run_faraz_pilot.py --batch-id pilot-easy-20261104 --difficulties easy \
+  --algorithms gbfs astar weighted_astar:1.5 weighted_astar:2.0 ida_star \
+  --heuristics deepseek-r1 hmax hff --jobs 6 --no-hash-seed
+uv run --frozen python $S/run_faraz_pilot.py --batch-id pilot-easy-seeded-20261104 --difficulties easy \
+  --algorithms gbfs astar weighted_astar:1.5 weighted_astar:2.0 ida_star \
+  --heuristics deepseek-r1 hmax hff --jobs 6 --hash-seed-scope run
+# M2-08 / M2-09 / batch comparison
+T=faraz-pilot-easy-seeded-20261104
+uv run --frozen python $S/compare_pilot_batches.py --a results/raw/faraz_search_pilot-easy-20261104.csv \
+  --b results/raw/faraz_search_pilot-easy-seeded-20261104.csv --tag $T
+uv run --frozen python $S/analyze_search_results.py --runs results/raw/faraz_search_pilot-easy-seeded-20261104.csv \
+  --tag $T --scope "PILOT (not final): 30 easy tasks, archived DeepSeek-R1/hmax/hFF, 60 s / 4096 MiB, 1 seeded run each, machine-f922a64c5235"
+uv run --frozen python $S/audit_failures.py --runs results/raw/faraz_search_pilot-easy-seeded-20261104.csv \
+  results/raw/faraz_search_validation-wa-ida-20261104.csv --tag $T
+```
+
+Re-running a command with an existing batch ID or tag stops with "refusing to
+overwrite"; use a new ID. The 2026-11-04 batches took 1.54 h (references),
+0.06 h (validation) and 2.43 h / 2.45 h (pilots) of summed process wall time.
+
+## 27. Dependencies and handoffs (Part II)
+
+**Amina (shared runner, reproduction):**
+- **[BLOCKER]** The official M2-07 matrix waits for the shared runner. Use
+  `search_adapters.run_search` (§22.2); GBFS stays her unmodified baseline.
+- **[BLOCKER for reproduction]** Fix and record `PYTHONHASHSEED` per process
+  (§22.4); otherwise GBFS plans/costs vary between identical runs.
+- Job Object code in `bounded_exec.py` can seed the runner's Windows monitor;
+  note it caps committed memory, not working set.
+- Fix the degree of parallelism (runs near 60 s flip, §22.3).
+
+**Ranem (heuristic reliability):**
+- `results/raw/faraz_optimal_refs.csv`: 17 proven L* (easy only) for
+  overestimation analysis; `unknown_*` rows must not be used as ground truth.
+- `exact_reference.py` computes h*(s) for her frozen state inventory (batch
+  CLI with hard limits). Waiting on that inventory.
+- Initial-state certificates: DeepSeek-R1 h(s0) > L* on 15/17 tasks.
+- **[BLOCKER]** New heuristic trials `trial-01..03` are needed before the
+  official comparison; only archived DeepSeek-R1 was used here.
+
+**Team decisions needed:** longer offline budget or faster exact solver for
+references (only 17/90 proven under 60 s); approve the `PYTHONHASHSEED`
+protocol note; results archiving (`results/` is git-ignored, §14).
+
+## 28. Remaining work before the final paper
+
+1. **Exact references beyond easy** (blocking good gap denominators): agree a
+   reference-only budget or solver; rerun `generate_optimal_refs.py` with a new
+   batch ID; also complete the 30-task UCS cross-check.
+2. **Official M2-07 matrix** through Amina's runner on all 90 tasks with the
+   frozen trial heuristics and seeded processes (scope `task`), fixed
+   parallelism, then rerun M2-08/M2-09 tools on its output.
+3. Run `exact_reference.py` on Ranem's frozen state inventory.
+4. Only after 1–2: promote findings to **[PAPER RESULT]** (none so far). Pilot
+   observations worth re-testing at scale: LLM-heuristic A* is not optimal but
+   near-greedy; IDA* amplifies LLM overestimation; hFF weight/quality trade-off.
+5. Review and commit Part II; open a PR from `feature/faraz-search`.

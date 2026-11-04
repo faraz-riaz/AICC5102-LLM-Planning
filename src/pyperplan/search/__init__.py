@@ -21,7 +21,9 @@ from .a_star import (
     astar_search_result,
     greedy_best_first_search,
     weighted_astar_search,
+    weighted_astar_search_result,
 )
+from .ida_star import ida_star_search, ida_star_search_result
 from .gbfs import gbfs_early_goal_test
 from .gbfs_int import gbfs_early_goal_test_int
 from .breadth_first_search import breadth_first_search

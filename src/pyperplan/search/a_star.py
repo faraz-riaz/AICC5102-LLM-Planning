@@ -44,6 +44,10 @@ class SearchResult:
     ``nodes_generated`` includes the root and every applicable successor node
     constructed, including duplicates. ``nodes_expanded`` counts best-g nodes
     whose successors are enumerated; a popped goal is not expanded.
+
+    The trailing optional fields are used by IDA* (``search.ida_star``), which
+    has no frontier and therefore reports ``nodes_reopened`` and
+    ``stale_nodes_skipped`` as ``None`` (not applicable) rather than 0.
     """
 
     status: SearchStatus
@@ -52,11 +56,14 @@ class SearchResult:
     plan_cost: float | None
     nodes_generated: int
     nodes_expanded: int
-    nodes_reopened: int
-    stale_nodes_skipped: int
+    nodes_reopened: int | None
+    stale_nodes_skipped: int | None
     dead_ends_pruned: int
     wall_time_s: float
     failure_detail: str | None = None
+    iterations: int | None = None
+    iteration_bounds: tuple[float, ...] | None = None
+    cycles_pruned: int | None = None
 
     @property
     def solved(self) -> bool:
@@ -163,7 +170,7 @@ def _log_result(result: SearchResult) -> None:
     logging.info("Search status: %s", result.status)
     logging.info("%d Nodes generated", result.nodes_generated)
     logging.info("%d Nodes expanded", result.nodes_expanded)
-    logging.info("%d Nodes reopened", result.nodes_reopened)
+    logging.info("%s Nodes reopened", result.nodes_reopened)
     logging.info("Search wall time: %.6f", result.wall_time_s)
     if result.solved:
         logging.info("Plan length: %d", result.plan_length)
@@ -180,9 +187,58 @@ def greedy_best_first_search(task, heuristic, use_relaxed_plan=False):
 
 
 def weighted_astar_search(task, heuristic, weight=5, use_relaxed_plan=False):
-    """Run the inherited generic best-first core with weighted-A* ordering."""
+    """Run the inherited generic best-first core with weighted-A* ordering.
+
+    Legacy plan-or-``None`` adapter (upstream default ``weight=5`` retained for
+    the ``-s wastar`` CLI). Experiments should call
+    ``weighted_astar_search_result`` with an explicit weight.
+    """
     return astar_search(
         task, heuristic, ordered_node_weighted_astar(weight), use_relaxed_plan
+    )
+
+
+def validate_weight(weight) -> float:
+    """Return ``weight`` as a float or raise ``ValueError``.
+
+    Any finite ``w >= 0`` is accepted (``w = 0`` is uniform-cost search). The
+    w-suboptimality bound ``cost <= w * C*`` is only meaningful for ``w >= 1``
+    *and* an admissible heuristic; this function does not imply that bound.
+    """
+    if isinstance(weight, bool) or not isinstance(weight, Real):
+        raise ValueError(f"weight must be a finite number >= 0, got {weight!r}")
+    value = float(weight)
+    if not math.isfinite(value) or value < 0:
+        raise ValueError(f"weight must be a finite number >= 0, got {weight!r}")
+    return value
+
+
+def weighted_astar_search_result(
+    task,
+    heuristic,
+    weight: float,
+    use_relaxed_plan: bool = False,
+    time_limit_s: float | None = None,
+) -> SearchResult:
+    """Instrumented Weighted A*: best-first search on ``f = g + w*h``.
+
+    Reuses the validated A* core unchanged (duplicate detection, reopening,
+    stale-entry skipping, goal test on pop, heuristic validation). Ties on f
+    are broken by lower h, then FIFO, exactly as in A*. Because ``1.0 * h ==
+    h`` in IEEE arithmetic, ``weight=1.0`` produces bit-identical frontier
+    keys and therefore the identical search as ``astar_search_result``.
+
+    Guarantee: if h is admissible and ``w >= 1``, the returned plan costs at
+    most ``w`` times the optimum. No bound holds for inadmissible heuristics
+    (e.g. LLM-generated ones).
+    """
+    value = validate_weight(weight)
+    return astar_search_result(
+        task,
+        heuristic,
+        make_open_entry=ordered_node_weighted_astar(value),
+        use_relaxed_plan=use_relaxed_plan,
+        time_limit_s=time_limit_s,
     )
 
 
