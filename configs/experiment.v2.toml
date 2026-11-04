@@ -31,7 +31,7 @@ comparison_identifiers = ["gbfs", "astar", "weighted_astar", "ida_star"]
 require_common_benchmark_instances = true
 require_common_heuristic_sets = true
 gbfs_implementation = "upstream:gbfs_early_goal_test"
-astar_implementation = "pending:faraz"
+astar_implementation = "project:search.a_star.astar_search"
 weighted_astar_implementation = "pending:faraz"
 ida_star_implementation = "pending:faraz"
 

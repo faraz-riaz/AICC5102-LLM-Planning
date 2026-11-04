@@ -15,7 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-from .a_star import astar_search, greedy_best_first_search, weighted_astar_search
+from .a_star import (
+    SearchResult,
+    astar_search,
+    astar_search_result,
+    greedy_best_first_search,
+    weighted_astar_search,
+)
 from .gbfs import gbfs_early_goal_test
 from .gbfs_int import gbfs_early_goal_test_int
 from .breadth_first_search import breadth_first_search

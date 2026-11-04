@@ -63,6 +63,10 @@ def test_agreed_pre_experiment_configuration() -> None:
         "weights": [1.0, 1.5, 2.0],
         "correctness_check_weight": 1.0,
     }
+    assert (
+        config["algorithms"]["astar_implementation"]
+        == "project:search.a_star.astar_search"
+    )
 
 
 def test_optimality_monitoring_and_status_policy() -> None:
@@ -89,6 +93,7 @@ def test_result_and_machine_schemas_cover_standard_fields() -> None:
     assert set(result["properties"]["optimal_cost_status"]["enum"]) == OPTIMAL_COST_STATUSES
     for field in (
         "heuristic_set_id",
+        "nodes_generated",
         "monitor_backend",
         "memory_metric",
         "memory_limit_enforced",

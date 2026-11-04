@@ -64,4 +64,9 @@ Put a concise machine-readable explanation in `failure_detail`; do not collapse 
 
 Every record must satisfy `configs/result.schema.json`. Use JSON null only where permitted; do not use sentinel costs or times. Raw records go to `results/raw/<config_id>/`, derived tables to `results/derived/<config_id>/`, and figures to `results/figures/<config_id>/`. Raw records are immutable.
 
+Search implementations must report both generated and expanded nodes. For the
+project A* implementation, generated nodes include the root and every
+applicable successor constructed (including duplicates); expanded nodes are
+best-g non-goal nodes whose successors are enumerated.
+
 All experiment changes use member feature branches and reviewed pull requests into `main`. Configuration, schema, benchmark, shared planner, and monitoring changes require cross-workstream review and passing CI.
