@@ -1,0 +1,25 @@
+2026-11-10 13:25:58,065 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-10 13:25:58,065 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_kro1dld3\domain.pddl
+2026-11-10 13:25:58,065 INFO     using search: gbfs_early_goal_test
+2026-11-10 13:25:58,065 INFO     using heuristic: hFFHeuristic
+2026-11-10 13:25:58,065 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_kro1dld3\domain.pddl
+2026-11-10 13:25:58,065 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_kro1dld3\medium-p12.pddl
+2026-11-10 13:25:58,065 INFO     5 Predicates parsed
+2026-11-10 13:25:58,065 INFO     4 Actions parsed
+2026-11-10 13:25:58,065 INFO     77 Objects parsed
+2026-11-10 13:25:58,065 INFO     0 Constants parsed
+2026-11-10 13:25:58,065 INFO     Grounding start: blocksworld-12
+2026-11-10 13:25:58,129 INFO     Relevance analysis removed 0 facts
+2026-11-10 13:25:58,129 INFO     Grounding end: blocksworld-12
+2026-11-10 13:25:58,129 INFO     6161 Variables created
+2026-11-10 13:25:58,129 INFO     12012 Operators created
+2026-11-10 13:25:58,160 INFO     Search start: blocksworld-12
+2026-11-10 13:25:58,176 INFO     Initial h value: 149.00
+2026-11-10 13:25:58,586 INFO     Found new best h: 148.00 after 4 expansions
+2026-11-10 13:26:01,314 INFO     Found new best h: 147.00 after 33 expansions
+2026-11-10 13:26:01,434 INFO     Found new best h: 146.00 after 34 expansions
+2026-11-10 13:26:15,819 INFO     Found new best h: 144.00 after 151 expansions
+2026-11-10 13:26:16,470 INFO     Found new best h: 143.00 after 156 expansions
+2026-11-10 13:26:55,866 INFO     Found new best h: 142.00 after 444 expansions
+2026-11-10 13:26:56,026 INFO     Found new best h: 141.00 after 445 expansions
+2026-11-10 13:26:56,185 INFO     Found new best h: 140.00 after 446 expansions

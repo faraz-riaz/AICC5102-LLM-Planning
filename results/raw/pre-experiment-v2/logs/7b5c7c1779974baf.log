@@ -1,0 +1,55 @@
+2026-11-10 13:36:32,409 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-10 13:36:32,410 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_yrtqetrw\domain.pddl
+2026-11-10 13:36:32,413 INFO     using search: gbfs_early_goal_test
+2026-11-10 13:36:32,413 INFO     using heuristic: hFFHeuristic
+2026-11-10 13:36:32,414 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_yrtqetrw\domain.pddl
+2026-11-10 13:36:32,415 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_yrtqetrw\easy-p19.pddl
+2026-11-10 13:36:32,422 INFO     5 Predicates parsed
+2026-11-10 13:36:32,422 INFO     3 Actions parsed
+2026-11-10 13:36:32,422 INFO     29 Objects parsed
+2026-11-10 13:36:32,422 INFO     0 Constants parsed
+2026-11-10 13:36:32,422 INFO     Grounding start: transport-19
+2026-11-10 13:36:32,440 INFO     Relevance analysis removed 0 facts
+2026-11-10 13:36:32,440 INFO     Grounding end: transport-19
+2026-11-10 13:36:32,440 INFO     230 Variables created
+2026-11-10 13:36:32,440 INFO     2410 Operators created
+2026-11-10 13:36:32,441 INFO     Search start: transport-19
+2026-11-10 13:36:32,444 INFO     Initial h value: 33.00
+2026-11-10 13:36:32,486 INFO     Found new best h: 32.00 after 1 expansions
+2026-11-10 13:36:32,578 INFO     Found new best h: 31.00 after 4 expansions
+2026-11-10 13:36:32,625 INFO     Found new best h: 30.00 after 6 expansions
+2026-11-10 13:36:32,951 INFO     Found new best h: 29.00 after 17 expansions
+2026-11-10 13:36:33,109 INFO     Found new best h: 27.00 after 22 expansions
+2026-11-10 13:36:34,138 INFO     Found new best h: 25.00 after 55 expansions
+2026-11-10 13:36:34,478 INFO     Found new best h: 24.00 after 60 expansions
+2026-11-10 13:36:34,549 INFO     Found new best h: 23.00 after 61 expansions
+2026-11-10 13:36:35,588 INFO     Found new best h: 22.00 after 77 expansions
+2026-11-10 13:36:53,215 INFO     Found new best h: 21.00 after 448 expansions
+2026-11-10 13:36:53,239 INFO     Found new best h: 20.00 after 449 expansions
+2026-11-10 13:36:53,256 INFO     Found new best h: 19.00 after 450 expansions
+2026-11-10 13:36:53,315 INFO     Found new best h: 18.00 after 452 expansions
+2026-11-10 13:36:53,379 INFO     Found new best h: 17.00 after 455 expansions
+2026-11-10 13:36:57,382 INFO     Found new best h: 16.00 after 544 expansions
+2026-11-10 13:36:57,673 INFO     Found new best h: 15.00 after 553 expansions
+2026-11-10 13:37:02,707 INFO     Found new best h: 14.00 after 675 expansions
+2026-11-10 13:37:03,456 INFO     Found new best h: 12.00 after 695 expansions
+2026-11-10 13:37:08,624 INFO     Found new best h: 11.00 after 845 expansions
+2026-11-10 13:37:08,645 INFO     Found new best h: 10.00 after 846 expansions
+2026-11-10 13:37:08,706 INFO     Found new best h: 9.00 after 849 expansions
+2026-11-10 13:37:08,754 INFO     Found new best h: 8.00 after 851 expansions
+2026-11-10 13:37:09,073 INFO     Found new best h: 7.00 after 864 expansions
+2026-11-10 13:37:09,090 INFO     Found new best h: 6.00 after 865 expansions
+2026-11-10 13:37:09,124 INFO     Found new best h: 5.00 after 866 expansions
+2026-11-10 13:37:09,140 INFO     Found new best h: 4.00 after 867 expansions
+2026-11-10 13:37:09,194 INFO     Found new best h: 3.00 after 869 expansions
+2026-11-10 13:37:09,204 INFO     Found new best h: 2.00 after 870 expansions
+2026-11-10 13:37:09,207 INFO     Found new best h: 1.00 after 871 expansions
+2026-11-10 13:37:09,207 INFO     Early goal reached via operator (drop v1 l10 p9 c0 c1).
+2026-11-10 13:37:09,207 INFO     872 Nodes expanded
+2026-11-10 13:37:09,207 INFO     Max open list size: 20004
+2026-11-10 13:37:09,207 INFO     Search end: transport-19
+2026-11-10 13:37:09,207 INFO     Search time: 36.64
+2026-11-10 13:37:09,207 INFO     Total time: 36.66
+2026-11-10 13:37:09,222 INFO     Plan length: 70
+2026-11-10 13:37:09,224 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-10 13:37:09,224 WARNING  warning: could not determine peak memory

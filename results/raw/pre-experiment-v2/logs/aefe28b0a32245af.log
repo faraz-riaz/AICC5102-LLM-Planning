@@ -1,0 +1,17 @@
+2026-11-10 12:00:21,546 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-10 12:00:21,546 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_9pxws89r\domain.pddl
+2026-11-10 12:00:21,549 INFO     using search: gbfs_early_goal_test
+2026-11-10 12:00:21,549 INFO     using heuristic: hMaxHeuristic
+2026-11-10 12:00:21,549 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_9pxws89r\domain.pddl
+2026-11-10 12:00:21,549 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_9pxws89r\hard-p30.pddl
+2026-11-10 12:00:21,574 INFO     5 Predicates parsed
+2026-11-10 12:00:21,574 INFO     4 Actions parsed
+2026-11-10 12:00:21,574 INFO     488 Objects parsed
+2026-11-10 12:00:21,574 INFO     0 Constants parsed
+2026-11-10 12:00:21,574 INFO     Grounding start: blocksworld-30
+2026-11-10 12:00:26,477 INFO     Relevance analysis removed 0 facts
+2026-11-10 12:00:26,624 INFO     Grounding end: blocksworld-30
+2026-11-10 12:00:26,624 INFO     239609 Variables created
+2026-11-10 12:00:26,624 INFO     477264 Operators created
+2026-11-10 12:00:29,421 INFO     Search start: blocksworld-30
+2026-11-10 12:00:30,660 INFO     Initial h value: 33.00

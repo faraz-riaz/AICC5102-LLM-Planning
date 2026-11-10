@@ -1,0 +1,17 @@
+2026-11-10 12:02:24,906 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-10 12:02:24,906 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_qdklg7np\domain.pddl
+2026-11-10 12:02:24,908 INFO     using search: gbfs_early_goal_test
+2026-11-10 12:02:24,908 INFO     using heuristic: hMaxHeuristic
+2026-11-10 12:02:24,908 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_qdklg7np\domain.pddl
+2026-11-10 12:02:24,911 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_qdklg7np\medium-p13.pddl
+2026-11-10 12:02:24,932 INFO     6 Predicates parsed
+2026-11-10 12:02:24,932 INFO     4 Actions parsed
+2026-11-10 12:02:24,932 INFO     86 Objects parsed
+2026-11-10 12:02:24,932 INFO     0 Constants parsed
+2026-11-10 12:02:24,932 INFO     Grounding start: miconic-13
+2026-11-10 12:02:24,979 INFO     Relevance analysis removed 0 facts
+2026-11-10 12:02:24,979 INFO     Grounding end: miconic-13
+2026-11-10 12:02:24,979 INFO     1978 Variables created
+2026-11-10 12:02:24,979 INFO     3614 Operators created
+2026-11-10 12:02:24,980 INFO     Search start: miconic-13
+2026-11-10 12:02:24,982 INFO     Initial h value: 3.00

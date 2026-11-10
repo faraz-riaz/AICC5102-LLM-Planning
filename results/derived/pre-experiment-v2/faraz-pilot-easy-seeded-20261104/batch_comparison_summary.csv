@@ -1,0 +1,16 @@
+heuristic_id,algorithm_label,paired_runs,both_success,status_differs,plan_differs,cost_differs,expansions_differ,initial_h_differs
+deepseek-r1,astar,30,30,0,0,0,0,0
+deepseek-r1,gbfs,30,30,0,21,5,18,0
+deepseek-r1,ida_star,30,23,0,0,0,0,0
+deepseek-r1,weighted_astar-w1.5,30,30,0,0,0,0,0
+deepseek-r1,weighted_astar-w2,30,30,0,0,0,0,0
+hff,astar,30,19,0,2,0,4,3
+hff,gbfs,30,25,2,18,14,20,3
+hff,ida_star,30,16,0,1,1,3,3
+hff,weighted_astar-w1.5,30,23,0,7,6,7,3
+hff,weighted_astar-w2,30,24,1,6,5,6,1
+hmax,astar,30,13,0,0,0,0,0
+hmax,gbfs,30,19,0,12,1,16,0
+hmax,ida_star,30,7,0,0,0,0,0
+hmax,weighted_astar-w1.5,30,14,1,0,0,0,0
+hmax,weighted_astar-w2,30,15,1,0,0,0,0

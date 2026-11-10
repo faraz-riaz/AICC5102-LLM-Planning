@@ -1,0 +1,13 @@
+pair,domain,tasks_solved_by_both,mean_plan_len_llm-r1,mean_plan_len_hff,llm-r1_shorter,equal,hff_shorter,mean_plan_len_hmax,hmax_shorter
+llm-r1 vs hff,blocksworld,8,46.8,81.5,8,0,0,,
+llm-r1 vs hff,miconic,20,84.5,84,4,8,8,,
+llm-r1 vs hff,transport,10,24.5,27.8,6,2,2,,
+llm-r1 vs hff,ALL,38,60.8,68.7,18,10,10,,
+llm-r1 vs hmax,blocksworld,5,34.4,,0,5,,34.4,0
+llm-r1 vs hmax,miconic,9,15.9,,3,6,,16.4,0
+llm-r1 vs hmax,transport,5,11,,1,4,,11.2,0
+llm-r1 vs hmax,ALL,19,19.5,,4,15,,19.8,0
+hff vs hmax,blocksworld,5,,61.2,,0,0,34.4,5
+hff vs hmax,miconic,9,,16.2,,7,2,16.4,0
+hff vs hmax,transport,5,,11.4,,3,1,11.2,1
+hff vs hmax,ALL,19,,26.8,,10,3,19.8,6

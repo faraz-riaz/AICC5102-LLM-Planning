@@ -54,6 +54,27 @@ records and these outputs exist only on her machine; they are reproducible with
 the README commands (`--hash-seed-scope run`). Her results were produced under
 the per-run seed policy and are **not** relabelled.
 
+**Same-machine R1/R2 (regenerated 2026-11-10, Faraz's machine).** These were
+regenerated for machine consistency with M2, using Amina's runner and her
+`summarize_results.py` unchanged:
+- GBFS + hFF is a new batch, `m1-r1r2-gbfs-hff` (90 runs, about 20 min, commit `0e1c685`).
+- GBFS + DeepSeek-R1 / hmax reuse the identical-configuration paired arm
+  (`m2-paired-gbfs-*`).
+- All 270 runs used per-task seeds, 60 s / 4096 MiB and 3 workers.
+
+Coverage: hFF **38/90**, hmax **19/90**, DeepSeek-R1 **64/90**.
+
+| Domain | LLM/hFF ratio | Paper |
+|---|---:|---:|
+| Blocksworld | 2.50 | 2.75 |
+| Miconic | 1.45 | 1.22 |
+| Transport | 1.50 | 2.03 |
+
+Outputs: `results/derived/pre-experiment-v2/m1-r1r2/` and
+`results/figures/pre-experiment-v2/coverage.png`. They differ from Amina's
+53/25/14 because the machine and seed policy differ. The method and code are
+hers.
+
 **Items for Amina's review:**
 
 1. Approve (or amend) the runner fixes in `553f0ee`.

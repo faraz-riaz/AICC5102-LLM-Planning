@@ -1,0 +1,16 @@
+heuristic,method,gap_n,0 (optimal),"(0,5]","(5,10]","(10,25]","(25,50]",>50
+deepseek-r1,astar,17,12,1,2,2,0,0
+deepseek-r1,gbfs,17,12,1,2,2,0,0
+deepseek-r1,ida_star,17,2,0,2,11,1,1
+deepseek-r1,weighted_astar-w1.5,17,12,1,2,2,0,0
+deepseek-r1,weighted_astar-w2,17,12,1,2,2,0,0
+hff,astar,17,16,0,1,0,0,0
+hff,gbfs,17,6,3,3,3,2,0
+hff,ida_star,16,14,0,2,0,0,0
+hff,weighted_astar-w1.5,17,11,1,4,1,0,0
+hff,weighted_astar-w2,17,5,4,4,3,1,0
+hmax,astar,13,13,0,0,0,0,0
+hmax,gbfs,16,7,1,4,3,1,0
+hmax,ida_star,7,7,0,0,0,0,0
+hmax,weighted_astar-w1.5,15,15,0,0,0,0,0
+hmax,weighted_astar-w2,16,14,0,1,1,0,0

@@ -1,0 +1,29 @@
+2026-11-10 12:07:58,827 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-10 12:07:58,827 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run__3_wh6ne\domain.pddl
+2026-11-10 12:07:58,833 INFO     using search: gbfs_early_goal_test
+2026-11-10 12:07:58,833 INFO     using heuristic: hMaxHeuristic
+2026-11-10 12:07:58,833 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run__3_wh6ne\domain.pddl
+2026-11-10 12:07:58,835 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run__3_wh6ne\easy-p06.pddl
+2026-11-10 12:07:58,845 INFO     5 Predicates parsed
+2026-11-10 12:07:58,845 INFO     3 Actions parsed
+2026-11-10 12:07:58,845 INFO     15 Objects parsed
+2026-11-10 12:07:58,845 INFO     0 Constants parsed
+2026-11-10 12:07:58,845 INFO     Grounding start: transport-06
+2026-11-10 12:07:58,846 INFO     Relevance analysis removed 0 facts
+2026-11-10 12:07:58,846 INFO     Grounding end: transport-06
+2026-11-10 12:07:58,846 INFO     54 Variables created
+2026-11-10 12:07:58,846 INFO     252 Operators created
+2026-11-10 12:07:58,846 INFO     Search start: transport-06
+2026-11-10 12:07:58,849 INFO     Initial h value: 4.00
+2026-11-10 12:07:58,849 INFO     Found new best h: 3.00 after 1 expansions
+2026-11-10 12:07:59,036 INFO     Found new best h: 2.00 after 181 expansions
+2026-11-10 12:07:59,264 INFO     Found new best h: 1.00 after 430 expansions
+2026-11-10 12:07:59,264 INFO     Early goal reached via operator (drop v3 l4 p2 c0 c1).
+2026-11-10 12:07:59,264 INFO     437 Nodes expanded
+2026-11-10 12:07:59,264 INFO     Max open list size: 2461
+2026-11-10 12:07:59,264 INFO     Search end: transport-06
+2026-11-10 12:07:59,264 INFO     Search time: 0.44
+2026-11-10 12:07:59,264 INFO     Total time: 0.44
+2026-11-10 12:07:59,264 INFO     Plan length: 15
+2026-11-10 12:07:59,289 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-10 12:07:59,289 WARNING  warning: could not determine peak memory

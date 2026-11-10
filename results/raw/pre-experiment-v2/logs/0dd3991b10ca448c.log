@@ -1,0 +1,2 @@
+
+{"worker_ok": true, "initial_h": 33.0, "setup_time_s": 8.208228100091219, "status": "timeout", "failure_detail": "cooperative time limit reached", "nodes_generated": 48, "nodes_expanded": 2, "nodes_reopened": 0, "stale_nodes_skipped": 0, "dead_ends_pruned": 0, "cycles_pruned": null, "iterations": null, "final_bound": null, "search_time_s": 51.4012364000082, "plan_cost": null, "plan_length": null, "plan_valid": null, "validation_detail": "no plan returned", "replay_cost": null, "plan_sha256": null, "plan": null, "self_peak_rss_mib": null, "python_hash_seed": "1751138608"}

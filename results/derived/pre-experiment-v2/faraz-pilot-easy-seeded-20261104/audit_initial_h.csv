@@ -1,0 +1,5 @@
+heuristic_id,tasks,overestimating_tasks,median_ratio,max_ratio
+deepseek-r1,17,15,1.1764705882352942,2.1
+hff,19,0,0.95,1.0
+hmax,17,0,0.2727272727272727,0.75
+zero,4,0,0.0,0.0

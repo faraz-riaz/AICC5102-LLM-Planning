@@ -1,0 +1,14 @@
+domain,difficulty,hff,hmax,llm-r1
+blocksworld,easy,8/10,5/10,10/10
+blocksworld,medium,0/10,0/10,10/10
+blocksworld,hard,0/10,0/10,0/10
+blocksworld,all,8/30,5/30,20/30
+miconic,easy,10/10,9/10,10/10
+miconic,medium,10/10,0/10,10/10
+miconic,hard,0/10,0/10,9/10
+miconic,all,20/30,9/30,29/30
+transport,easy,10/10,5/10,10/10
+transport,medium,0/10,0/10,5/10
+transport,hard,0/10,0/10,0/10
+transport,all,10/30,5/30,15/30
+ALL,all,38/90,19/90,64/90

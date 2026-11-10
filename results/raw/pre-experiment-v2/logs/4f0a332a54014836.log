@@ -1,0 +1,29 @@
+2026-11-10 13:31:56,678 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-10 13:31:56,679 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_hyc8d56x\domain.pddl
+2026-11-10 13:31:56,684 INFO     using search: gbfs_early_goal_test
+2026-11-10 13:31:56,684 INFO     using heuristic: hFFHeuristic
+2026-11-10 13:31:56,684 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_hyc8d56x\domain.pddl
+2026-11-10 13:31:56,685 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_hyc8d56x\easy-p02.pddl
+2026-11-10 13:31:56,686 INFO     6 Predicates parsed
+2026-11-10 13:31:56,686 INFO     4 Actions parsed
+2026-11-10 13:31:56,686 INFO     5 Objects parsed
+2026-11-10 13:31:56,686 INFO     0 Constants parsed
+2026-11-10 13:31:56,686 INFO     Grounding start: miconic-02
+2026-11-10 13:31:56,687 INFO     Relevance analysis removed 0 facts
+2026-11-10 13:31:56,687 INFO     Grounding end: miconic-02
+2026-11-10 13:31:56,687 INFO     10 Variables created
+2026-11-10 13:31:56,687 INFO     17 Operators created
+2026-11-10 13:31:56,687 INFO     Search start: miconic-02
+2026-11-10 13:31:56,687 INFO     Initial h value: 4.00
+2026-11-10 13:31:56,687 INFO     Found new best h: 3.00 after 1 expansions
+2026-11-10 13:31:56,687 INFO     Found new best h: 2.00 after 3 expansions
+2026-11-10 13:31:56,687 INFO     Found new best h: 1.00 after 4 expansions
+2026-11-10 13:31:56,687 INFO     Early goal reached via operator (depart f1 p1).
+2026-11-10 13:31:56,687 INFO     5 Nodes expanded
+2026-11-10 13:31:56,687 INFO     Max open list size: 7
+2026-11-10 13:31:56,687 INFO     Search end: miconic-02
+2026-11-10 13:31:56,687 INFO     Search time: 0.00
+2026-11-10 13:31:56,688 INFO     Total time: 0.02
+2026-11-10 13:31:56,688 INFO     Plan length: 4
+2026-11-10 13:31:56,691 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-10 13:31:56,691 WARNING  warning: could not determine peak memory
