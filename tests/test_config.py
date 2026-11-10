@@ -63,6 +63,35 @@ def test_agreed_pre_experiment_configuration() -> None:
         "weights": [1.0, 1.5, 2.0],
         "correctness_check_weight": 1.0,
     }
+    assert (
+        config["algorithms"]["astar_implementation"]
+        == "project:search.a_star.astar_search"
+    )
+    assert (
+        config["algorithms"]["weighted_astar_implementation"]
+        == "project:search.a_star.weighted_astar_search"
+    )
+    assert (
+        config["algorithms"]["ida_star_implementation"]
+        == "project:search.ida_star.ida_star_search"
+    )
+
+
+def test_configured_search_implementations_are_importable() -> None:
+    import importlib
+    import sys
+
+    config = load_config()
+    pyperplan = str(ROOT / "src" / "pyperplan")
+    sys.path.insert(0, pyperplan)
+    try:
+        for key in ("astar_implementation", "weighted_astar_implementation", "ida_star_implementation"):
+            origin, dotted = config["algorithms"][key].split(":", 1)
+            assert origin == "project"
+            module_name, function_name = dotted.rsplit(".", 1)
+            assert callable(getattr(importlib.import_module(module_name), function_name))
+    finally:
+        sys.path.remove(pyperplan)
 
 
 def test_optimality_monitoring_and_status_policy() -> None:
@@ -89,6 +118,7 @@ def test_result_and_machine_schemas_cover_standard_fields() -> None:
     assert set(result["properties"]["optimal_cost_status"]["enum"]) == OPTIMAL_COST_STATUSES
     for field in (
         "heuristic_set_id",
+        "nodes_generated",
         "monitor_backend",
         "memory_metric",
         "memory_limit_enforced",
