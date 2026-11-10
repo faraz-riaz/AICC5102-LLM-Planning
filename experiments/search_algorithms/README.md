@@ -24,5 +24,11 @@ It runs A* with zero, hmax, and the archived upstream DeepSeek R1 heuristic (`ar
 | `run_faraz_pilot.py` | Bounded pilot/validation batches (NOT the official matrix). |
 | `analyze_search_results.py` | M2-08 coverage, optimality gaps, paired common-solved comparison, figures R3/R4/R5. |
 | `audit_failures.py` | M2-09 failure and guarantee audit. |
+| `convert_runner_records.py` | Shared-runner records + logs -> analysis table (`search_runs.csv`). |
+| `check_matrix_completeness.py` | Official-matrix completeness/integrity audit (missing, duplicates, schema, plan replay, seeds). |
+| `m2_paired_analysis.py` | Matched-task comparisons (vs A*, LLM vs hmax, IDA* vs A*). |
+| `merge_reference_tables.py` | Merge reference tables from different reference budgets. |
+
+Official M2 results (2026-11-10) are run through the shared runner (`experiments/reproduction/run_search_algorithms.py`); see `docs/M1_M2_FINAL_INTEGRATION_STATUS.md`.
 
 Exact commands used are listed in `docs/FARAZ_PROGRESS.md` (§24). All writers refuse to overwrite existing result files.

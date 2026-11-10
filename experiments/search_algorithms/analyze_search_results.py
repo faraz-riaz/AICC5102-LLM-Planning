@@ -278,7 +278,8 @@ def figure_r4(df: pd.DataFrame, path: Path, scope: str) -> None:
             median = float(np.median(gaps))
             ax.plot([xi - 0.3, xi + 0.3], [median, median], color=INK, linewidth=1.5, zorder=4)
         labels = [
-            f"{ALGORITHM_NAMES.get(m, m)}\n(n={int((sub['method'] == m).sum())})" for m in methods
+            f"{ALGORITHM_NAMES.get(m, m).replace(' w=', chr(10) + 'w=')}\n(n={int((sub['method'] == m).sum())})"
+            for m in methods
         ]
         ax.set_xticks(range(len(methods)), labels, fontsize=7)
         ax.set_title(HEURISTIC_NAMES.get(heuristic, heuristic), fontsize=9, color=INK)

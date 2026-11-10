@@ -1261,3 +1261,30 @@ Tests: `feature/faraz-search` 154 passed; `feature/amina-runner-wiring` 158
 passed (incl. new `tests/test_shared_runner.py`, with an end-to-end GBFS + A*
 run on Blocksworld easy-p03 confirming both runners use the same task hash
 seed). Benchmark hashes intact on both.
+
+## 30. Official M2 matrix, final R3–R5 and M1/M2 integration (2026-11-10)
+
+Full details: [`docs/M1_M2_FINAL_INTEGRATION_STATUS.md`](M1_M2_FINAL_INTEGRATION_STATUS.md).
+In brief:
+
+- **Integration.** Branch `integration/m1-m2` merges Amina's committed
+  branches and `feature/faraz-search`, plus the runner fixes (`553f0ee`,
+  awaiting Amina's review).
+- **Official matrix.** 600 runs through the shared runner (A*/WA* 1.5/WA* 2.0
+  × DeepSeek-R1/hmax × 90 tasks, plus IDA* × 2 × 30 easy) and a 180-run paired
+  GBFS arm. Completeness audit passed: 0 missing, 0 duplicates, and 363/363
+  successful plans independently re-validated.
+- **Coverage (of 90).**
+  - DeepSeek-R1: GBFS 64, A* 65, WA* 1.5 70, WA* 2.0 69.
+  - hmax: GBFS 19, A* 14, WA* 1.5 15, WA* 2.0 16.
+  - IDA* (easy tasks only): 24/30 with DeepSeek-R1, 7/30 with hmax.
+- **References.** Still 17/90 proven. An extended 300 s attempt proved 0 of
+  the 13 unproven easy tasks; all 14 official A*+hmax easy solutions equal L*.
+- **R4 gaps (17 easy tasks).**
+  - DeepSeek-R1: A*/WA* 2.79 %, GBFS 3.31 %, IDA* 21.8 %.
+  - hmax: A* and WA* 1.5 0 %, WA* 2.0 1.52 %, GBFS 6.03 %.
+- **Audit.** 0 guarantee violations, 0 negative gaps, 0 invalid plans.
+
+The pilot results in §22–§24 are superseded by these official results, and
+those sections remain as history. No result is tagged [PAPER RESULT] yet;
+promoting results to the paper is a team decision.
