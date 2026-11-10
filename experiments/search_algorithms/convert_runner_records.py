@@ -127,6 +127,12 @@ def convert(raw_dir: Path, prefixes: list[str]) -> list[dict]:
             for source, target in WORKER_FIELDS.items():
                 if source in report:
                     row[target] = report[source]
+        # Plan hash from the saved plan file, identical for every runner:
+        # SHA-256 of the operator names joined by "\n" (same as search_worker).
+        plan_file = raw_dir / "plans" / f"{run_id}.soln"
+        if plan_file.is_file():
+            names = [line.strip() for line in plan_file.read_text(encoding="utf-8").splitlines() if line.strip()]
+            row["plan_sha256"] = hashlib.sha256("\n".join(names).encode("utf-8")).hexdigest()
         row["log_found"] = bool(log_text)
         rows.append(row)
     return rows

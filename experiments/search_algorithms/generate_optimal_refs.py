@@ -71,8 +71,10 @@ def compile_reference(task: dict, astar_row: dict | None, ucs_row: dict | None, 
         "sha256_problem": task["sha256_problem"],
     }
     common_tail = {
-        "time_limit_s": config["resources"]["time_limit_s"],
-        "memory_limit_mib": config["resources"]["memory_limit_mib"],
+        # Limits actually used by this task's solver run (may be a
+        # reference-only budget); configuration values when skipped.
+        "time_limit_s": (astar_row or {}).get("time_limit_s", config["resources"]["time_limit_s"]),
+        "memory_limit_mib": (astar_row or {}).get("memory_limit_mib", config["resources"]["memory_limit_mib"]),
         "config_id": config["config_id"],
         "benchmark_version": config["benchmark_version"],
         "cost_model": config["optimality_reference"]["cost_model"],
@@ -170,18 +172,31 @@ def main() -> int:
     parser.add_argument("--no-stage-skip", action="store_true")
     parser.add_argument("--no-ucs-fallback", action="store_true", help="do not run exact UCS on tasks A*+hmax left unproven (non-cross-check stages)")
     parser.add_argument("--raw-dir", type=Path, default=None, help="per-run JSON directory (default results/raw/<config_id>)")
+    parser.add_argument("--problems", nargs="+", default=None, help="restrict to domain:problem_id entries")
+    parser.add_argument("--time-limit", type=float, default=None,
+                        help="reference-only budget in seconds (default: config resources.time_limit_s)")
+    parser.add_argument("--memory-limit", type=int, default=None,
+                        help="reference-only memory cap in MiB (default: config resources.memory_limit_mib)")
     args = parser.parse_args()
 
     if args.output.exists():
         raise SystemExit(f"refusing to overwrite {args.output}; pass a new --output")
     prov = provenance()
     config = prov["config"]
-    time_limit = float(config["resources"]["time_limit_s"])
-    memory_limit = int(config["resources"]["memory_limit_mib"])
+    # Reference budgets may exceed the main benchmark budget (references are
+    # offline ground truth, not compared runtimes); the budget used is
+    # recorded in every output row.
+    time_limit = float(args.time_limit or config["resources"]["time_limit_s"])
+    memory_limit = int(args.memory_limit or config["resources"]["memory_limit_mib"])
     cross_difficulties = set(config["optimality_reference"]["cross_check_difficulties"])
     batch_id = args.batch_id or "refs-" + utc_now().replace(":", "").replace("-", "")
     raw_dir = args.raw_dir or ROOT / "results" / "raw" / config["config_id"]
     tasks = [r for r in load_manifest() if args.domains is None or r["domain"] in args.domains]
+    if args.problems:
+        wanted = {tuple(item.split(":", 1)) for item in args.problems}
+        tasks = [r for r in tasks if (r["domain"], r["problem_id"]) in wanted]
+        if len(tasks) != len(wanted):
+            raise SystemExit("some --problems entries are not in the frozen manifest")
     print(f"batch {batch_id}: limits {time_limit}s / {memory_limit} MiB, jobs={args.jobs}, "
           f"dirty={prov['git_worktree_dirty']}", flush=True)
 

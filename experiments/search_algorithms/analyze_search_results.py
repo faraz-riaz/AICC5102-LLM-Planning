@@ -123,6 +123,7 @@ def quality_table(df: pd.DataFrame) -> pd.DataFrame:
             "gap_max_pct": gaps.max() if len(gaps) else np.nan,
             "optimal_n": int((gaps == 0).sum()),
             "median_search_time_s": solved["search_time_s"].median(),
+            "median_wall_time_s": solved["wall_time_s"].median(),
             "mean_search_time_s": solved["search_time_s"].mean(),
             "median_nodes_expanded": solved["nodes_expanded"].median(),
             "median_nodes_generated": solved["nodes_generated"].median(),
@@ -142,7 +143,13 @@ def common_solved_table(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         sizes[heuristic] = len(common)
         for method in methods:
             sub = group[(group["method"] == method) & (group["status"] == "success")]
-            sub = sub[[(d, p) in common for d, p in zip(sub["domain"], sub["problem_id"])]]
+            # Index-aligned boolean mask: a plain empty list would select zero
+            # *columns* (not rows) when the method solved nothing.
+            in_common = pd.Series(
+                [(d, p) in common for d, p in zip(sub["domain"], sub["problem_id"])],
+                index=sub.index, dtype=bool,
+            )
+            sub = sub[in_common]
             gaps = sub["gap_pct"].dropna()
             rows.append({
                 "heuristic": heuristic,
@@ -155,9 +162,35 @@ def common_solved_table(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
                 "median_nodes_expanded": sub["nodes_expanded"].median(),
                 "median_nodes_generated": sub["nodes_generated"].median(),
                 "median_search_time_s": sub["search_time_s"].median(),
+                "median_wall_time_s": sub["wall_time_s"].median(),
                 "total_nodes_expanded": sub["nodes_expanded"].sum(),
             })
     return pd.DataFrame(rows), sizes
+
+
+def coverage_by(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    """Valid-plan coverage per heuristic x method x <column> (domain/difficulty)."""
+    rows = []
+    for (heuristic, method, value), group in df.groupby(["heuristic_id", "method", column]):
+        success = int((group["status"] == "success").sum())
+        rows.append({"heuristic": heuristic, "method": method, column: value, "attempted": len(group),
+                     "success": success, "timeout": int((group["status"] == "timeout").sum()),
+                     "other_failure": len(group) - success - int((group["status"] == "timeout").sum()),
+                     "coverage_pct": 100.0 * success / len(group)})
+    return pd.DataFrame(rows)
+
+
+def effort_by_difficulty(df: pd.DataFrame) -> pd.DataFrame:
+    """Median effort on solved runs per heuristic x method x difficulty."""
+    rows = []
+    for (heuristic, method, difficulty), group in df.groupby(["heuristic_id", "method", "difficulty"]):
+        solved = group[group["status"] == "success"]
+        rows.append({"heuristic": heuristic, "method": method, "difficulty": difficulty,
+                     "attempted": len(group), "solved": len(solved),
+                     "median_nodes_expanded": solved["nodes_expanded"].median(),
+                     "median_wall_time_s": solved["wall_time_s"].median(),
+                     "median_plan_length": solved["plan_length"].median()})
+    return pd.DataFrame(rows)
 
 
 def gap_distribution(df: pd.DataFrame) -> pd.DataFrame:
@@ -333,11 +366,14 @@ def main() -> int:
     parser.add_argument("--tag", required=True)
     parser.add_argument("--scope", required=True, help="text stamped on every figure, e.g. 'PILOT: easy tier only'")
     parser.add_argument("--config-id", default="pre-experiment-v2")
+    parser.add_argument("--difficulties", nargs="+", default=None, help="restrict to these difficulty tiers")
+    parser.add_argument("--methods", nargs="+", default=None, help="restrict to these algorithm labels")
     args = parser.parse_args()
 
     derived = ROOT / "results" / "derived" / args.config_id / args.tag
     figures = ROOT / "results" / "figures" / args.config_id / args.tag
-    own_outputs = [derived / f"{n}.csv" for n in ("coverage", "quality", "common_solved", "gap_distribution")]
+    own_outputs = [derived / f"{n}.csv" for n in ("coverage", "quality", "common_solved", "gap_distribution",
+                                                 "coverage_by_domain", "coverage_by_difficulty", "effort_by_difficulty")]
     own_outputs += [derived / "summary.md", figures / "R3_coverage.png", figures / "R4_gap_distribution.png",
                     figures / "R5_effort_vs_quality.png"]
     if any(path.exists() for path in own_outputs):
@@ -346,11 +382,21 @@ def main() -> int:
     figures.mkdir(parents=True, exist_ok=True)
 
     df = attach_references(load_runs(args.runs), pd.read_csv(args.refs))
+    if args.difficulties:
+        df = df[df["difficulty"].isin(args.difficulties)]
+    if args.methods:
+        df = df[df["method"].isin(args.methods)]
+    if df.empty:
+        raise SystemExit("no runs left after filtering")
+    by_domain = coverage_by(df, "domain")
+    by_difficulty = coverage_by(df, "difficulty")
+    effort = effort_by_difficulty(df)
     coverage = coverage_table(df)
     quality = quality_table(df)
     common, sizes = common_solved_table(df)
     distribution = gap_distribution(df)
-    for name, frame in (("coverage", coverage), ("quality", quality), ("common_solved", common), ("gap_distribution", distribution)):
+    for name, frame in (("coverage", coverage), ("quality", quality), ("common_solved", common), ("gap_distribution", distribution),
+                        ("coverage_by_domain", by_domain), ("coverage_by_difficulty", by_difficulty), ("effort_by_difficulty", effort)):
         frame.to_csv(derived / f"{name}.csv", index=False)
 
     figure_r3(coverage, figures / "R3_coverage.png", args.scope)
@@ -368,10 +414,19 @@ def main() -> int:
         to_markdown(coverage[["heuristic", "method", "attempted", "success", "invalid_plan", "unsolved", "timeout", "memory_limit", "planner_error", "coverage_pct"]]),
         "",
         "## Quality on each method's own solved set",
-        to_markdown(quality[["heuristic", "method", "solved_valid", "gap_n", "optimal_n", "gap_mean_pct", "gap_median_pct", "gap_max_pct", "median_search_time_s", "median_nodes_expanded"]]),
+        to_markdown(quality[["heuristic", "method", "solved_valid", "gap_n", "optimal_n", "gap_mean_pct", "gap_median_pct", "gap_max_pct", "median_wall_time_s", "median_nodes_expanded"]]),
         "",
         "## Paired comparison on common-solved tasks",
-        to_markdown(common[["heuristic", "method", "common_solved_n", "gap_n", "optimal_n", "gap_mean_pct", "median_nodes_expanded", "median_search_time_s"]]),
+        to_markdown(common[["heuristic", "method", "common_solved_n", "gap_n", "optimal_n", "gap_mean_pct", "median_nodes_expanded", "median_wall_time_s"]]),
+        "",
+        "## Coverage by domain",
+        to_markdown(by_domain),
+        "",
+        "## Coverage by difficulty",
+        to_markdown(by_difficulty),
+        "",
+        "## Effort on solved runs by difficulty",
+        to_markdown(effort),
         "",
         "## Gap distribution (counts)",
         to_markdown(distribution),

@@ -111,6 +111,10 @@ def main() -> int:
     df["guarantee"] = df.apply(guarantee, axis=1)
     df["outcome"] = df.apply(outcome, axis=1)
     df["violation"] = df.apply(violation, axis=1)
+    # A valid plan cheaper than a proven optimum is impossible: it would mean
+    # the reference or the plan/cost bookkeeping is wrong. Counted separately
+    # and treated as a violation for the exit code.
+    df["negative_gap"] = (df["status"] == "success") & df["ref_proven"] & (df["plan_cost"] < df["L_star"])
 
     status = (
         df.pivot_table(index=["heuristic_id", "method", "difficulty"], columns="status", values="run_id", aggfunc="count", fill_value=0)
@@ -159,11 +163,12 @@ def main() -> int:
     initial_h.to_csv(targets[5], index=False)
 
     violations = int(df["violation"].sum())
+    negative_gaps = int(df["negative_gap"].sum())
     lines = [
         f"# Failure and guarantee audit: {args.tag}",
         "",
         f"Inputs: {', '.join(p.as_posix() for p in args.runs)}; references: {args.refs.as_posix()}",
-        f"Runs: {len(df)}. Guarantee violations: **{violations}**.",
+        f"Runs: {len(df)}. Guarantee violations: **{violations}**. Negative optimality gaps (cost below proven L*): **{negative_gaps}**.",
         "",
         "## Run status by method and difficulty",
         to_markdown(status),
@@ -185,8 +190,8 @@ def main() -> int:
         f"Non-success runs listed in audit_failures.csv: {len(failures)}",
     ]
     (out / "audit_summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"wrote audit to {out}; violations={violations}")
-    return 1 if violations else 0
+    print(f"wrote audit to {out}; violations={violations}; negative_gaps={negative_gaps}")
+    return 1 if violations or negative_gaps else 0
 
 
 if __name__ == "__main__":

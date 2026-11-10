@@ -354,3 +354,109 @@ def test_runner_record_converter_selects_by_batch_and_maps_ids(tmp_path: Path) -
     assert rows["a1"]["python_hash_seed"] == "123"
     assert rows["g1"]["algorithm_label"] == "gbfs" and rows["g1"]["search_cpu_time_s"] == 0.42
     assert rows["g1"]["search_time_s"] is None
+
+
+# ---------------------------------------------------------------------------
+# Official-matrix analysis tools (2026-11-10)
+# ---------------------------------------------------------------------------
+
+
+def _analysis_frame():
+    import pandas as pd
+
+    rows = []
+    for method, status, cost, expanded in (
+        ("astar", "success", 10.0, 100), ("gbfs", "success", 12.0, 20),
+        ("ida_star", "timeout", None, 5000),
+    ):
+        rows.append({"domain": "miconic", "problem_id": "easy-p02", "difficulty": "easy",
+                     "heuristic_id": "deepseek-r1", "algorithm_label": method, "method": method,
+                     "status": status, "plan_cost": cost, "plan_length": cost, "nodes_expanded": expanded,
+                     "nodes_generated": expanded * 3, "wall_time_s": 1.0, "search_time_s": 0.5,
+                     "plan_sha256": f"h-{method}", "ida_iterations": 3 if method == "ida_star" else None,
+                     "run_id": f"r-{method}"})
+    return pd.DataFrame(rows)
+
+
+def test_common_solved_table_handles_a_method_that_solved_nothing() -> None:
+    import pandas as pd
+    from analyze_search_results import attach_references, common_solved_table
+
+    refs = pd.DataFrame([{"domain": "miconic", "problem_id": "easy-p02", "optimal_cost": 4.0,
+                          "optimality_proven": True, "reference_status": "proven"}])
+    common, sizes = common_solved_table(attach_references(_analysis_frame(), refs))
+    assert sizes["deepseek-r1"] == 0  # IDA* solved nothing, so no common task
+    assert set(common["method"]) == {"astar", "gbfs", "ida_star"}
+
+
+def test_paired_vs_astar_counts_matched_tasks_only() -> None:
+    from m2_paired_analysis import paired_vs_astar
+
+    table = paired_vs_astar(_analysis_frame()).set_index("method")
+    assert table.loc["gbfs", "both_solved"] == 1
+    assert table.loc["gbfs", "costlier_than_astar"] == 1 and table.loc["gbfs", "identical_plan"] == 0
+    assert table.loc["gbfs", "median_expansion_ratio"] == 0.2
+    assert table.loc["ida_star", "both_solved"] == 0
+
+
+def test_completeness_checker_replays_saved_plans(tmp_path: Path) -> None:
+    import json as _json
+
+    from check_matrix_completeness import audit
+    from result_records import derive_seed
+
+    task = load_task("miconic", "easy-p02.pddl")
+    _cost, plan = independent_uniform_cost(task)
+    raw = tmp_path / "raw"
+    (raw / "plans").mkdir(parents=True)
+    (raw / "batches").mkdir()
+    record = _valid_record() | {
+        "run_id": "r1", "domain": "miconic", "problem_id": "easy-p02", "difficulty": "easy",
+        "algorithm": "astar", "heuristic_id": "miconic11_10", "heuristic_set_id": "upstream-deepseek-r1",
+        "plan_length": len(plan), "plan_cost": float(len(plan)), "optimal_cost": None,
+        "optimal_cost_status": "not_requested", "optimality_proven": False,
+        "optimal_reference_run_id": None, "optimal_reference_algorithm": None,
+        "optimal_reference_heuristic": None, "optimal_reference_plan_valid": None,
+    }
+    (raw / "r1.json").write_text(_json.dumps(record), encoding="utf-8")
+    (raw / "plans" / "r1.soln").write_text("\n".join(op.name for op in plan) + "\n", encoding="utf-8")
+    seed = derive_seed(5102, "pre-experiment-v2", "miconic", "easy-p02", "PYTHONHASHSEED")
+    (raw / "batches" / "b.json").write_text(_json.dumps({
+        "batch": "m2-official-astar-llm", "run_ids": ["r1"], "hash_seed_scope": "task",
+        "python_hash_seeds": {"r1": seed}}), encoding="utf-8")
+
+    summary, issues = audit(raw, ["m2-official-"], [("astar", None, "llm", ("easy",))])
+
+    assert summary["successful_plans_replayed_valid"] == 1
+    assert summary["missing"] == 29 and summary["duplicates"] == 0
+    assert {i["check"] for i in issues} == {"missing"}
+
+
+def test_reference_merge_prefers_proven_and_flags_disagreement(tmp_path: Path) -> None:
+    import csv as _csv
+
+    from merge_reference_tables import merge
+
+    def write(name, rows):
+        path = tmp_path / name
+        with path.open("w", newline="", encoding="utf-8") as stream:
+            writer = _csv.DictWriter(stream, fieldnames=list(rows[0]))
+            writer.writeheader()
+            writer.writerows(rows)
+        return path
+
+    base = {"domain": "blocksworld", "reference_detail": "", "time_limit_s": "60"}
+    first = write("a.csv", [
+        base | {"problem_id": "p1", "optimal_cost": "", "optimality_proven": "False", "reference_status": "unknown_timeout"},
+        base | {"problem_id": "p2", "optimal_cost": "10.0", "optimality_proven": "True", "reference_status": "proven"},
+        base | {"problem_id": "p3", "optimal_cost": "7.0", "optimality_proven": "True", "reference_status": "proven"},
+    ])
+    ext = dict(base, time_limit_s="300")
+    second = write("b.csv", [
+        ext | {"problem_id": "p1", "optimal_cost": "12.0", "optimality_proven": "True", "reference_status": "proven"},
+        ext | {"problem_id": "p3", "optimal_cost": "8.0", "optimality_proven": "True", "reference_status": "proven"},
+    ])
+    rows = {r["problem_id"]: r for r in merge([first, second])}
+    assert rows["p1"]["optimal_cost"] == "12.0" and rows["p1"]["reference_budget_s"] == "300"
+    assert rows["p2"]["reference_source_file"] == "a.csv"
+    assert rows["p3"]["reference_status"] == "cross_check_mismatch" and rows["p3"]["optimal_cost"] == ""
