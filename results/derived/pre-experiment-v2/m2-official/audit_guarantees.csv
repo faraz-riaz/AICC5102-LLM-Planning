@@ -1,0 +1,11 @@
+heuristic_id,method,guarantee,empirically_optimal,no_proven_reference,not_solved,suboptimal,violations
+deepseek-r1,astar,none,12,48,25,5,0
+deepseek-r1,gbfs,none,11,47,26,6,0
+deepseek-r1,ida_star,none,2,7,6,15,0
+deepseek-r1,weighted_astar-w1.5,none,12,53,20,5,0
+deepseek-r1,weighted_astar-w2,none,12,52,21,5,0
+hmax,astar,optimal,14,0,76,0,0
+hmax,gbfs,none,7,3,71,9,0
+hmax,ida_star,optimal,7,0,23,0,0
+hmax,weighted_astar-w1.5,bounded_w,15,0,75,0,0
+hmax,weighted_astar-w2,bounded_w,14,0,74,2,0

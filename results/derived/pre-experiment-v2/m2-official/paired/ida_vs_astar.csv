@@ -1,0 +1,3 @@
+heuristic,both_solved_easy,median_expansion_ratio_ida_over_astar,max_expansion_ratio_ida_over_astar,median_ida_iterations,equal_cost,ida_costlier
+deepseek-r1,24,1.1925925925925926,2203.9810426540284,1.0,3,21
+hmax,7,45.08038461538462,1118.4520547945206,8.0,7,0

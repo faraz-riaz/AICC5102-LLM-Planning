@@ -1,0 +1,11 @@
+heuristic,method,difficulty,attempted,success,timeout,other_failure,coverage_pct
+deepseek-r1,astar,easy,30,30,0,0,100.0
+deepseek-r1,gbfs,easy,30,30,0,0,100.0
+deepseek-r1,ida_star,easy,30,24,6,0,80.0
+deepseek-r1,weighted_astar-w1.5,easy,30,30,0,0,100.0
+deepseek-r1,weighted_astar-w2,easy,30,30,0,0,100.0
+hmax,astar,easy,30,14,16,0,46.666666666666664
+hmax,gbfs,easy,30,19,11,0,63.333333333333336
+hmax,ida_star,easy,30,7,23,0,23.333333333333332
+hmax,weighted_astar-w1.5,easy,30,15,15,0,50.0
+hmax,weighted_astar-w2,easy,30,16,14,0,53.333333333333336

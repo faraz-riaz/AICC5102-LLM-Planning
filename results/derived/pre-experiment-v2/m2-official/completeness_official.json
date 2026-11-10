@@ -1,0 +1,20 @@
+{
+  "batch_prefixes": [
+    "m2-official-"
+  ],
+  "scheduled_combinations": 600,
+  "records_found": 600,
+  "unique_combinations_found": 600,
+  "missing": 0,
+  "duplicates": 0,
+  "unexpected": 0,
+  "successful_plans_replayed_valid": 280,
+  "status_counts": {
+    "memory_limit": 10,
+    "success": 280,
+    "timeout": 310
+  },
+  "tasks_with_inconsistent_hash_seed": 0,
+  "issues_by_check": {},
+  "passed": true
+}
