@@ -283,3 +283,74 @@ def test_fixed_hash_seed_makes_gbfs_hff_reproducible_across_processes() -> None:
     assert {k: first.worker[k] for k in keys} == {k: second.worker[k] for k in keys}
     with pytest.raises(ValueError):
         run_bounded(job, time_limit_s=1, memory_limit_mib=64, hash_seed=-1)
+
+
+# ---------------------------------------------------------------------------
+# Integration with the shared runner (2026-11-10)
+# ---------------------------------------------------------------------------
+
+
+def test_all_pyperplan_builtin_heuristics_are_available() -> None:
+    expected = {"blind", "goalcount", "hadd", "hff", "hmax", "hsa", "landmark", "lmcut", "zero"}
+    assert expected <= set(search_adapters.BUILTIN_HEURISTICS)
+    task = load_task("transport", "easy-p01.pddl")
+    reference_cost, _ = independent_uniform_cost(task)
+    for name in ("blind", "lmcut"):  # admissible under unit costs
+        heuristic = search_adapters.load_heuristic_class(name)(task)
+        result = search_adapters.run_search("astar", task, heuristic, time_limit_s=60)
+        assert result.status == "solved" and result.plan_cost == reference_cost
+
+
+@pytest.mark.skipif(os.name != "nt", reason="exercises the Windows bounded executor")
+def test_worker_reports_before_a_parent_that_kills_exactly_at_the_limit() -> None:
+    """The shared runner kills the worker at exactly time_limit_s with no grace.
+    The worker must stop and report first (initial_h is computed during setup)."""
+    from bounded_exec import run_bounded
+
+    bench = ROOT / "benchmarks" / "ipc2023-learning" / "testing" / "blocksworld"
+    job = {
+        "domain_file": str(bench / "domain.pddl"), "problem_file": str(bench / "hard-p02.pddl"),
+        "algorithm": "ida_star", "heuristic_id": "hmax", "heuristic_file": None, "weight": None,
+    }
+    outcome = run_bounded(job, time_limit_s=4, memory_limit_mib=4096, hard_kill_grace_s=0)
+    assert not outcome.killed_for_time
+    assert outcome.worker["status"] == "timeout"
+    assert outcome.worker["nodes_expanded"] is not None
+    assert outcome.worker["initial_h"] is not None
+
+
+def test_runner_record_converter_selects_by_batch_and_maps_ids(tmp_path: Path) -> None:
+    import json as _json
+
+    from convert_runner_records import convert
+
+    raw = tmp_path / "raw"
+    (raw / "logs").mkdir(parents=True)
+    (raw / "batches").mkdir()
+    base = _valid_record() | {"optimal_cost": None, "optimal_cost_status": "not_requested",
+                              "optimality_proven": False, "optimal_reference_run_id": None,
+                              "optimal_reference_algorithm": None, "optimal_reference_heuristic": None,
+                              "optimal_reference_plan_valid": None}
+    wastar = base | {"run_id": "a1", "algorithm": "weighted_astar", "heuristic_weight": 1.5,
+                     "heuristic_id": "miconic11_10", "heuristic_set_id": "upstream-deepseek-r1"}
+    gbfs = base | {"run_id": "g1", "algorithm": "gbfs", "heuristic_id": "hff"}
+    other = base | {"run_id": "x1", "algorithm": "astar", "heuristic_id": "hmax"}
+    for record in (wastar, gbfs, other):
+        (raw / f"{record['run_id']}.json").write_text(_json.dumps(record), encoding="utf-8")
+    worker = {"status": "solved", "search_time_s": 0.25, "initial_h": 4.0, "nodes_reopened": 0,
+              "dead_ends_pruned": 0, "python_hash_seed": "123"}
+    (raw / "logs" / "a1.log").write_text("noise\n" + _json.dumps(worker) + "\n", encoding="utf-8")
+    (raw / "logs" / "g1.log").write_text("INFO Search time: 0.42\nPlan length: 3\n", encoding="utf-8")
+    (raw / "batches" / "m-wa.json").write_text(_json.dumps({"batch": "matched-wa15", "run_ids": ["a1"]}), encoding="utf-8")
+    (raw / "batches" / "g.json").write_text(_json.dumps({"batch": "repro-hff", "run_ids": ["g1"]}), encoding="utf-8")
+
+    rows = {row["run_id"]: row for row in convert(raw, ["matched-", "repro-"])}
+
+    assert set(rows) == {"a1", "g1"}  # x1 has no matching sidecar
+    assert rows["a1"]["algorithm_label"] == "weighted_astar-w1.5"
+    assert rows["a1"]["heuristic_id"] == "deepseek-r1"
+    assert rows["a1"]["heuristic_file"] == "artifacts/upstream/deepseek-r1/miconic11_10.py"
+    assert rows["a1"]["search_time_s"] == 0.25 and rows["a1"]["initial_h"] == 4.0
+    assert rows["a1"]["python_hash_seed"] == "123"
+    assert rows["g1"]["algorithm_label"] == "gbfs" and rows["g1"]["search_cpu_time_s"] == 0.42
+    assert rows["g1"]["search_time_s"] is None

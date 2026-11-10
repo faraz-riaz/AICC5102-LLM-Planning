@@ -30,7 +30,10 @@ sys.path.insert(0, str(ROOT / "src" / "pyperplan"))
 sys.path.insert(0, str(HERE))
 
 # Seconds kept in reserve so the worker can report before its budget ends.
-REPORT_MARGIN_S = 0.5
+# A parent that hard-kills at exactly the time limit (the shared runner's
+# run_search_algorithms.py) also pays interpreter start-up before this
+# process's clock starts, so the margin must cover start-up + reporting.
+REPORT_MARGIN_S = 1.0
 
 
 def _plan_sha256(names: list[str] | None) -> str | None:
@@ -69,6 +72,17 @@ def run(job: dict) -> dict:
     if algorithm != "uniform_cost":
         heuristic_path = Path(job["heuristic_file"]) if job.get("heuristic_file") else None
         heuristic = load_heuristic_class(job["heuristic_id"], heuristic_path)(task)
+        # Initial-state estimate, computed during setup (it counts against the
+        # time budget but not against search_time_s). Nothing expensive may run
+        # after the search, otherwise a parent that kills at the time limit can
+        # discard the worker's report of a timed-out run.
+        from search import searchspace
+
+        try:
+            out["initial_h"] = float(heuristic(searchspace.make_root_node(task.initial_state)))
+        except Exception as error:  # noqa: BLE001 - recorded; the search reports its own error
+            out["initial_h"] = None
+            out["initial_h_error"] = f"{type(error).__name__}: {error}"
     setup_time = time.perf_counter() - PROCESS_STARTED
     out["setup_time_s"] = setup_time
     remaining = float(job["time_limit_s"]) - setup_time - REPORT_MARGIN_S
@@ -126,15 +140,6 @@ def run(job: dict) -> dict:
         plan_sha256=_plan_sha256(names),
         plan=names,
     )
-    if heuristic is not None:
-        # Initial-state estimate, computed after the timed search.
-        from search import searchspace
-
-        try:
-            out["initial_h"] = float(heuristic(searchspace.make_root_node(task.initial_state)))
-        except Exception as error:  # noqa: BLE001
-            out["initial_h"] = None
-            out["initial_h_error"] = f"{type(error).__name__}: {error}"
     out["self_peak_rss_mib"] = _peak_rss_mib_self()
     import os
 
