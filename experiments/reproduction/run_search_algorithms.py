@@ -53,6 +53,7 @@ from run_reproduction import (
     git,
     load_tasks,
     machine_profile,
+    python_hash_seed,
     resolve_heuristic,
     utc_now,
     validate_plan,
@@ -162,7 +163,9 @@ def execute_run(task: dict, args, ctx: dict) -> dict:
             "weight": args.weight,
             "time_limit_s": args.time_limit,
         }
-        env = dict(os.environ, PYTHONHASHSEED=str(seed), PYTHONUTF8="1")
+        hash_seed = python_hash_seed(ctx, domain, problem_id, seed)
+        ctx["hash_seeds"][run_id] = hash_seed
+        env = dict(os.environ, PYTHONHASHSEED=str(hash_seed), PYTHONUTF8="1")
         cmd = [sys.executable, "-X", "utf8", str(WORKER)]
         outcome = run_limited_with_input(cmd, env, raw_dir / "logs" / f"{run_id}.log",
                               args.time_limit, args.memory_limit, json.dumps(job))
@@ -266,6 +269,8 @@ def main() -> int:
     ap.add_argument("--workers", type=int, default=1, help="parallel runs (1 = clean timings)")
     ap.add_argument("--heuristic-set-id", default=None)
     ap.add_argument("--trial-id", default=None)
+    ap.add_argument("--hash-seed-scope", choices=["task", "run"], default="task",
+                    help="PYTHONHASHSEED per task (default; same seed as the GBFS runner) or per run")
     args = ap.parse_args()
     if (args.algorithm == "weighted_astar") != (args.weight is not None):
         ap.error("--weight is required for weighted_astar and only allowed there")
@@ -281,6 +286,8 @@ def main() -> int:
         "machine_id": profile["machine_id"],
         "schema": json.loads(SCHEMA.read_text(encoding="utf-8")),
         "raw_dir": ROOT / "results" / "raw" / config["config_id"],
+        "hash_seed_scope": args.hash_seed_scope,
+        "hash_seeds": {},
     }
     dirty = bool(git("status", "--porcelain"))
     weight_text = "" if args.weight is None else f" w={args.weight:g}"
@@ -306,6 +313,8 @@ def main() -> int:
         "git_commit": ctx["git_commit"],
         "git_worktree_dirty": dirty,
         "machine_profile": profile,
+        "hash_seed_scope": ctx["hash_seed_scope"],
+        "python_hash_seeds": ctx["hash_seeds"],
         "run_ids": [r["run_id"] for r in records],
     }
     write_new(ctx["raw_dir"] / "batches" / f"{args.batch}-{uuid.uuid4().hex[:6]}.json",

@@ -34,9 +34,13 @@ Design notes
     There is a short gap between process start and job assignment.
   * Linux/macOS (used only for testing): RLIMIT_AS plus process-group kill;
     peak memory is not measured (recorded as null).
-  * PYTHONHASHSEED is fixed per run (derived from the base seed), because
-    Pyperplan's grounding and hFF iterate over Python sets of strings and
-    would otherwise differ between processes.
+  * PYTHONHASHSEED is fixed explicitly, because Pyperplan's grounding and hFF
+    iterate over Python sets of strings and would otherwise differ between
+    processes. Default scope "task": one seed per task, shared by every
+    algorithm/heuristic/trial and by Faraz's tools (same formula), so paired
+    comparisons see the identical grounded task. Scope "run" (the run seed)
+    reproduces the original 270 reproduction runs. The seed used for every run
+    is listed in the batch sidecar.
   * Each run works on its own temporary copy of the task, so plan files
     (.soln) of different runs can never overwrite each other.
   * Raw records are immutable: existing files are never overwritten.
@@ -78,7 +82,7 @@ UPSTREAM_FILES = {
     "miconic": "miconic11_10.py",
     "transport": "transport7_10.py",
 }
-BUILTIN_HEURISTICS = {"hff", "hmax", "blind", "goalcount", "hadd", "landmark", "lmcut", "hsa"}
+BUILTIN_HEURISTICS = {"hff", "hmax", "blind", "goalcount", "hadd", "landmark", "lmcut", "hsa", "zero"}
 SEARCH_NAMES = {"gbfs": "gbfs_early_goal_test"}
 IS_WINDOWS = os.name == "nt"
 
@@ -98,6 +102,19 @@ def derive_seed(base_seed: int, *fields: object) -> int:
     """Protocol seed: SHA-256 of the base seed and canonical run fields."""
     text = ":".join([str(base_seed), *(str(f) for f in fields)])
     return int(hashlib.sha256(text.encode("utf-8")).hexdigest()[:8], 16)
+
+
+def python_hash_seed(ctx: dict, domain: str, problem_id: str, run_seed: int) -> int:
+    """PYTHONHASHSEED for one run.
+
+    "task": SHA-256 of (base seed, config_id, domain, problem_id, "PYTHONHASHSEED"),
+    identical to experiments/search_algorithms/faraz_jobs.py, so GBFS, A*, WA*,
+    IDA* and every heuristic trial ground a task in the same operator order.
+    "run": the run seed (behaviour of the original reproduction batches).
+    """
+    if ctx["hash_seed_scope"] == "task":
+        return derive_seed(ctx["base_seed"], ctx["config_id"], domain, problem_id, "PYTHONHASHSEED")
+    return run_seed
 
 
 def git(*args: str) -> str:
@@ -349,12 +366,16 @@ def validate_plan(domain_file: Path, problem_file: Path, plan_file: Path) -> tup
         [sys.executable, "-X", "utf8", str(VALIDATOR), str(domain_file), str(problem_file), str(plan_file)],
         cwd=ROOT, capture_output=True, text=True,
     )
+    # Exit 0 + "valid plan" on stdout: valid. Exit 1 with the reason on stderr:
+    # invalid plan, unless stderr starts with "plan validation failed" (the
+    # validator could not read/parse its inputs). Anything else: validator error.
     out = (result.stdout or "").strip()
-    if out.startswith("valid plan"):
+    err = (result.stderr or "").strip()
+    if result.returncode == 0 and out.startswith("valid plan"):
         return True, None
-    if out.lower().startswith("invalid"):
-        return False, out[-300:]
-    return None, (out or result.stderr or "validator gave no output").strip()[-300:]
+    if result.returncode == 1 and err and not err.startswith("plan validation failed") and "Traceback" not in err:
+        return False, err[-300:]
+    return None, (err or out or f"validator exit {result.returncode} without output")[-300:]
 
 
 def execute_run(task: dict, args, ctx: dict) -> dict:
@@ -373,7 +394,9 @@ def execute_run(task: dict, args, ctx: dict) -> dict:
         domain_file = tmp / "domain.pddl"
         shutil.copyfile(problem_src, problem)
         shutil.copyfile(domain_src, domain_file)
-        env = dict(os.environ, PYTHONHASHSEED=str(seed), PYTHONUTF8="1")
+        hash_seed = python_hash_seed(ctx, domain, problem_id, seed)
+        ctx["hash_seeds"][run_id] = hash_seed
+        env = dict(os.environ, PYTHONHASHSEED=str(hash_seed), PYTHONUTF8="1")
         cmd = [sys.executable, "-X", "utf8", str(PYPERPLAN), "-s", SEARCH_NAMES[args.algorithm],
                "-H", heur_arg, str(problem)]
         outcome = run_limited(cmd, env, raw_dir / "logs" / f"{run_id}.log", args.time_limit, args.memory_limit)
@@ -490,6 +513,8 @@ def main() -> int:
     ap.add_argument("--heuristic-set-id", default=None)
     ap.add_argument("--trial-id", default=None)
     ap.add_argument("--summary-csv", type=Path, default=None, help="also write a CSV summary of this batch")
+    ap.add_argument("--hash-seed-scope", choices=["task", "run"], default="task",
+                    help="PYTHONHASHSEED per task (default; paired comparisons) or per run (original reproduction batches)")
     args = ap.parse_args()
 
     domains = [d.strip() for d in args.domain.split(",") if d.strip()]
@@ -503,6 +528,8 @@ def main() -> int:
         "machine_id": profile["machine_id"],
         "schema": json.loads(SCHEMA.read_text(encoding="utf-8")),
         "raw_dir": ROOT / "results" / "raw" / config["config_id"],
+        "hash_seed_scope": args.hash_seed_scope,
+        "hash_seeds": {},
     }
     dirty = bool(git("status", "--porcelain"))
     print(f"{len(tasks)} runs | heuristic={args.heuristic} | {args.time_limit:g}s, {args.memory_limit} MiB | "
@@ -525,6 +552,8 @@ def main() -> int:
         "git_commit": ctx["git_commit"],
         "git_worktree_dirty": dirty,
         "machine_profile": profile,
+        "hash_seed_scope": ctx["hash_seed_scope"],
+        "python_hash_seeds": ctx["hash_seeds"],
         "run_ids": [r["run_id"] for r in records],
     }
     write_new(ctx["raw_dir"] / "batches" / f"{args.batch}-{uuid.uuid4().hex[:6]}.json", json.dumps(sidecar, indent=2) + "\n")

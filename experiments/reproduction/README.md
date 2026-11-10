@@ -41,7 +41,11 @@ uv run --frozen python experiments/reproduction/run_reproduction.py --batch bw-t
 ```
 
 `--heuristic`: `hff`, `hmax`, `blind`, ... (any built-in Pyperplan name), `llm-upstream`, or a path to a `.py` file.
-Other options: `--domain a,b` `--difficulty easy|medium|hard` `--limit N` `--time-limit S` `--memory-limit MiB` `--workers N` `--summary-csv FILE`.
+Other options: `--domain a,b` `--difficulty easy|medium|hard` `--limit N` `--time-limit S` `--memory-limit MiB` `--workers N` `--summary-csv FILE` `--hash-seed-scope task|run`.
+
+`--hash-seed-scope` (both runners, default `task`): `PYTHONHASHSEED` is one seed per task, SHA-256 of (base seed, config_id, domain, problem_id, `PYTHONHASHSEED`). It is shared by GBFS, A*, WA*, IDA*, every heuristic and every trial, and is the same formula as Faraz's tools. Every algorithm and trial then grounds a task in the same operator order, so paired comparisons and trial-to-trial variance are not mixed with hash-seed noise. `run` uses each run's own seed. **The original 270 reproduction runs used `run`**; add `--hash-seed-scope run` to reproduce them exactly. The seed of every run is listed in the batch sidecar (`python_hash_seeds`).
+
+When running a heuristic *file*, always pass `--domain` with the domain that file was written for: the runner applies the given file to every selected domain.
 Defaults come from `configs/experiment.v2.toml` (60 s, 4096 MiB). Runs are sequential; `--workers > 1` makes runs compete for CPU and inflates wall times.
 
 A*, Weighted A* and IDA* (needs Faraz's search code from branch `feature/faraz-search`):
@@ -52,7 +56,7 @@ uv run --frozen python experiments/reproduction/run_search_algorithms.py --batch
 uv run --frozen python experiments/reproduction/run_search_algorithms.py --batch ida-llm --algorithm ida_star --heuristic llm-upstream --domain blocksworld
 ```
 
-`--weight` is required for `weighted_astar` and not allowed for the others. The other options are the same as above.
+`--weight` is required for `weighted_astar` and not allowed for the others. The other options are the same as above. Any built-in Pyperplan heuristic name works, including `zero` (A* with `zero` = uniform-cost search).
 
 Summaries:
 
@@ -60,15 +64,15 @@ Summaries:
 uv run --frozen python experiments/reproduction/summarize_results.py
 ```
 
-It refuses to overwrite existing outputs. To regenerate, delete `results/derived/pre-experiment-v2` and `results/figures/pre-experiment-v2` first (never `results/raw`).
+It summarizes only GBFS records that belong to a batch sidecar (A*/WA*/IDA* records and other members' records in the same folder are ignored). It refuses to overwrite existing outputs. To regenerate, delete `results/derived/pre-experiment-v2` and `results/figures/pre-experiment-v2` first (never `results/raw`).
 
 ## What it does for each run
 
 1. Reads the task from `benchmarks/manifest.csv` and checks the task file against its stored SHA-256.
 2. Copies the task and domain to a temporary folder (so plan files of different runs cannot overwrite each other).
-3. Runs `python src/pyperplan/pyperplan.py -s gbfs_early_goal_test -H <heuristic> <task>` with `PYTHONHASHSEED` fixed from the run seed (SHA-256 of base seed 5102 and the run fields).
+3. Runs `python src/pyperplan/pyperplan.py -s gbfs_early_goal_test -H <heuristic> <task>` with `PYTHONHASHSEED` fixed (per task by default; see `--hash-seed-scope`).
 4. Windows: the child runs in a Job Object (hard memory cap on the whole process tree, process tree killed at the time limit). Linux/macOS: `RLIMIT_AS` and process-group kill, peak memory not measured.
-5. Validates every plan with `tools/validate_plan.py`.
+5. Validates every plan with `tools/validate_plan.py` (exit 0 = valid; exit 1 with a reason = `invalid_plan`; unreadable inputs or a crash = `validator_error`).
 6. Writes `results/raw/pre-experiment-v2/<run_id>.json` (all required fields of `configs/result.schema.json`), the raw log in `logs/`, solved plans in `plans/`, and a batch file in `batches/`. Existing files are never overwritten. `results/raw` is git-ignored.
 
 Statuses the runner can write: `success`, `unsolved`, `timeout`, `memory_limit`, `invalid_plan`, `planner_error`, `validator_error`. Our 270 real runs produced only `success` and `timeout`.

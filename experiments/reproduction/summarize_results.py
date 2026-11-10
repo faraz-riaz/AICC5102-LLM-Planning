@@ -10,7 +10,10 @@ results/derived/<config_id>/:
   plan_quality.csv      plan lengths on tasks solved by both heuristics of a pair
 and, if matplotlib is installed, results/figures/<config_id>/coverage.png (one figure).
 
-Selection rule: all batches except those whose label starts with "smoke".
+Selection rule: GBFS records listed in a batch sidecar (results/raw/<config_id>/
+batches/*.json), except batches whose label starts with "smoke". Records of other
+algorithms (A*, WA*, IDA* from run_search_algorithms.py) and records without a
+sidecar (e.g. Faraz's pilot records in the same folder) are ignored.
 If a (domain, task, heuristic) was run more than once, the LATEST record is used.
 
     uv run --frozen python experiments/reproduction/summarize_results.py
@@ -58,9 +61,11 @@ def load_records(raw_dir: Path, skip_prefixes: tuple[str, ...]) -> list[dict]:
     records = []
     for path in raw_dir.glob("*.json"):
         record = json.loads(path.read_text(encoding="utf-8"))
-        batch = batch_of.get(record["run_id"], "(no batch)")
-        if batch.startswith(skip_prefixes):
-            continue
+        batch = batch_of.get(record["run_id"])
+        if batch is None or batch.startswith(skip_prefixes):
+            continue  # not a runner batch, or a smoke batch
+        if record.get("algorithm") != "gbfs":
+            continue  # A*/WA*/IDA* records share the folder but are not baselines
         record["batch"] = batch
         record["heuristic"] = label(record)
         records.append(record)
