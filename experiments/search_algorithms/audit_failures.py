@@ -41,7 +41,7 @@ sys.path.insert(0, str(HERE))
 
 from analyze_search_results import attach_references, load_runs, to_markdown  # noqa: E402
 
-ADMISSIBLE = {"zero", "hmax"}
+ADMISSIBLE = {"zero", "blind", "hmax", "lmcut"}  # under unit action costs
 
 
 def guarantee(row) -> str:

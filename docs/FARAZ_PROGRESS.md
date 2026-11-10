@@ -1237,3 +1237,27 @@ protocol note; results archiving (`results/` is git-ignored, §14).
    observations worth re-testing at scale: LLM-heuristic A* is not optimal but
    near-greedy; IDA* amplifies LLM overestimation; hFF weight/quality trade-off.
 5. Review and commit Part II; open a PR from `feature/faraz-search`.
+
+## 29. Shared-runner integration review and fixes (2026-11-10)
+
+Amina's shared runner now exists (`feature/amina-reproduction`: GBFS runner
+`run_reproduction.py`; `feature/amina-runner-wiring`: plus
+`run_search_algorithms.py`, which runs this workstream's `search_worker.py`
+under the same limits and record format). The M2-07 blocker "no shared
+runner" (§22.1) is therefore resolved, pending the fixes below. Review
+findings and fixes (all uncommitted; not pushed):
+
+| Finding | Fix | Branch |
+|---|---|---|
+| Runner kills the worker at exactly the time limit; the worker computed h(s0) *after* the search, so a timed-out run could be killed before reporting (node counts lost) | Worker computes h(s0) during setup; reporting margin 0.5 → 1.0 s. Test: worker reports under a parent with zero kill grace | `feature/faraz-search` (+ identical copy on the wiring branch) |
+| Worker knew only `zero`/`hmax`/`hff`; other Pyperplan built-ins (`blind`, `lmcut`, …) failed every run | `search_adapters` discovers all built-ins like the CLI; `blind`/`lmcut` marked admissible in `faraz_jobs`/`audit_failures` | same |
+| Runner records lack the extended columns M2-08/M2-09 need; heuristic IDs differ (file stem / `upstream-deepseek-r1` vs `deepseek-r1`) | New `convert_runner_records.py`: selects runs via batch sidecars, maps IDs, pulls search statistics from worker logs | same |
+| Per-run `PYTHONHASHSEED` (includes algorithm/heuristic/trial) mixes hash-seed noise into paired and trial comparisons (§22.4) | `--hash-seed-scope task\|run` in both runners, default `task` = same formula as `faraz_jobs` (verified by test); `run` reproduces the original 270 runs; seeds listed in batch sidecars | `feature/amina-runner-wiring` |
+| Invalid plans recorded as `validator_error` (validator prints failures to stderr) | Validator interpreted by exit code; test covers valid / goal-not-reached / unknown operator / missing file | wiring |
+| `--heuristic zero` rejected | `zero` added to built-ins | wiring |
+| Reproduction summary mixed A*/WA*/IDA* and non-batch records into GBFS tables | Summary keeps only GBFS records listed in a batch sidecar | wiring |
+
+Tests: `feature/faraz-search` 154 passed; `feature/amina-runner-wiring` 158
+passed (incl. new `tests/test_shared_runner.py`, with an end-to-end GBFS + A*
+run on Blocksworld easy-p03 confirming both runners use the same task hash
+seed). Benchmark hashes intact on both.

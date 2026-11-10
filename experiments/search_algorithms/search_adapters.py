@@ -28,8 +28,6 @@ import math
 import time
 from pathlib import Path
 
-from heuristics.relaxation import hFFHeuristic, hMaxHeuristic
-from heuristics.zero import ZeroHeuristic
 from search.a_star import (
     SearchResult,
     astar_search_result,
@@ -41,10 +39,35 @@ from search.ida_star import ida_star_search_result
 
 ROOT = Path(__file__).resolve().parents[2]
 ALGORITHMS = ("gbfs", "astar", "weighted_astar", "ida_star")
-BUILTIN_HEURISTICS = {"zero": ZeroHeuristic, "hmax": hMaxHeuristic, "hff": hFFHeuristic}
-# Admissibility under the unit-cost model. hFF and LLM heuristics are not
-# admissible in general; "unknown" means no admissibility claim is made.
-HEURISTIC_ADMISSIBILITY = {"zero": "admissible", "hmax": "admissible", "hff": "inadmissible"}
+
+
+def _discover_builtin_heuristics() -> dict:
+    """Map CLI names to classes exactly like ``pyperplan.py:get_heuristics``:
+    every ``*Heuristic`` class in ``src/pyperplan/heuristics/*.py``, named by
+    its class name without ``Heuristic``, lower-cased (``hff``, ``hmax``,
+    ``zero``, ``blind``, ``lmcut``, ``landmark``, ``hadd``, ``hsa``, ...)."""
+    registry: dict = {}
+    directory = ROOT / "src" / "pyperplan" / "heuristics"
+    for path in sorted(directory.glob("*.py")):
+        if path.stem in {"__init__", "heuristic_base"}:
+            continue
+        module = importlib.import_module(f"heuristics.{path.stem}")
+        for name in dir(module):
+            if name.endswith("Heuristic") and name != "Heuristic" and not name.startswith("_"):
+                registry.setdefault(name[: -len("Heuristic")].lower(), getattr(module, name))
+    return registry
+
+
+BUILTIN_HEURISTICS = _discover_builtin_heuristics()
+# Admissibility under the unit-cost model; anything not listed (hFF, hadd,
+# landmark counts, LLM heuristics, ...) carries no admissibility claim.
+HEURISTIC_ADMISSIBILITY = {
+    "zero": "admissible",
+    "blind": "admissible",
+    "hmax": "admissible",
+    "lmcut": "admissible",
+    "hff": "inadmissible",
+}
 LLM_HEURISTIC_FILES = {
     "deepseek-r1": {
         "blocksworld": "artifacts/upstream/deepseek-r1/blocksworld9_10.py",

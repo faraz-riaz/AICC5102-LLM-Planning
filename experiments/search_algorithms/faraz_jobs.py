@@ -32,7 +32,9 @@ LLM_HEURISTIC_FILES = {
 LLM_HEURISTIC_SET_IDS = {"deepseek-r1": "zenodo-17400964-deepseek-r1-selected"}
 ADMISSIBILITY = {
     "zero": "admissible",
+    "blind": "admissible",
     "hmax": "admissible",
+    "lmcut": "admissible",
     "hff": "inadmissible",
     "deepseek-r1": "unknown",
     "none": "not_applicable",
