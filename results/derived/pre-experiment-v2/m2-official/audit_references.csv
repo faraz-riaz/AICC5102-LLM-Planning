@@ -1,0 +1,10 @@
+difficulty,domain,not_requested,proven,unknown_timeout
+easy,blocksworld,0,2,8
+easy,miconic,0,10,0
+easy,transport,0,5,5
+hard,blocksworld,10,0,0
+hard,miconic,10,0,0
+hard,transport,10,0,0
+medium,blocksworld,0,0,10
+medium,miconic,0,0,10
+medium,transport,0,0,10

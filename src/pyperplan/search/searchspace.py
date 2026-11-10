@@ -67,10 +67,11 @@ def make_root_node(initial_state):
     return SearchNode(initial_state, None, None, 0)
 
 
-def make_child_node(parent_node, action, state):
+def make_child_node(parent_node, action, state, action_cost=1):
     """
     Construct a new search node containing the state and the applied action.
     The node is linked to the given parent node.
-    The g-value is set to the parents g-value + 1.
+    The g-value is set to the parent's g-value plus ``action_cost``. Existing
+    callers retain Pyperplan's unit-action-cost behavior through the default.
     """
-    return SearchNode(state, parent_node, action, parent_node.g + 1)
+    return SearchNode(state, parent_node, action, parent_node.g + action_cost)
