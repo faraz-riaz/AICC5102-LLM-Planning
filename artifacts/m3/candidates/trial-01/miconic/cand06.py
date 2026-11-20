@@ -1,0 +1,120 @@
+from heuristics.heuristic_base import Heuristic
+
+def get_parts(fact):
+    """Utility function to extract parts of a PDDL fact by removing parentheses and splitting."""
+    return fact[1:-1].split()
+
+class miconicLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the miconic domain.
+
+    # Summary
+    This heuristic estimates the minimum number of actions required to serve all remaining unserved 
+    passengers. It calculates the exact number of required board and depart actions, and estimates 
+    the required lift movement actions by counting the number of unique floors that must be visited.
+
+    # Assumptions
+    - Every passenger in the goals needs to be boarded at their origin floor and departed at their destination floor.
+    - The lift can move from any floor to any other floor in a single action (due to the transitivity of the `above` predicate).
+    - The lift's capacity is unlimited.
+    - The cost to move between floors is accurately approximated by the number of unique required floors minus one 
+      (if the lift is already at one of the required floors, saving exactly 1 move).
+
+    # Heuristic Initialization
+    - Extract the destination floor of each passenger from the static facts (and the initial state as a fallback).
+    - Identify the set of all passengers that need to be served based on the goal conditions.
+    - Identify any other non-standard goal conditions to ensure the heuristic strictly evaluates to zero only at goal states.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to identify the current floor of the lift, the set of served passengers, 
+       the set of boarded passengers, and the origin floors of unboarded passengers.
+    2. Determine the set of unserved goal passengers.
+    3. Classify unserved passengers into unboarded and boarded subsets.
+    4. Calculate the base action cost: 2 actions (board + depart) for each unboarded passenger, 
+       and 1 action (depart) for each boarded passenger.
+    5. Form a set of required floors (`F_req`) to visit: this includes the origins of all unboarded 
+       passengers and the destinations of all unserved passengers.
+    6. Calculate the movement cost: every required floor visit takes at least 1 move action, except 
+       if the lift is already at one of the required floors (which saves 1 move).
+    7. Add a penalty for any unmet goals that are not related to serving passengers.
+    8. Return the sum of the base action cost, the movement cost, and the unmet other goals penalty.
+    """
+
+    def __init__(self, task):
+        self.destinations = {}
+        
+        # Extract destinations from static facts
+        for fact in task.static:
+            parts = get_parts(fact)
+            if parts[0] == "destin":
+                self.destinations[parts[1]] = parts[2]
+                
+        # Fallback: Also check initial state in case destinations are placed there
+        for fact in task.initial_state:
+            parts = get_parts(fact)
+            if parts[0] == "destin":
+                self.destinations[parts[1]] = parts[2]
+                
+        self.goal_passengers = set()
+        self.other_goals = set()
+        
+        # Separate the passengers that need to be served from other potential goals
+        for fact in task.goals:
+            parts = get_parts(fact)
+            if parts[0] == "served":
+                self.goal_passengers.add(parts[1])
+            else:
+                self.other_goals.add(fact)
+
+    def __call__(self, node):
+        state = node.state
+        
+        P_served = set()
+        P_boarded = set()
+        origins = {}
+        f_curr = None
+        
+        # Parse dynamically changing facts from the state
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == "served":
+                P_served.add(parts[1])
+            elif parts[0] == "boarded":
+                P_boarded.add(parts[1])
+            elif parts[0] == "origin":
+                origins[parts[1]] = parts[2]
+            elif parts[0] == "lift-at":
+                f_curr = parts[1]
+                
+        # Identify the sets of passengers we still need to process
+        P_unserved = self.goal_passengers - P_served
+        P_unboarded = P_unserved - P_boarded
+        
+        F_req = set()
+        
+        # We need to visit the origin floors for unboarded passengers
+        for p in P_unboarded:
+            if p in origins:
+                F_req.add(origins[p])
+                
+        # We need to visit the destination floors for all unserved passengers
+        for p in P_unserved:
+            if p in self.destinations:
+                F_req.add(self.destinations[p])
+                
+        # Base movement cost
+        move_cost = len(F_req)
+        # If the lift is currently at one of the required floors, we save a move action
+        if f_curr in F_req:
+            move_cost -= 1
+            
+        move_cost = max(0, move_cost)
+            
+        # 2 actions (board + depart) per unboarded, 1 action (depart) per boarded
+        board_depart_cost = 2 * len(P_unboarded) + len(P_unserved & P_boarded)
+        
+        # Count any extra miscellaneous goals that are not yet fulfilled 
+        # (This ensures the heuristic strictly returns 0 ONLY for goal states)
+        unmet_other_goals = sum(1 for goal in self.other_goals if goal not in state)
+                
+        return move_cost + board_depart_cost + unmet_other_goals

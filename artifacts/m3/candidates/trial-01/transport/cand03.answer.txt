@@ -1,0 +1,172 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+
+class transportLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Transport domain.
+
+    # Summary
+    This heuristic estimates the minimum number of actions to deliver all packages 
+    to their goal locations. It computes the shortest path distance between locations 
+    and penalizes packages not at their destinations.
+
+    # Assumptions
+    - Packages can be at a location or inside a vehicle.
+    - Vehicles can carry packages, and picking/dropping costs 1 action each.
+    - Driving costs 1 action per road segment.
+    - Capacity constraints are relaxed; vehicles are assumed to be able to carry 
+      the necessary packages without splitting trips unnecessarily.
+    - Wait times or deadlocks are ignored.
+
+    # Heuristic Initialization
+    - Extract goal locations for packages and vehicles (if any).
+    - Extract static road networks and compute all-pairs shortest paths using the 
+      Floyd-Warshall algorithm.
+    - Identify the set of vehicles from the initial state's capacity facts.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to find the locations of all vehicles and packages.
+       Also track which packages are currently loaded inside which vehicle.
+    2. Initialize `total_cost = 0`.
+    3. For each package that has a goal location:
+       - If the package is at its goal location, add 0 to the cost.
+       - If the package is inside a vehicle:
+         - Add 1 for the drop action.
+         - Add the shortest path distance from the vehicle's current location to the goal.
+       - If the package is at a location (but not its goal):
+         - Add 1 for the pick action and 1 for the drop action.
+         - Add the shortest path distance from its current location to its goal.
+         - Keep track of the location as needing a vehicle to visit.
+    4. For each vehicle that has a goal location:
+       - Compute and add the shortest path from its current location to its goal.
+    5. For each location that has at least one package waiting to be picked up:
+       - Find the minimum distance from any vehicle to this location.
+       - Add this minimum distance to the total cost, simulating the actions required 
+         for a vehicle to reach the package.
+    6. Ensure the heuristic evaluates to 0 if and only if the goal is fully reached.
+    """
+
+    def __init__(self, task):
+        self.task = task
+        self.goals = task.goals
+        static_facts = task.static
+
+        # Identify all vehicles from the initial state
+        self.vehicles = set()
+        for fact in task.initial_state:
+            parts = get_parts(fact)
+            if parts[0] == "capacity":
+                self.vehicles.add(parts[1])
+
+        # Extract road network
+        self.adj = {}
+        for fact in static_facts:
+            parts = get_parts(fact)
+            if parts[0] == "road":
+                u, v = parts[1], parts[2]
+                self.adj.setdefault(u, []).append(v)
+                self.adj.setdefault(v, [])
+
+        # Compute All-Pairs Shortest Paths using Floyd-Warshall
+        self.locations = list(self.adj.keys())
+        self.distances = {l: {l2: float('inf') for l2 in self.locations} for l in self.locations}
+        for l in self.locations:
+            self.distances[l][l] = 0
+        for u in self.adj:
+            for v in self.adj[u]:
+                self.distances[u][v] = 1
+
+        for k in self.locations:
+            for i in self.locations:
+                for j in self.locations:
+                    if self.distances[i][k] + self.distances[k][j] < self.distances[i][j]:
+                        self.distances[i][j] = self.distances[i][k] + self.distances[k][j]
+
+        # Extract goals
+        self.goal_locations = {}
+        self.vehicle_goals = {}
+        for goal in self.goals:
+            parts = get_parts(goal)
+            if parts[0] == "at":
+                obj, loc = parts[1], parts[2]
+                if obj in self.vehicles:
+                    self.vehicle_goals[obj] = loc
+                else:
+                    self.goal_locations[obj] = loc
+
+    def __call__(self, node):
+        state = node.state
+        
+        # Exact goal match ensures heuristic is 0 ONLY for goal states
+        if self.task.goal_reached(state):
+            return 0
+
+        current_locations = {}
+        in_vehicle = {}
+        
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == "at":
+                obj, loc = parts[1], parts[2]
+                current_locations[obj] = loc
+            elif parts[0] == "in":
+                pkg, veh = parts[1], parts[2]
+                in_vehicle[pkg] = veh
+
+        total_cost = 0
+        packages_to_pickup_at = set()
+
+        # Step 3: Compute cost for packages
+        for pkg, goal_loc in self.goal_locations.items():
+            if pkg in current_locations:
+                pkg_loc = current_locations[pkg]
+                if pkg_loc != goal_loc:
+                    total_cost += 2  # 1 pick + 1 drop
+                    if pkg_loc in self.distances and goal_loc in self.distances[pkg_loc]:
+                        dist = self.distances[pkg_loc][goal_loc]
+                        if dist != float('inf'):
+                            total_cost += dist
+                    packages_to_pickup_at.add(pkg_loc)
+            elif pkg in in_vehicle:
+                veh = in_vehicle[pkg]
+                veh_loc = current_locations.get(veh)
+                if veh_loc:
+                    total_cost += 1  # 1 drop
+                    if veh_loc != goal_loc:
+                        if veh_loc in self.distances and goal_loc in self.distances[veh_loc]:
+                            dist = self.distances[veh_loc][goal_loc]
+                            if dist != float('inf'):
+                                total_cost += dist
+        
+        # Step 4: Compute cost for vehicles with specific goals
+        for veh, goal_loc in self.vehicle_goals.items():
+            veh_loc = current_locations.get(veh)
+            if veh_loc and veh_loc != goal_loc:
+                if veh_loc in self.distances and goal_loc in self.distances[veh_loc]:
+                    dist = self.distances[veh_loc][goal_loc]
+                    if dist != float('inf'):
+                        total_cost += dist
+
+        # Step 5: Compute costs for vehicles moving to pickup unfulfilled packages
+        for loc in packages_to_pickup_at:
+            min_dist = float('inf')
+            for veh in self.vehicles:
+                veh_loc = current_locations.get(veh)
+                if veh_loc and veh_loc in self.distances and loc in self.distances[veh_loc]:
+                    min_dist = min(min_dist, self.distances[veh_loc][loc])
+            
+            if min_dist != float('inf'):
+                total_cost += min_dist
+
+        # Step 6: Fallback check to avoid returning 0 on non-goal states
+        if total_cost == 0:
+            return 1
+
+        return total_cost
+```

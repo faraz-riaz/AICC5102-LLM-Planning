@@ -1,0 +1,226 @@
+from heuristics.heuristic_base import Heuristic
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+    
+    # Summary
+    This heuristic estimates the minimum number of actions required to transform the current state into the goal state. It calculates exactly which blocks are "in place" and which are not, and assigns a realistic action cost to each out-of-place block based on its dependencies.
+
+    # Assumptions
+    - The domain follows standard STRIPS blocksworld rules (`pickup`, `putdown`, `stack`, `unstack`).
+    - A block is considered "in place" if its current support matches its goal support, its support is recursively in place, and it does not violate any clear goals or block other blocks' target supports.
+    - An out-of-place block takes 1 to 4 actions to fix, depending on whether it is held, if its target is ready, and if it must be moved out of the way to clear another block.
+
+    # Heuristic Initialization
+    - Parses all goal predicates to extract `target_support` (which block should be on which), `target_clear`, `target_arm_empty`, and `target_holding`.
+    - Computes `target_support_inv` to quickly check if a block is the target support for other blocks.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to extract `current_support` for each block (including `TABLE` and `ARM`), and the `is_clear` set.
+    2. Determine which blocks are "in place". A block `x` is in place if:
+       - It is not required to be held (unless it is currently held and perfectly matches the goal).
+       - Its current support matches its target support.
+       - Its support is also in place.
+       - Its support does not need to be clear for the goal, and no other block needs to be stacked on it.
+    3. For every block that is out of place:
+       - If it is in the arm, it requires 1 action to be put down, or 3 actions to be stacked on its target if the target is not yet ready (1 action if target is ready).
+       - If it is not in the arm and needs to be held, it requires 1 action (pickup/unstack).
+       - If it is not in the arm and needs to go to the table (or has no specific target), it requires 2 actions (unstack/pickup + putdown).
+       - If it is not in the arm and needs to go on a block `y`, it usually requires 2 actions. However, if it must be moved out of the way before `y` is ready (because its current support must be cleared for another block or goal), it requires 4 actions (move to table temporarily, then later to `y`).
+    4. Sum the calculated costs for all out-of-place blocks to get the final heuristic value.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        
+        self.target_support = {}
+        self.target_clear = set()
+        self.target_arm_empty = False
+        self.target_holding = None
+        
+        # Parse the goals
+        for goal in self.goals:
+            parts = goal[1:-1].split()
+            pred = parts[0]
+            if pred == "on":
+                self.target_support[parts[1]] = parts[2]
+            elif pred == "on-table":
+                self.target_support[parts[1]] = "TABLE"
+            elif pred == "clear":
+                self.target_clear.add(parts[1])
+            elif pred == "arm-empty":
+                self.target_arm_empty = True
+            elif pred == "holding":
+                self.target_holding = parts[1]
+                
+        # Inverse mapping to know what blocks want to be on a specific block
+        self.target_support_inv = {}
+        for z, y in self.target_support.items():
+            if y != "TABLE":
+                if y not in self.target_support_inv:
+                    self.target_support_inv[y] = set()
+                self.target_support_inv[y].add(z)
+
+    def __call__(self, node):
+        state = node.state
+        
+        current_support = {}
+        is_clear = set()
+        held = None
+        blocks = set()
+        
+        # Parse the state facts
+        for fact in state:
+            parts = fact[1:-1].split()
+            pred = parts[0]
+            if pred == "on":
+                current_support[parts[1]] = parts[2]
+                blocks.add(parts[1])
+                blocks.add(parts[2])
+            elif pred == "on-table":
+                current_support[parts[1]] = "TABLE"
+                blocks.add(parts[1])
+            elif pred == "clear":
+                is_clear.add(parts[1])
+                blocks.add(parts[1])
+            elif pred == "holding":
+                held = parts[1]
+                current_support[parts[1]] = "ARM"
+                blocks.add(parts[1])
+                
+        # Include all blocks explicitly mentioned in the goals
+        for b in self.target_support:
+            blocks.add(b)
+            if self.target_support[b] != "TABLE":
+                blocks.add(self.target_support[b])
+        for b in self.target_clear:
+            blocks.add(b)
+        if self.target_holding:
+            blocks.add(self.target_holding)
+            
+        memo = {}
+        visiting = set()
+        
+        def check_in_place(x):
+            """Recursively check if a block is perfectly in place according to the goals."""
+            if x in memo:
+                return memo[x]
+            if x in visiting:
+                return False  # Cycle detected, not in place
+            visiting.add(x)
+            
+            supp = current_support.get(x)
+            
+            if supp is None:
+                memo[x] = False
+                visiting.remove(x)
+                return False
+                
+            # If the block should be held, but it's not in the arm
+            if self.target_holding == x and supp != "ARM":
+                memo[x] = False
+                visiting.remove(x)
+                return False
+                
+            if supp == "ARM":
+                # If it's held and exactly matches the holding goal
+                if self.target_holding == x:
+                    memo[x] = True
+                    visiting.remove(x)
+                    return True
+                
+                tsupp = self.target_support.get(x, "ANY")
+                # If it's held and no explicit goal forbids it, it might be in place
+                if (tsupp == "ANY" and not self.target_arm_empty and 
+                    x not in self.target_support_inv and self.target_holding is None):
+                    memo[x] = True
+                    visiting.remove(x)
+                    return True
+                else:
+                    memo[x] = False
+                    visiting.remove(x)
+                    return False
+                    
+            tsupp = self.target_support.get(x, "ANY")
+            if tsupp != "ANY" and supp != tsupp:
+                memo[x] = False
+                visiting.remove(x)
+                return False
+                
+            if supp != "TABLE":
+                if not check_in_place(supp):
+                    memo[x] = False
+                    visiting.remove(x)
+                    return False
+                if supp in self.target_clear:
+                    memo[x] = False
+                    visiting.remove(x)
+                    return False
+                if supp in self.target_support_inv:
+                    if any(z != x for z in self.target_support_inv[supp]):
+                        memo[x] = False
+                        visiting.remove(x)
+                        return False
+                        
+            memo[x] = True
+            visiting.remove(x)
+            return True
+
+        # Pre-evaluate in-place status for all blocks
+        for b in blocks:
+            check_in_place(b)
+            
+        total_cost = 0
+        
+        # Calculate cost for out-of-place blocks
+        for b in blocks:
+            if memo.get(b, False):
+                continue
+                
+            if b == held:
+                if self.target_holding == b:
+                    continue  # Should be caught by in_place, but safe to skip
+                tsupp = self.target_support.get(b, "ANY")
+                if tsupp in ("TABLE", "ANY"):
+                    total_cost += 1
+                else:
+                    y = tsupp
+                    # If target is ready and clear, we can stack immediately
+                    if memo.get(y, False) and (y in is_clear):
+                        total_cost += 1
+                    else:
+                        total_cost += 3
+            else:
+                if self.target_holding == b:
+                    # Just needs to be picked up/unstacked (if not clear, blocks on it will pay their cost)
+                    total_cost += 1
+                else:
+                    tsupp = self.target_support.get(b, "ANY")
+                    if tsupp in ("TABLE", "ANY"):
+                        total_cost += 2
+                    else:
+                        y = tsupp
+                        supp = current_support.get(b)
+                        if supp == y:
+                            total_cost += 4
+                        else:
+                            must_move_to_clear = False
+                            if supp != "TABLE" and supp is not None:
+                                # Determine if the current support MUST be moved/cleared
+                                if not memo.get(supp, False):
+                                    must_move_to_clear = True
+                                elif supp in self.target_clear:
+                                    must_move_to_clear = True
+                                elif supp in self.target_support_inv and any(z != b for z in self.target_support_inv[supp]):
+                                    must_move_to_clear = True
+                                    
+                            target_ready = memo.get(y, False)
+                            
+                            # If we must move b to clear space, but its target y isn't ready, we need 4 actions
+                            if must_move_to_clear and not target_ready:
+                                total_cost += 4
+                            else:
+                                total_cost += 2
+                                
+        return total_cost

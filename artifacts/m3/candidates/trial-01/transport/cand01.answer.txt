@@ -1,0 +1,174 @@
+```python
+import collections
+from heuristics.heuristic_base import Heuristic
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+
+class transportLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Transport domain.
+
+    # Summary
+    This heuristic estimates the minimum number of actions (pick-up, drop, and drive) 
+    required to transport all packages to their respective goal locations. To avoid 
+    local minima and plateau traps in Greedy Best-First Search (GBFS), it carefully 
+    combines the direct delivery costs of packages with a mathematically bounded 
+    vehicle-to-package distance penalty that prevents heuristic spikes.
+
+    # Assumptions
+    - Vehicles can carry packages, and picking up/dropping a package costs 1 action each.
+    - Driving between connected locations costs 1 action per road segment.
+    - Capacity constraints are relaxed in the heuristic computation to ensure fast evaluation 
+      and prevent the search from getting stuck in deep dead ends where a full vehicle is 
+      penalized for being unable to pick up nearby packages.
+    - The shortest path distance between any two locations is precomputable via All-Pairs 
+      Shortest Path (APSP) and serves as an accurate lower bound for transport cost.
+
+    # Heuristic Initialization
+    1. Parse the initial state to identify all vehicle objects via their `capacity` predicate.
+    2. Extract the road network from the static facts.
+    3. Run a Breadth-First Search (BFS) from every location to compute the APSP matrix 
+       (`self.dist`), giving the optimal drive cost between any two locations.
+    4. Isolate the goal conditions to identify the target destinations for packages and 
+       (if any) vehicles.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to find the locations of all vehicles and uncarried packages, 
+       and determine which vehicles are carrying which packages.
+    2. Package Actions Estimate:
+       - For each uncarried package not at its goal, add `2 + dist(current, goal)`. 
+         (1 pick-up + 1 drop + drive distance). Add its location to `uncarried_locs`.
+       - For each carried package not at its goal, add `1 + dist(vehicle, goal)`. 
+         (1 drop + remaining drive distance).
+    3. Vehicle Routing Estimate (The max-of-mins approach):
+       - If we just add the distance to the closest vehicle for each package, the heuristic 
+         can spike when packages are picked up, or form upward slopes when a vehicle moves 
+         away from other packages to deliver its current load.
+       - To prevent this, we calculate the shortest distance from ANY vehicle to each 
+         uncarried location, and then take the MAXIMUM of these minimum distances. 
+       - This guarantees a strictly non-increasing heuristic as vehicles move towards their 
+         destinations, completely eliminating spikes and ensuring smooth gradients for GBFS.
+    4. Vehicle Goals:
+       - If any vehicles have specific goal locations, their remaining travel distances 
+         are added directly to the total cost.
+    5. Return the accumulated sum, which becomes 0 perfectly at the goal state.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        static_facts = task.static
+
+        # Extract vehicles from the initial state using the capacity predicate.
+        self.vehicles = set()
+        for fact in task.initial_state:
+            parts = get_parts(fact)
+            if parts[0] == "capacity":
+                self.vehicles.add(parts[1])
+                
+        # Build the road network from static facts.
+        self.roads = collections.defaultdict(list)
+        self.locations = set()
+        for fact in static_facts:
+            parts = get_parts(fact)
+            if parts[0] == "road":
+                _, l1, l2 = parts
+                self.roads[l1].append(l2)
+                self.locations.add(l1)
+                self.locations.add(l2)
+
+        # Precompute All-Pairs Shortest Paths (APSP) using BFS (edges have unit cost).
+        self.dist = {}
+        for start_node in self.locations:
+            self.dist[start_node] = {start_node: 0}
+            queue = collections.deque([start_node])
+            while queue:
+                curr = queue.popleft()
+                d = self.dist[start_node][curr]
+                for neighbor in self.roads[curr]:
+                    if neighbor not in self.dist[start_node]:
+                        self.dist[start_node][neighbor] = d + 1
+                        queue.append(neighbor)
+                        
+        # Extract goals for packages and vehicles.
+        self.goal_locations = {}
+        self.vehicle_goals = {}
+        for goal in self.goals:
+            parts = get_parts(goal)
+            if parts[0] == "at":
+                obj, loc = parts[1], parts[2]
+                if obj in self.vehicles:
+                    self.vehicle_goals[obj] = loc
+                else:
+                    self.goal_locations[obj] = loc
+
+    def get_dist(self, l1, l2):
+        """Safely retrieve the precomputed shortest distance between two locations."""
+        if l1 == l2:
+            return 0
+        return self.dist.get(l1, {}).get(l2, 10000)
+
+    def __call__(self, node):
+        state = node.state
+
+        # State tracking dictionaries
+        package_location = {}
+        package_in_vehicle = {}
+        vehicle_location = {}
+
+        # Parse current state
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == "at":
+                obj, loc = parts[1], parts[2]
+                if obj in self.vehicles:
+                    vehicle_location[obj] = loc
+                else:
+                    package_location[obj] = loc
+            elif parts[0] == "in":
+                p, v = parts[1], parts[2]
+                package_in_vehicle[p] = v
+
+        total_cost = 0
+        uncarried_locs = set()
+
+        # Compute cost for packages
+        for p, g in self.goal_locations.items():
+            if p in package_location:
+                l = package_location[p]
+                if l == g:
+                    continue  # Package is already safely at its goal
+                
+                # 1 pick-up + 1 drop + driving distance
+                total_cost += 2 + self.get_dist(l, g)
+                uncarried_locs.add(l)
+
+            elif p in package_in_vehicle:
+                v = package_in_vehicle[p]
+                v_loc = vehicle_location.get(v)
+                if v_loc is not None:
+                    if v_loc == g:
+                        total_cost += 1  # 1 drop
+                    else:
+                        total_cost += 1 + self.get_dist(v_loc, g)  # 1 drop + driving distance
+
+        # Compute max-of-mins distance for guiding vehicles to uncarried packages
+        # Using max prevents heuristic spikes and upward slopes, guaranteeing node expansion minimization
+        if uncarried_locs and vehicle_location:
+            max_of_mins = 0
+            for l in uncarried_locs:
+                min_v_dist = min(self.get_dist(v_loc, l) for v_loc in vehicle_location.values())
+                if min_v_dist > max_of_mins:
+                    max_of_mins = min_v_dist
+            total_cost += max_of_mins
+
+        # Compute remaining driving cost for vehicles that have specific goal locations
+        for v, g in self.vehicle_goals.items():
+            v_loc = vehicle_location.get(v)
+            if v_loc and v_loc != g:
+                total_cost += self.get_dist(v_loc, g)
+
+        return total_cost
+```

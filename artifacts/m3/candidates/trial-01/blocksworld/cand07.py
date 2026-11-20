@@ -1,0 +1,165 @@
+from heuristics.heuristic_base import Heuristic
+
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Blocksworld domain.
+
+    # Summary
+    This heuristic estimates the number of actions required to reach the goal state
+    by identifying "well-placed" blocks and calculating the necessary moves for
+    "misplaced" blocks.
+
+    # Assumptions
+    - Blocks that are already in their correct final position (and where all blocks below them are also correctly placed) do not need to be moved.
+    - Each misplaced block requires at least 2 actions to move (unstack/pickup + stack/putdown).
+    - If a block is currently held in the robotic arm, it requires a base of 1 action (stack/putdown).
+    - A block requires an extra move (2 additional actions) if its destination is currently blocked by the block itself. This happens in cyclic dependencies or deadlocks.
+
+    # Heuristic Initialization
+    - Extract goal conditions (`on`, `on-table`, `clear`) into accessible dictionaries and sets to efficiently verify conditions.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to determine the location of each block (`current_on`, `current_on_table`, `current_holding`).
+    2. Iteratively discover all "well-placed" blocks from the bottom up. A block is well-placed if:
+        - It is on the table and does not violate any specific `on` goals.
+        - It is on another well-placed block and does not violate any `on`, `on-table`, or `clear` goals.
+    3. Identify "misplaced" blocks as all blocks that are not well-placed.
+    4. For each misplaced block, add its base move cost (1 if held, 2 otherwise).
+    5. Check for cyclic deadlocks to add extra move costs:
+        - If the block is currently held and its target is not well-placed or not clear, it must be temporarily put on the table (+2 actions).
+        - If the block is resting on another block, trace its chain of required goals. If any block in its future goal chain is currently located underneath it, it must be temporarily moved to the table to free the blocks below (+2 actions).
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        self.goal_on = {}
+        self.goal_on_table = set()
+        self.goal_clear = set()
+        
+        # Blocksworld does not use static facts, so we extract goal relationships.
+        for goal in self.goals:
+            parts = get_parts(goal)
+            if parts[0] == "on":
+                self.goal_on[parts[1]] = parts[2]
+            elif parts[0] == "on-table":
+                self.goal_on_table.add(parts[1])
+            elif parts[0] == "clear":
+                self.goal_clear.add(parts[1])
+                
+        # Fast lookup for what block must be immediately on top of a specific block
+        self.goal_on_rev = {y: x for x, y in self.goal_on.items()}
+
+    def __call__(self, node):
+        state = node.state
+        
+        current_on = {}
+        current_on_table = set()
+        current_holding = None
+        
+        all_blocks = set()
+        
+        # 1. Parse current state configuration
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == "on":
+                current_on[parts[1]] = parts[2]
+                all_blocks.add(parts[1])
+                all_blocks.add(parts[2])
+            elif parts[0] == "on-table":
+                current_on_table.add(parts[1])
+                all_blocks.add(parts[1])
+            elif parts[0] == "holding":
+                current_holding = parts[1]
+                all_blocks.add(parts[1])
+                
+        # 2. Iteratively discover well-placed blocks
+        well_placed = set()
+        changed = True
+        while changed:
+            changed = False
+            for x in all_blocks:
+                if x in well_placed:
+                    continue
+                
+                is_wp = False
+                if x in current_on_table:
+                    # If it's on the table, it is well-placed as long as it doesn't need to be on another block.
+                    if x in self.goal_on:
+                        is_wp = False
+                    else:
+                        is_wp = True
+                elif x in current_on:
+                    y = current_on[x]
+                    # If it's on another block, the block below must be well-placed first.
+                    if y in well_placed:
+                        violates = False
+                        if x in self.goal_on and self.goal_on[x] != y:
+                            violates = True
+                        if x in self.goal_on_table:
+                            violates = True
+                        if y in self.goal_clear:
+                            violates = True
+                        if y in self.goal_on_rev and self.goal_on_rev[y] != x:
+                            violates = True
+                        
+                        if not violates:
+                            is_wp = True
+                
+                if is_wp:
+                    well_placed.add(x)
+                    changed = True
+                    
+        # 3. All other blocks are misplaced and need to be moved
+        misplaced = all_blocks - well_placed
+        
+        # Helper method for deadlock verification
+        def is_below(target, block):
+            curr = block
+            while curr in current_on:
+                curr = current_on[curr]
+                if curr == target:
+                    return True
+            return False
+            
+        cost = 0
+        
+        # 4 & 5. Base costs and extra cyclic deadlock costs
+        for x in misplaced:
+            if x == current_holding:
+                cost += 1
+                needs_extra = False
+                if x in self.goal_on:
+                    y = self.goal_on[x]
+                    # If held block's target isn't ready or isn't clear, we must set it on the table.
+                    if y not in well_placed:
+                        needs_extra = True
+                    else:
+                        if y in current_on.values():
+                            needs_extra = True
+                if needs_extra:
+                    cost += 2
+            else:
+                cost += 2
+                needs_extra = False
+                # If the block is currently on another block, check for goal dependency chains getting trapped under it.
+                if x in current_on:
+                    if x in self.goal_on:
+                        curr_goal = self.goal_on[x]
+                        visited = set()
+                        # Follow the goal chain to spot any cyclic blockings
+                        while curr_goal is not None and curr_goal not in visited:
+                            visited.add(curr_goal)
+                            if is_below(curr_goal, x):
+                                needs_extra = True
+                                break
+                            curr_goal = self.goal_on.get(curr_goal, None)
+                if needs_extra:
+                    cost += 2
+                    
+        return cost
