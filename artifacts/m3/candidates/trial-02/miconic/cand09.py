@@ -1,0 +1,127 @@
+from heuristics.heuristic_base import Heuristic
+
+class miconicLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the miconic domain.
+    
+    # Summary
+    This heuristic estimates the minimum number of actions required to serve all 
+    passengers. It computes the required board actions, depart actions, and the 
+    estimated number of elevator moves based on the unique floors that still need 
+    to be visited.
+    
+    # Assumptions
+    - The elevator has unlimited capacity.
+    - Every passenger requires exactly one `board` and one `depart` action to be served.
+    - The elevator can travel directly between any two floors in a single `up` or `down` 
+      action. Therefore, the number of move actions is strongly correlated with the 
+      number of unique floors to visit.
+    - The `above` predicate defines a complete order of floors, so any floor is 
+      reachable in 1 action from any other floor.
+
+    # Heuristic Initialization
+    - Extract the passengers that need to be served from the goal state.
+    - Extract the static `destin` facts from the task to map each passenger to 
+      their destination floor.
+    
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to find which passengers have been `served`, which 
+       are currently `boarded`, and the `origin` floors of unboarded passengers. 
+       Also, determine the elevator's current floor (`lift-at`).
+    2. Determine the set of goal passengers that still need to be boarded and served.
+    3. Identify all required stops (floors) to fulfill these passengers:
+       - Origins of unboarded passengers (O).
+       - Destinations of boarded passengers (D_boarded).
+       - Destinations of unboarded passengers (D_unboarded).
+    4. Calculate `move_cost`: 
+       - It is based on the number of unique required stops (`O | D_boarded | D_unboarded`).
+       - If the current floor is an origin of an unboarded passenger or a destination 
+         of a boarded passenger, we can perform a useful action immediately without 
+         moving. Thus, we discount the move cost by 1.
+    5. Calculate `board_cost` as the number of unboarded passengers.
+    6. Calculate `depart_cost` as the number of unserved passengers.
+    7. Return the sum of `move_cost`, `board_cost`, and `depart_cost`.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        self.goal_passengers = set()
+        
+        # Extract goal passengers
+        for goal in self.goals:
+            parts = goal[1:-1].split()
+            if parts[0] == "served":
+                self.goal_passengers.add(parts[1])
+                
+        # Extract destination floors for each passenger from static facts
+        self.destinations = {}
+        for fact in task.static:
+            parts = fact[1:-1].split()
+            if parts[0] == "destin":
+                self.destinations[parts[1]] = parts[2]
+
+    def __call__(self, node):
+        state = node.state
+        
+        # The heuristic is 0 only for goal states
+        if self.goals <= state:
+            return 0
+            
+        served = set()
+        boarded = set()
+        origins = {}
+        current_floor = None
+        
+        # Extract dynamic information from the current state facts
+        for fact in state:
+            parts = fact[1:-1].split()
+            if parts[0] == "served":
+                served.add(parts[1])
+            elif parts[0] == "boarded":
+                boarded.add(parts[1])
+            elif parts[0] == "origin":
+                origins[parts[1]] = parts[2]
+            elif parts[0] == "lift-at":
+                current_floor = parts[1]
+                
+        # Determine remaining goals
+        unserved_goals = self.goal_passengers - served
+        
+        # Fallback for unexpected non-goal states where unserved is empty
+        if not unserved_goals:
+            return 1
+            
+        unboarded_goals = unserved_goals - boarded
+        boarded_goals = unserved_goals & boarded
+        
+        O = set()
+        D_unboarded = set()
+        for p in unboarded_goals:
+            orig = origins.get(p)
+            if orig:
+                O.add(orig)
+            dest = self.destinations.get(p)
+            if dest:
+                D_unboarded.add(dest)
+                
+        D_boarded = set()
+        for p in boarded_goals:
+            dest = self.destinations.get(p)
+            if dest:
+                D_boarded.add(dest)
+                
+        all_stops = O | D_boarded | D_unboarded
+        
+        # Calculate estimated move cost based on required stops
+        if len(all_stops) == 0:
+            move_cost = 0
+        elif current_floor in O or current_floor in D_boarded:
+            move_cost = len(all_stops) - 1
+        else:
+            move_cost = len(all_stops)
+            
+        board_cost = len(unboarded_goals)
+        depart_cost = len(unserved_goals)
+        
+        # Return total heuristic cost
+        return move_cost + board_cost + depart_cost

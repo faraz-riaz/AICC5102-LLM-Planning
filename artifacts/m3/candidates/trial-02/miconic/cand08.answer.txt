@@ -1,0 +1,120 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+class miconicLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the miconic domain.
+
+    # Summary
+    This heuristic estimates the minimum number of actions required to serve all goal passengers in the Miconic domain. It calculates the exact number of remaining board and depart actions, and estimates the number of elevator move actions based on the unique floors that still need to be visited.
+
+    # Assumptions
+    - The elevator can transition directly between any two floors (the `above` relation is transitively complete for valid states), meaning every required floor change can be accomplished in 1 move action.
+    - The elevator has unlimited capacity, so it can pick up all passengers on a floor at once.
+    - Boarding or departing a passenger takes exactly 1 action.
+
+    # Heuristic Initialization
+    - Extract the set of goal passengers from the task's goals (i.e., passengers that must be `served`).
+    - Extract the destination floor (`destin`) for each passenger from the static and initial facts.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Extract the current state information: the elevator's current floor (`lift-at`), the set of boarded passengers (`boarded`), the set of served passengers (`served`), and the waiting floors of unboarded passengers (`origin`).
+    2. Initialize an action counter (`actions_needed = 0`) and a set of unique floors to visit (`floors_to_visit`).
+    3. For each goal passenger that is not yet served:
+       a. If the passenger is boarded: add 1 to `actions_needed` (for the `depart` action). Add their destination floor to `floors_to_visit`. If the elevator is currently at their destination, mark the current floor as `actionable`.
+       b. If the passenger is unboarded: add 2 to `actions_needed` (for the `board` and `depart` actions). Add their origin and destination floors to `floors_to_visit`. If the elevator is currently at their origin, mark the current floor as `actionable`.
+    4. Calculate `moves_needed` as the number of unique floors in `floors_to_visit`. If the current floor is `actionable` (meaning a board or depart action can immediately be performed without moving), subtract 1 from `moves_needed`.
+    5. Return the final heuristic value as `2 * actions_needed + moves_needed`. The `actions_needed` is weighted by 2 to ensure the heuristic value strictly decreases when `board` or `depart` actions are applied. When a board/depart action occurs, `actions_needed` drops by 1, and `moves_needed` may at worst increase by 1, resulting in a net decrease in the heuristic. This brilliantly breaks plateaus and provides a strong, monotonic gradient towards the goal.
+    """
+
+    def __init__(self, task):
+        """
+        Initialize the heuristic by extracting the goal passengers and their destinations.
+        """
+        self.goal_passengers = set()
+        for goal in task.goals:
+            parts = goal[1:-1].split()
+            if parts[0] == "served":
+                self.goal_passengers.add(parts[1])
+
+        # Extract destinations from both static facts and initial state
+        # to guarantee we catch them regardless of how the planner categorized them.
+        self.destin = {}
+        for fact in task.static | task.initial_state:
+            parts = fact[1:-1].split()
+            if parts[0] == "destin":
+                self.destin[parts[1]] = parts[2]
+
+    def __call__(self, node):
+        """
+        Compute the heuristic value (estimated cost to reach the goal) for the given state.
+        """
+        state = node.state
+        
+        lift_at = None
+        boarded = set()
+        served = set()
+        origins = {}
+        
+        # Parse current state facts
+        for fact in state:
+            parts = fact[1:-1].split()
+            predicate = parts[0]
+            
+            if predicate == "lift-at":
+                lift_at = parts[1]
+            elif predicate == "boarded":
+                boarded.add(parts[1])
+            elif predicate == "served":
+                served.add(parts[1])
+            elif predicate == "origin":
+                origins[parts[1]] = parts[2]
+                
+        actions_needed = 0
+        floors_to_visit = set()
+        actionable = False
+        
+        # Determine remaining effort for each goal passenger
+        for p in self.goal_passengers:
+            if p in served:
+                continue  # Passenger has reached their destination
+                
+            if p in boarded:
+                actions_needed += 1  # Requires 1 'depart' action
+                dest_floor = self.destin.get(p)
+                if dest_floor:
+                    floors_to_visit.add(dest_floor)
+                    if lift_at == dest_floor:
+                        actionable = True
+            else:
+                actions_needed += 2  # Requires 1 'board' and 1 'depart' action
+                
+                # Check origin for pick-up
+                if p in origins:
+                    org_floor = origins[p]
+                    floors_to_visit.add(org_floor)
+                    if lift_at == org_floor:
+                        actionable = True
+                
+                # Check destination for drop-off
+                dest_floor = self.destin.get(p)
+                if dest_floor:
+                    floors_to_visit.add(dest_floor)
+                
+        # If no more board/depart actions are needed, we reached the goal.
+        if actions_needed == 0:
+            return 0
+            
+        # Base move estimation: Number of unique floors that still require a visit
+        moves_needed = len(floors_to_visit)
+        
+        # If we can immediately execute an action at the current floor, 
+        # we don't need a move for the first required floor interaction.
+        if actionable:
+            moves_needed -= 1
+            
+        # Heuristic strictly decreasing gradient:
+        # Multiplier of 2 perfectly offsets cases where performing an action temporarily 
+        # causes `moves_needed` to increment, avoiding search plateaus.
+        return 2 * actions_needed + moves_needed
+```

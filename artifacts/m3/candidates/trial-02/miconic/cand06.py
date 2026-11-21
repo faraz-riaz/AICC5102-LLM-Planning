@@ -1,0 +1,104 @@
+from heuristics.heuristic_base import Heuristic
+
+class miconicLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the miconic domain.
+
+    # Summary
+    The heuristic estimates the total number of actions required to serve all remaining passengers. It calculates an independent action cost for each unserved passenger based on their current state and sums these individual costs up. 
+
+    # Assumptions
+    - Each passenger needs to be boarded at their origin floor and departed at their destination floor.
+    - The elevator can travel between any two floors in a single move action (since `above` is defined transitively for all applicable pairs in this domain).
+    - The capacity of the elevator is unlimited.
+    - The heuristic sums the cost per passenger independently. It purposely ignores the action cost savings that occur when multiple passengers share the same origin or destination floor. While this makes the heuristic non-admissible, it makes it highly informative for a greedy best-first search. It naturally provides a steeper gradient towards floors with multiple waiting or departing passengers.
+
+    # Heuristic Initialization
+    - Extract the set of target passengers (those that need to be `served`) and optionally the goal floor of the elevator from the task's goals.
+    - Extract the destination floor for each passenger from the static facts (and initial state) using the `destin` predicate.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current node's state to determine:
+        - The set of goal passengers that are not yet served.
+        - The set of passengers currently boarded in the elevator.
+        - The origin floors of the passengers still waiting to be boarded.
+        - The current floor of the elevator (`lift-at`).
+    2. If all goal passengers are served and the elevator is at its goal floor (if specified), return a cost of 0.
+    3. Initialize the total estimated cost to 0.
+    4. For each unserved goal passenger, calculate their individual remaining steps:
+        - If the passenger is already boarded:
+            - Add 1 action for departing.
+            - If the elevator is not currently at the passenger's destination floor, add 1 action for moving to that destination.
+        - If the passenger is not boarded:
+            - Add 2 actions (1 for boarding, 1 for departing).
+            - If the elevator is not currently at the passenger's origin floor, add 1 action for moving to the origin.
+            - Add 1 action for the future movement from the origin to the destination.
+    5. Check for any specific `lift-at` goal at the end. If all passengers are served but the lift is not at the required goal floor, add 1 action.
+    6. Return the total summed cost.
+    """
+
+    def __init__(self, task):
+        self.goal_passengers = set()
+        self.goal_lift_at = None
+        
+        # Extract goals
+        for g in task.goals:
+            parts = g[1:-1].split()
+            if parts[0] == 'served':
+                self.goal_passengers.add(parts[1])
+            elif parts[0] == 'lift-at':
+                self.goal_lift_at = parts[1]
+                
+        # Extract destinations for all passengers
+        self.destinations = {}
+        for fact in task.static | task.initial_state:
+            parts = fact[1:-1].split()
+            if parts[0] == 'destin':
+                self.destinations[parts[1]] = parts[2]
+
+    def __call__(self, node):
+        state = node.state
+        
+        unserved = set(self.goal_passengers)
+        boarded = set()
+        origins = {}
+        lift_at = None
+        
+        # Parse the current state
+        for fact in state:
+            parts = fact[1:-1].split()
+            if parts[0] == 'served':
+                if parts[1] in unserved:
+                    unserved.remove(parts[1])
+            elif parts[0] == 'boarded':
+                boarded.add(parts[1])
+            elif parts[0] == 'origin':
+                origins[parts[1]] = parts[2]
+            elif parts[0] == 'lift-at':
+                lift_at = parts[1]
+                
+        cost = 0
+        
+        # Calculate action costs per unserved passenger
+        for p in unserved:
+            if p in boarded:
+                cost += 1  # 1 action to depart
+                
+                # Need to move to destination if not already there
+                if self.destinations[p] != lift_at:
+                    cost += 1 
+            else:
+                cost += 2  # 2 actions: board and depart
+                
+                # Need to move to origin if not already there
+                if origins.get(p) != lift_at:
+                    cost += 1
+                
+                # Will definitely need to move from origin to destination later
+                cost += 1
+                
+        # If all passengers are served, handle the case where the lift has to end up at a specific floor
+        if not unserved and self.goal_lift_at and lift_at != self.goal_lift_at:
+            cost += 1
+            
+        return cost
