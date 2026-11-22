@@ -186,7 +186,7 @@ Integrate the final sampled-state frequency, generation stability and error–qu
 
 ## Appendix A. Evidence, configuration and validation
 
-This supplement separates complete measurements from the pending reliability extension. Table 2 records the current experimental contract. The source bundle is the AICC5102-LLM-Planning repository, preparation commit e94d6cb, with raw records under results/raw/pre-experiment-v2 and authoritative derived runs under results/derived/pre-experiment-v2/m2-official and m1-r1r2. The preparation source register and validation report identify the exact input hashes.
+This supplement separates complete measurements from the pending reliability extension. Table 2 records the current experimental contract. The source bundle is the AICC5102-LLM-Planning repository, preparation commit e94d6cb, with raw records under results/raw/run_records and authoritative derived runs under results/derived/history/three_workers/search_comparison and m1-r1r2. The preparation source register and validation report identify the exact input hashes.
 
 {{table|setup}}
 

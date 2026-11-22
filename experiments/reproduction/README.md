@@ -9,7 +9,7 @@ Results and caveats: [DISCREPANCIES.md](DISCREPANCIES.md).
 |---|---|
 | `run_reproduction.py` | Shared runner. One child process per run, hard time and memory limit, plan validation, one schema-valid JSON record per run. |
 | `run_search_algorithms.py` | Same runner for A*, Weighted A* and IDA*. Starts Faraz's `search_worker.py` under the same time and memory limits, validates the plan and writes the same record. Reuses code from `run_reproduction.py`. |
-| `summarize_results.py` | Turns the records into `baseline_runs.csv`, `coverage.csv`, `reproduction.csv`, `plan_quality.csv` and `coverage.png`. |
+| `summarize_reproduction.py` | Turns the records into `baseline_runs.csv`, `coverage.csv`, `reproduction.csv`, `plan_quality.csv` and `coverage.png`. |
 | `DISCREPANCIES.md` | What matches the paper, what differs and why. |
 
 ## Assets this work uses (M1-02)
@@ -61,10 +61,10 @@ uv run --frozen python experiments/reproduction/run_search_algorithms.py --batch
 Summaries:
 
 ```bash
-uv run --frozen python experiments/reproduction/summarize_results.py
+uv run --frozen python experiments/reproduction/summarize_reproduction.py
 ```
 
-It summarizes only GBFS records that belong to a batch sidecar (A*/WA*/IDA* records and other members' records in the same folder are ignored). It refuses to overwrite existing outputs. To regenerate, delete `results/derived/pre-experiment-v2` and `results/figures/pre-experiment-v2` first (never `results/raw`).
+It summarizes only GBFS records that belong to a batch sidecar (A*/WA*/IDA* records and other members' records in the same folder are ignored). It refuses to overwrite existing outputs. To regenerate, delete `results/derived` and `results/figures` first (never `results/raw`).
 
 ## What it does for each run
 
@@ -73,7 +73,7 @@ It summarizes only GBFS records that belong to a batch sidecar (A*/WA*/IDA* reco
 3. Runs `python src/pyperplan/pyperplan.py -s gbfs_early_goal_test -H <heuristic> <task>` with `PYTHONHASHSEED` fixed (per task by default; see `--hash-seed-scope`).
 4. Windows: the child runs in a Job Object (hard memory cap on the whole process tree, process tree killed at the time limit). Linux/macOS: `RLIMIT_AS` and process-group kill, peak memory not measured.
 5. Validates every plan with `tools/validate_plan.py` (exit 0 = valid; exit 1 with a reason = `invalid_plan`; unreadable inputs or a crash = `validator_error`).
-6. Writes `results/raw/pre-experiment-v2/<run_id>.json` (all required fields of `configs/result.schema.json`), the raw log in `logs/`, solved plans in `plans/`, and a batch file in `batches/`. Existing files are never overwritten. `results/raw` is git-ignored.
+6. Writes `results/raw/run_records/<run_id>.json` (all required fields of `configs/result.schema.json`), the raw log in `logs/`, solved plans in `plans/`, and a batch file in `batches/`. Existing files are never overwritten. `results/raw` is git-ignored.
 
 Statuses the runner can write: `success`, `unsolved`, `timeout`, `memory_limit`, `invalid_plan`, `planner_error`, `validator_error`. Our 270 real runs produced only `success` and `timeout`.
 

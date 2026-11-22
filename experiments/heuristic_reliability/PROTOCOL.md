@@ -1,7 +1,7 @@
 # M3 heuristic generation and selection protocol (`m3-select-v1`)
 
 Owner: Ranem (M3). Frozen on 2026-11-18, before any trial was generated.
-Implemented in `generate_and_select.py`; every value below is a constant there.
+Implemented in `generate_and_select_heuristics.py`; every value below is a constant there.
 
 ## What a trial is
 
@@ -64,7 +64,7 @@ The winner is copied to `artifacts/m3/selected/<trial>/<domain>_<trialNN>.py`
 (for example `selected/trial-01/blocksworld_trial01.py`), and
 one row is added to `artifacts/m3/heuristic_manifest.csv`. The row records the
 model, provider, prompt hash, settings, training-set hash, file path, SHA-256 and
-freeze time, using the columns proposed in `paper_preparation/M3_PENDING_INTEGRATION.md`.
+freeze time, using the columns proposed in `paper_preparation/RELIABILITY_INTEGRATION_SPEC.md`.
 A frozen file is never overwritten; the script refuses to re-freeze. Test-task
 runs may start only after all nine files are frozen.
 

@@ -20,21 +20,21 @@
 
 - Priority: CRITICAL
 - Missing content / required result: Document the actual model/version, prompts, candidate counts, sampling settings, repair budget, training-only selection scores, independent trial IDs and frozen file hashes for three newly generated sets; supply generation and selection logs before describing this protocol as executed.
-- Expected source/output: `results/raw/m3/heuristic_manifest.csv (proposed); generation and selection logs`
+- Expected source/output: `results/raw/sampled_states/heuristic_manifest.csv (proposed); generation and selection logs`
 - Figure/table/content affected: Independent-generation protocol
 
 ## 4. 5.3 Initial-state and sampled-state reliability — sampling
 
 - Priority: CRITICAL
 - Missing content / required result: Specify and freeze a heuristic-independent reachable-state sampling rule, seed, source tasks, depths and inventory hash. Report sampled, finite-proven, unknown and proven-dead-end counts by task/domain before comparing estimates.
-- Expected source/output: `results/raw/m3/frozen_state_inventory.jsonl (proposed); executed sampling protocol`
+- Expected source/output: `results/raw/sampled_states/sampled_states.jsonl (proposed); executed sampling protocol`
 - Figure/table/content affected: R6 methods
 
 ## 5. 5.3 Sampled-state results — errors
 
 - Priority: CRITICAL
 - Missing content / required result: Insert sampled-state overestimation frequency, signed/absolute/positive error summaries and eligible counts for archived and new heuristics on identical states. Label task-macro and pooled-state rates separately; exclude unknown references and report h* = 0 separately for relative errors.
-- Expected source/output: `results/raw/m3/state_references.csv; results/derived/pre-experiment-v2/m3/state_estimates.csv and task_errors.csv (proposed)`
+- Expected source/output: `results/raw/sampled_states/sampled_state_optimal_costs.csv; results/derived/heuristic_reliability/sampled_state_estimates.csv and task_errors.csv (proposed)`
 - Figure/table/content affected: R6 numerical results
 
 ## 6. 5.3 Figure 3 caption — composite
@@ -48,7 +48,7 @@
 
 - Priority: CRITICAL
 - Missing content / required result: Add per-domain/tier coverage and matched effort for the three newly generated sets from admitted trial runs. Compare against the archived curves under identical tasks, budgets and hash seeds; report failure counts and any machine differences.
-- Expected source/output: `results/raw/pre-experiment-v2/batches/m3-*.json; m3/trial_runs.csv (proposed)`
+- Expected source/output: `results/raw/run_records/batches/m3-*.json; m3/trial_runs.csv (proposed)`
 - Figure/table/content affected: R7 new-trial scaling
 
 ## 8. 5.3 Independent generation — trials

@@ -14,14 +14,14 @@ import pandas as pd
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / 'paper_preparation/scripts'))
-import prepare as prep
+import build_paper_tables_and_figures as prep
 
 
 def main():
     warnings.filterwarnings('ignore', message='Mean of empty slice', category=RuntimeWarning)
-    runs = pd.read_csv(prep.DATA / 'm2-official/search_runs.csv')
-    base = pd.read_csv(prep.DATA / 'm1-r1r2/baseline_runs.csv')
-    refs = pd.read_csv(ROOT / 'results/raw/faraz_optimal_refs.csv')
+    runs = pd.read_csv(prep.DATA / 'history/three_workers/search_comparison/search_runs.csv')
+    base = pd.read_csv(prep.DATA / 'history/three_workers/reproduction/baseline_runs.csv')
+    refs = pd.read_csv(ROOT / 'results/raw/optimal_costs.csv')
     report = prep.verify_raw(runs, base)
     old = json.loads((ROOT / 'paper_preparation/VALIDATION.json').read_text())
     for name, expected in old['source_sha256'].items():
@@ -31,7 +31,7 @@ def main():
     prepared_q = pd.read_csv(ROOT / 'paper_preparation/tables/appendix/A4_quality.csv')
     pd.testing.assert_frame_equal(q[prepared_q.columns].reset_index(drop=True), prepared_q, check_dtype=False)
     pairs = prep.paired_vs_astar(df)
-    pd.testing.assert_frame_equal(pairs, pd.read_csv(prep.DATA / 'm2-official/paired/paired_vs_astar.csv'), check_dtype=False)
+    pd.testing.assert_frame_equal(pairs, pd.read_csv(prep.DATA / 'history/three_workers/search_comparison/paired/paired_vs_astar.csv'), check_dtype=False)
     prepared_ida = pd.read_csv(ROOT / 'paper_preparation/tables/appendix/A7_ida_overhead.csv')
     pd.testing.assert_frame_equal(prep.ida_vs_astar(df)[prepared_ida.columns], prepared_ida, check_dtype=False)
     for h, expected in [('deepseek-r1', [64, 65, 70, 69, 24]), ('hmax', [19, 14, 15, 16, 7])]:

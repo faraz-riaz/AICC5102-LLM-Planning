@@ -285,7 +285,7 @@ def main() -> int:
         "git_commit": git("rev-parse", "HEAD"),
         "machine_id": profile["machine_id"],
         "schema": json.loads(SCHEMA.read_text(encoding="utf-8")),
-        "raw_dir": ROOT / "results" / "raw" / config["config_id"],
+        "raw_dir": ROOT / "results" / "raw" / "run_records",
         "hash_seed_scope": args.hash_seed_scope,
         "hash_seeds": {},
     }

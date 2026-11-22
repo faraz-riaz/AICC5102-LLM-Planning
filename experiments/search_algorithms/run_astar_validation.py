@@ -388,7 +388,7 @@ def main() -> int:
     parser.add_argument(
         "--output",
         type=Path,
-        default=ROOT / "results" / "raw" / "faraz_astar_validation.csv",
+        default=ROOT / "results" / "raw" / "astar_validation.csv",
     )
     parser.add_argument("--time-limit-s", type=float, default=None)
     parser.add_argument("--force", action="store_true")

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Optimality-gap and trade-off analysis from real run outputs (M2-08).
 
-Inputs: one or more extended run CSVs written by ``run_faraz_pilot.py`` (or
+Inputs: one or more extended run CSVs written by ``run_pilot_batches.py`` (or
 records with the same columns from the shared runner) and the task-level
-reference table ``results/raw/faraz_optimal_refs.csv``.
+reference table ``results/raw/optimal_costs.csv``.
 
 Definitions (denominators are always reported):
 
@@ -16,7 +16,7 @@ Definitions (denominators are always reported):
   well as on each method's own solved set.
 
 Outputs (never overwritten): CSV + Markdown tables under
-``results/derived/<config_id>/<tag>/`` and figures R3/R4/R5 under
+``results/derived/<tag>/`` and figures R3/R4/R5 under
 ``results/figures/<config_id>/<tag>/``. Every figure is stamped with the
 input scope so pilot data cannot be mistaken for final results.
 """
@@ -363,7 +363,7 @@ def figure_r5(common: pd.DataFrame, path: Path, scope: str, sizes: dict) -> None
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--runs", nargs="+", type=Path, required=True)
-    parser.add_argument("--refs", type=Path, default=ROOT / "results" / "raw" / "faraz_optimal_refs.csv")
+    parser.add_argument("--refs", type=Path, default=ROOT / "results" / "raw" / "optimal_costs.csv")
     parser.add_argument("--tag", required=True)
     parser.add_argument("--scope", required=True, help="text stamped on every figure, e.g. 'PILOT: easy tier only'")
     parser.add_argument("--config-id", default="pre-experiment-v2")
@@ -371,12 +371,12 @@ def main() -> int:
     parser.add_argument("--methods", nargs="+", default=None, help="restrict to these algorithm labels")
     args = parser.parse_args()
 
-    derived = ROOT / "results" / "derived" / args.config_id / args.tag
-    figures = ROOT / "results" / "figures" / args.config_id / args.tag
+    derived = ROOT / "results" / "derived" / args.tag
+    figures = ROOT / "results" / "figures" / args.tag
     own_outputs = [derived / f"{n}.csv" for n in ("coverage", "quality", "common_solved", "gap_distribution",
                                                  "coverage_by_domain", "coverage_by_difficulty", "effort_by_difficulty")]
-    own_outputs += [derived / "summary.md", figures / "R3_coverage.png", figures / "R4_gap_distribution.png",
-                    figures / "R5_effort_vs_quality.png"]
+    own_outputs += [derived / "summary.md", figures / "coverage.png", figures / "optimality_gap.png",
+                    figures / "effort_vs_quality.png"]
     if any(path.exists() for path in own_outputs):
         raise SystemExit(f"refusing to overwrite existing output for tag {args.tag!r}")
     derived.mkdir(parents=True, exist_ok=True)
@@ -400,9 +400,9 @@ def main() -> int:
                         ("coverage_by_domain", by_domain), ("coverage_by_difficulty", by_difficulty), ("effort_by_difficulty", effort)):
         frame.to_csv(derived / f"{name}.csv", index=False)
 
-    figure_r3(coverage, figures / "R3_coverage.png", args.scope)
-    figure_r4(df, figures / "R4_gap_distribution.png", args.scope)
-    figure_r5(common, figures / "R5_effort_vs_quality.png", args.scope, sizes)
+    figure_r3(coverage, figures / "coverage.png", args.scope)
+    figure_r4(df, figures / "optimality_gap.png", args.scope)
+    figure_r5(common, figures / "effort_vs_quality.png", args.scope, sizes)
 
     lines = [
         f"# Search analysis: {args.tag}",

@@ -27,9 +27,9 @@ from heuristics.relaxation import hFFHeuristic, hMaxHeuristic  # noqa: E402
 from search.gbfs import gbfs_early_goal_test  # noqa: E402
 
 import search_adapters  # noqa: E402
-from exact_reference import exact_remaining_cost, task_from_state  # noqa: E402
-from generate_optimal_refs import compile_reference, cross_check_outcome  # noqa: E402
-from result_records import derive_seed, load_schema, validate_record  # noqa: E402
+from compute_state_optimal_costs import exact_remaining_cost, task_from_state  # noqa: E402
+from compute_optimal_costs import compile_reference, cross_check_outcome  # noqa: E402
+from run_record_utils import derive_seed, load_schema, validate_record  # noqa: E402
 
 sys.path.remove(str(PYPERPLAN))
 loaded_tools = sys.modules.get("tools")
@@ -230,7 +230,7 @@ def test_seed_derivation_is_stable_sha256() -> None:
 
 @pytest.mark.skipif(os.name != "nt", reason="Job Object enforcement is Windows-specific")
 def test_bounded_exec_enforces_memory_cap_and_reports_peak() -> None:
-    from bounded_exec import classify, run_bounded
+    from run_with_limits_windows import classify, run_bounded
 
     bench = ROOT / "benchmarks" / "ipc2023-learning" / "testing" / "blocksworld"
     job = {
@@ -250,7 +250,7 @@ def test_bounded_exec_enforces_memory_cap_and_reports_peak() -> None:
 
 @pytest.mark.skipif(os.name != "nt", reason="Job Object enforcement is Windows-specific")
 def test_bounded_exec_hard_kills_after_grace() -> None:
-    from bounded_exec import classify, run_bounded
+    from run_with_limits_windows import classify, run_bounded
 
     bench = ROOT / "benchmarks" / "ipc2023-learning" / "testing" / "blocksworld"
     job = {
@@ -269,7 +269,7 @@ def test_bounded_exec_hard_kills_after_grace() -> None:
 def test_fixed_hash_seed_makes_gbfs_hff_reproducible_across_processes() -> None:
     """Grounding/hFF iterate over sets of strings, so results depend on
     PYTHONHASHSEED. With the same per-run seed, two processes must agree."""
-    from bounded_exec import run_bounded
+    from run_with_limits_windows import run_bounded
 
     bench = ROOT / "benchmarks" / "ipc2023-learning" / "testing" / "transport"
     job = {
@@ -305,7 +305,7 @@ def test_all_pyperplan_builtin_heuristics_are_available() -> None:
 def test_worker_reports_before_a_parent_that_kills_exactly_at_the_limit() -> None:
     """The shared runner kills the worker at exactly time_limit_s with no grace.
     The worker must stop and report first (initial_h is computed during setup)."""
-    from bounded_exec import run_bounded
+    from run_with_limits_windows import run_bounded
 
     bench = ROOT / "benchmarks" / "ipc2023-learning" / "testing" / "blocksworld"
     job = {
@@ -322,7 +322,7 @@ def test_worker_reports_before_a_parent_that_kills_exactly_at_the_limit() -> Non
 def test_runner_record_converter_selects_by_batch_and_maps_ids(tmp_path: Path) -> None:
     import json as _json
 
-    from convert_runner_records import convert
+    from build_run_table import convert
 
     raw = tmp_path / "raw"
     (raw / "logs").mkdir(parents=True)
@@ -390,7 +390,7 @@ def test_common_solved_table_handles_a_method_that_solved_nothing() -> None:
 
 
 def test_paired_vs_astar_counts_matched_tasks_only() -> None:
-    from m2_paired_analysis import paired_vs_astar
+    from paired_method_comparison import paired_vs_astar
 
     table = paired_vs_astar(_analysis_frame()).set_index("method")
     assert table.loc["gbfs", "both_solved"] == 1
@@ -402,8 +402,8 @@ def test_paired_vs_astar_counts_matched_tasks_only() -> None:
 def test_completeness_checker_replays_saved_plans(tmp_path: Path) -> None:
     import json as _json
 
-    from check_matrix_completeness import audit
-    from result_records import derive_seed
+    from check_run_completeness import audit
+    from run_record_utils import derive_seed
 
     task = load_task("miconic", "easy-p02.pddl")
     _cost, plan = independent_uniform_cost(task)
@@ -435,7 +435,7 @@ def test_completeness_checker_replays_saved_plans(tmp_path: Path) -> None:
 def test_reference_merge_prefers_proven_and_flags_disagreement(tmp_path: Path) -> None:
     import csv as _csv
 
-    from merge_reference_tables import merge
+    from merge_optimal_cost_tables import merge
 
     def write(name, rows):
         path = tmp_path / name

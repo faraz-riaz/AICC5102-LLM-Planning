@@ -22,9 +22,9 @@
   "pending_trial_table_observations": 0,
   "new_planner_runs": 0,
   "source_sha256": {
-    "results/derived/pre-experiment-v2/m2-official/search_runs.csv": "dd1db63c372169ee2fb3f819ee6c1499560f454c2eacf2df414cb83709437203",
-    "results/derived/pre-experiment-v2/m1-r1r2/baseline_runs.csv": "f89b19f06b90ffa963bdb9a587989d8b08c480bc52afeefd3442a3d6368a9cd8",
-    "results/raw/faraz_optimal_refs.csv": "3d85c5076ee4cc244a409e1a2ab12ebb1bd7bd0ac07fad04a36461e05b2656fe",
+    "results/derived/history/three_workers/search_comparison/search_runs.csv": "dd1db63c372169ee2fb3f819ee6c1499560f454c2eacf2df414cb83709437203",
+    "results/derived/history/three_workers/reproduction/baseline_runs.csv": "f89b19f06b90ffa963bdb9a587989d8b08c480bc52afeefd3442a3d6368a9cd8",
+    "results/raw/optimal_costs.csv": "3d85c5076ee4cc244a409e1a2ab12ebb1bd7bd0ac07fad04a36461e05b2656fe",
     "benchmarks/manifest.csv": "f7c95a9dce9c5777847d92581f2051f5d34532e902069a3c12f08cefebdfcc23",
     "artifacts/upstream/deepseek-r1/provenance.json": "45c499797b4c3c164a04e47c7f5ae15ca39a1aa26fc4cd06af267f87309030d3"
   }

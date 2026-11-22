@@ -277,7 +277,7 @@ def test_legacy_astar_adapter_still_returns_a_plan() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Additional coverage added when completing M2-02 (see docs/FARAZ_PROGRESS.md).
+# Additional coverage added when completing M2-02 (see docs/SEARCH_ALGORITHMS_LOG.md).
 # ---------------------------------------------------------------------------
 
 LLM_HEURISTICS = ROOT / "artifacts" / "upstream" / "deepseek-r1"

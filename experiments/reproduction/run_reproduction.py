@@ -28,7 +28,7 @@ Heuristic values:
 Design notes
   * Windows: the child runs inside a Job Object (hard memory cap on the whole
     process tree, process tree killed when the time limit is reached). The
-    Job-Object calls follow the pattern used in Faraz's bounded_exec.py.
+    Job-Object calls follow the pattern used in Faraz's run_with_limits_windows.py.
     Peak memory is the job's peak COMMITTED memory (recorded as
     memory_metric = platform_native_process_tree_bytes), not the working set.
     There is a short gap between process start and job assignment.
@@ -108,7 +108,7 @@ def python_hash_seed(ctx: dict, domain: str, problem_id: str, run_seed: int) -> 
     """PYTHONHASHSEED for one run.
 
     "task": SHA-256 of (base seed, config_id, domain, problem_id, "PYTHONHASHSEED"),
-    identical to experiments/search_algorithms/faraz_jobs.py, so GBFS, A*, WA*,
+    identical to experiments/search_algorithms/run_record_builder.py, so GBFS, A*, WA*,
     IDA* and every heuristic trial ground a task in the same operator order.
     "run": the run seed (behaviour of the original reproduction batches).
     """
@@ -527,7 +527,7 @@ def main() -> int:
         "git_commit": git("rev-parse", "HEAD"),
         "machine_id": profile["machine_id"],
         "schema": json.loads(SCHEMA.read_text(encoding="utf-8")),
-        "raw_dir": ROOT / "results" / "raw" / config["config_id"],
+        "raw_dir": ROOT / "results" / "raw" / "run_records",
         "hash_seed_scope": args.hash_seed_scope,
         "hash_seeds": {},
     }

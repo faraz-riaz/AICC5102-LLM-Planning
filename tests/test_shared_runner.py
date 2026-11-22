@@ -22,7 +22,7 @@ for path in (str(REPRODUCTION), str(SEARCH)):
 
 import run_reproduction  # noqa: E402
 import run_search_algorithms  # noqa: E402
-import summarize_results  # noqa: E402
+import summarize_reproduction  # noqa: E402
 
 BENCH = ROOT / "benchmarks" / "ipc2023-learning" / "testing" / "blocksworld"
 
@@ -87,8 +87,8 @@ def test_validate_plan_distinguishes_valid_invalid_and_validator_errors(tmp_path
 # ---------------------------------------------------------------------------
 
 
-def test_task_hash_seed_is_shared_and_matches_faraz_tools(tmp_path: Path) -> None:
-    from result_records import derive_seed
+def test_task_hash_seed_is_shared_and_matches_search_tools(tmp_path: Path) -> None:
+    from run_record_utils import derive_seed
 
     ctx = _context(tmp_path, "task")
     seed_a = run_reproduction.python_hash_seed(ctx, "miconic", "easy-p02", run_seed=11)
@@ -122,7 +122,7 @@ def test_summary_uses_only_gbfs_records_from_runner_batches(tmp_path: Path) -> N
     (raw / "batches" / "b.json").write_text(json.dumps({"batch": "astar-hff", "run_ids": ["astar1"]}), encoding="utf-8")
     (raw / "batches" / "c.json").write_text(json.dumps({"batch": "smoke", "run_ids": ["smoke1"]}), encoding="utf-8")
 
-    selected = summarize_results.load_records(raw, ("smoke",))
+    selected = summarize_reproduction.load_records(raw, ("smoke",))
 
     assert [r["run_id"] for r in selected] == ["gbfs1"]
 
@@ -141,7 +141,7 @@ def test_gbfs_and_astar_runs_share_the_task_hash_seed_and_write_valid_records(tm
     astar = run_search_algorithms.execute_run(task, argparse.Namespace(algorithm="astar", weight=None, **common), ctx)
 
     assert gbfs["status"] == "success" and astar["status"] == "success"
-    assert astar["plan_cost"] == 20.0  # proven optimum (faraz_optimal_refs.csv)
+    assert astar["plan_cost"] == 20.0  # proven optimum (optimal_costs.csv)
     assert astar["nodes_generated"] is not None and gbfs["nodes_generated"] is None
     seeds = set(ctx["hash_seeds"].values())
     assert len(seeds) == 1  # both runners grounded the task with the same PYTHONHASHSEED

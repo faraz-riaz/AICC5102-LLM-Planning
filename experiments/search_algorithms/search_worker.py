@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Child-process entry point: run exactly one search job and print JSON.
 
-Launched by ``bounded_exec.run_bounded`` inside a resource-limited process.
+Launched by ``run_with_limits_windows.run_bounded`` inside a resource-limited process.
 Reads one JSON job from stdin and writes one JSON object to stdout.
 
 Job fields: ``domain_file``, ``problem_file``, ``algorithm`` (one of
@@ -62,8 +62,8 @@ def run(job: dict) -> dict:
     problem = parser.parse_problem(domain)
     task = grounding.ground(problem)
     if job.get("initial_state") is not None:
-        # h*(s) queries: search from a sampled state (exact_reference.py).
-        from exact_reference import task_from_state
+        # h*(s) queries: search from a sampled state (compute_state_optimal_costs.py).
+        from compute_state_optimal_costs import task_from_state
 
         task = task_from_state(task, job["initial_state"])
 

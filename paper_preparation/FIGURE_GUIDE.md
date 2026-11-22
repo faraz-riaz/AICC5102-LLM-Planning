@@ -1,6 +1,6 @@
 # Figure guide
 
-All four current figures are actual saved-data figures, available as vector PDF and 200 dpi PNG. Paths below are under `paper_preparation/`. Sources/eligibility are in EVIDENCE_INVENTORY; regeneration is `python paper_preparation/scripts/prepare.py`. Colors are Okabe–Ito blue for archived R1, vermilion for hmax; algorithms use distinct marker/line styles, hmax bars use hatching. Black marks show descriptive means/medians, not uncertainty intervals.
+All four current figures are actual saved-data figures, available as vector PDF and 200 dpi PNG. Paths below are under `paper_preparation/`. Sources/eligibility are in EVIDENCE_INVENTORY; regeneration is `python paper_preparation/scripts/build_paper_tables_and_figures.py`. Colors are Okabe–Ito blue for archived R1, vermilion for hmax; algorithms use distinct marker/line styles, hmax bars use hatching. Black marks show descriptive means/medians, not uncertainty intervals.
 
 ## F1 — coverage and difficulty (main)
 
@@ -40,8 +40,8 @@ All four current figures are actual saved-data figures, available as vector PDF 
 
 ## F5 — independent heuristic variability (planned; no image/data generated)
 
-- **Proposed output:** `figures/appendix/F5_M3_trial_stability.pdf`, `.png` only after `m3_displays.py --trials` receives real data.
-- **Input/schema:** M3_PENDING_INTEGRATION R8; exactly3 independently generated/selected trial sets, same per-method manifest test scope and contract. Per-trial tables accompany mean±sampleSD, ddof1. Gray diamonds show matched archived R1 counts; dots show actual trial counts.
+- **Proposed output:** `figures/appendix/F5_M3_trial_stability.pdf`, `.png` only after `reliability_displays.py --trials` receives real data.
+- **Input/schema:** RELIABILITY_INTEGRATION_SPEC R8; exactly3 independently generated/selected trial sets, same per-method manifest test scope and contract. Per-trial tables accompany mean±sampleSD, ddof1. Gray diamonds show matched archived R1 counts; dots show actual trial counts.
 - **Would demonstrate:** variability across selected heuristics and compatibility with the archived result. All90 and easy30 labels remain explicit.
 - **Caption to finalize:** name actual model/version and selection protocol; specify3 independent generation trials, tested problems, mean±SD definition, archived reference and fixed resource contract. Do not fill in results before data arrival.
 - **Caveats:** provenance independence cannot be inferred from three CSV labels; SD is across trials, not across benchmark tasks; different hardware changes runtime comparability.

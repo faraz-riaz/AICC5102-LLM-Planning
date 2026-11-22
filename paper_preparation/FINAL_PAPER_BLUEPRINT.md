@@ -65,7 +65,7 @@ Within this budget, reserve approximately **0.20 page T1**, **0.30 page F1**, **
 - **References:** proven validated A*+hmax/UCS solutions under unit action costs; unknown search/reference outcomes remain null. Briefly give gap definition and denominator rule. State reference selection bias.
 - **Accuracy:** signed h−h*, absolute error, positive error max(0,h−h*), overestimate h>h*+epsilon; finite proven reference states only. Initial-state certificate is separate from M3 sampled states.
 - **M3 design to add:** predeclared heuristic-independent reachable-state sampling; three independently generated and independently selected sets; training-only selection; freeze files/hashes before testing. Supply actual model, prompt, candidate count, settings, repair budget and selection details once documented. Do not import archived settings as if they were the new protocol.
-- **Sources:** `src/pyperplan/search/a_star.py`, `ida_star.py`; `experiments/search_algorithms/search_adapters.py`, `generate_optimal_refs.py`, `exact_reference.py`; `artifacts/upstream/deepseek-r1/provenance.json`; tests/validation evidence summarized in integration report.
+- **Sources:** `src/pyperplan/search/a_star.py`, `ida_star.py`; `experiments/search_algorithms/search_adapters.py`, `compute_optimal_costs.py`, `compute_state_optimal_costs.py`; `artifacts/upstream/deepseek-r1/provenance.json`; tests/validation evidence summarized in integration report.
 - **Displays:** short equations in text, no workflow figure required. **Owners:** Amina baseline, Faraz search/reference methods, Ranem generation/sampling. **M3 update:** complete generation and sample design; avoid claiming this subsection's planned design has been executed.
 
 ## 4. Experimental Setup (~0.60 page)
@@ -113,7 +113,7 @@ Within this budget, reserve approximately **0.20 page T1**, **0.30 page F1**, **
 - **R8 to add:** three independent selected sets, coverage mean ± sample SD and individual trial points with matched archived reference. Explain training-only selection and any generation failures; keep full settings/candidate scores appendix. Do not mistake within-test variation for across-trial variability.
 - **R9 to add if defensible:** task-level error summary joined to exact plan gaps with heuristic/algorithm identity; eligible task count per group. Same task across algorithms is dependent. Present association without causal wording or pseudo-replicated states. If small/constant/tied sample prevents informative association, report that negative finding and put join details appendix.
 - **Displays:** reserve one 5.5-inch compact main composite: R6 accuracy panel + R8 stability panel if both real outputs exist. Rebuild only after schemas/provenance verified. F5/F6 adapters currently target appendix; promote a selected panel after inspection. No generated M3 plots exist now.
-- **Sources:** future frozen M3 manifest, state inventory/reference/errors, trial sidecars, M3_PENDING_INTEGRATION, existing A11 and archived tables.
+- **Sources:** future frozen M3 manifest, state inventory/reference/errors, trial sidecars, RELIABILITY_INTEGRATION_SPEC, existing A11 and archived tables.
 - **Owner:** Ranem; Faraz reviews reference/gap joins; Amina reviews runner consistency. **Pending:** this subsection cannot be finalized from M1/M2 alone.
 
 ## 6. Limitations (~0.30 page)

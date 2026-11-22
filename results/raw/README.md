@@ -14,8 +14,8 @@ So that every reported number traces to raw run files, the following records fro
 
 For each run: `pre-experiment-v2/<run_id>.json` (schema record), `logs/<run_id>.log`, `plans/<run_id>.soln` (solved runs) and the batch sidecar (run IDs, PYTHONHASHSEED per run, machine profile). All used `--hash-seed-scope task`, 60 s / 4096 MiB, 3 workers.
 
-Also committed: `pre-experiment-v2/faraz-*.json`. These are search-workstream records from `bounded_exec.py`: exact references (`faraz-refs-*`), the WA*/IDA* validation batch and the easy-tier pilots. The `faraz_*.csv` tables here summarize them, and `docs/FARAZ_PROGRESS.md` explains each one.
+Also committed: `pre-experiment-v2/faraz-*.json`. These are search-workstream records from `run_with_limits_windows.py`: exact references (`faraz-refs-*`), the WA*/IDA* validation batch and the easy-tier pilots. The `faraz_*.csv` tables here summarize them, and `docs/SEARCH_ALGORITHMS_LOG.md` explains each one.
 
-**Final 8-worker configuration (2026-11-22):** `w8-m2-` (600 runs, M2 search matrix) and `w8-gbfs-` (270 runs, GBFS + DeepSeek-R1 / hmax / hFF), both at 60 s / 4096 MiB, 8 workers, per-task seeds. This is the set to use for comparisons. Ranem's M3 test runs (`m3-`, 1,170 runs, same settings) are on branch `feature/ranem-heuristics`. See `docs/M1_M2_FINAL_INTEGRATION_STATUS.md` §7.
+**Final 8-worker configuration (2026-11-22):** `w8-m2-` (600 runs, M2 search matrix) and `w8-gbfs-` (270 runs, GBFS + DeepSeek-R1 / hmax / hFF), both at 60 s / 4096 MiB, 8 workers, per-task seeds. This is the set to use for comparisons. Ranem's M3 test runs (`m3-`, 1,170 runs, same settings) are on branch `feature/ranem-heuristics`. See `docs/INTEGRATION_STATUS.md` §7.
 
 Not committed: smoke-test batches (`smoke-*`) and synthetic test fixtures.

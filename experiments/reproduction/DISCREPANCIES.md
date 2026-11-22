@@ -1,6 +1,6 @@
 # Reproduction: what matches the paper and what differs (M1-07)
 
-Owner: Amina. Data: `results/derived/pre-experiment-v2/` (270 runs, GBFS `gbfs_early_goal_test`, 60 s / 4096 MiB, one Windows PC).
+Owner: Amina. Data: `results/derived/` (270 runs, GBFS `gbfs_early_goal_test`, 60 s / 4096 MiB, one Windows PC).
 
 ## What we reproduced
 

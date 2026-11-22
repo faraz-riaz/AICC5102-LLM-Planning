@@ -34,7 +34,7 @@ def main() -> int:
     parser.add_argument("--config-id", default="pre-experiment-v2")
     args = parser.parse_args()
 
-    out = ROOT / "results" / "derived" / args.config_id / args.tag
+    out = ROOT / "results" / "derived" / args.tag
     detail_path, summary_path = out / "batch_comparison.csv", out / "batch_comparison_summary.csv"
     if detail_path.exists() or summary_path.exists():
         raise SystemExit("refusing to overwrite existing comparison")

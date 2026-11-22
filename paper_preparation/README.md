@@ -8,14 +8,14 @@ This directory contains the scientific outline, traceable existing-data figures/
 - [EVIDENCE_INVENTORY.md](EVIDENCE_INVENTORY.md): R1–R9 status, exact sources, observation counts, scope and limitations.
 - [KEY_FINDINGS.md](KEY_FINDINGS.md): ranked supported observations, numbers and interpretation boundaries.
 - [FIGURE_GUIDE.md](FIGURE_GUIDE.md), [MAIN_VS_APPENDIX.md](MAIN_VS_APPENDIX.md): factual captions, sizes and display selection.
-- [M3_PENDING_INTEGRATION.md](M3_PENDING_INTEGRATION.md): expected actual data, schemas and admission rules; no M3 result is claimed complete.
+- [RELIABILITY_INTEGRATION_SPEC.md](RELIABILITY_INTEGRATION_SPEC.md): expected actual data, schemas and admission rules; no M3 result is claimed complete.
 - [VALIDATION.json](VALIDATION.json): source hashes and numerical/record checks from the generator.
 
 ## Directory and output map
 
 ```text
-scripts/prepare.py           saved-data generator and assertions
-scripts/m3_displays.py       optional real-data R6/R8/R9 adapters
+scripts/build_paper_tables_and_figures.py           saved-data generator and assertions
+scripts/reliability_displays.py       optional real-data R6/R8/R9 adapters
 figures/main/               F1 coverage/scaling, F2 exact quality (PDF + PNG)
 figures/appendix/           F3 paired effort, F4 initial-state accuracy (PDF + PNG)
 tables/main/               T1 reproduction, T2 alternative search summary
@@ -29,7 +29,7 @@ There are **18 table families** (each CSV/Markdown/LaTeX):17 filled with existin
 
 ## Data and ownership
 
-Primary inputs are `results/derived/pre-experiment-v2/m2-official/search_runs.csv` (780 rows), `m1-r1r2/baseline_runs.csv` (270), task references `results/raw/faraz_optimal_refs.csv` (90 outcomes,17 proven), manifest and heuristic provenance. The generator verifies against current raw JSON/log/plan files selected through the11 relevant batch sidecars. **870 unique** experiment records, not1050:180 GBFS rows are shared. Successful saved plan checks number401 across the unique runs.
+Primary inputs are `results/derived/history/three_workers/search_comparison/search_runs.csv` (780 rows), `m1-r1r2/baseline_runs.csv` (270), task references `results/raw/optimal_costs.csv` (90 outcomes,17 proven), manifest and heuristic provenance. The generator verifies against current raw JSON/log/plan files selected through the11 relevant batch sidecars. **870 unique** experiment records, not1050:180 GBFS rows are shared. Successful saved plan checks number401 across the unique runs.
 
 M1/M2 coverage, quality, paired effort and archived initial-state figures are ready as evidence for writing. Amina's historical53/25/14 reproduction has only document evidence here; main T1 uses the independently raw-verifiable same-machine64/38/19 regeneration and labels the protocol. M3 sampled states, selected trial files, trial run records and error–quality joins are absent. Original standalone assignment/proposal and dedicated88.6s grounding profile are unavailable; source notes distinguish these from accessible current records. Historical reports claiming current raw files are uncommitted are superseded by base main.
 
@@ -38,7 +38,7 @@ M1/M2 coverage, quality, paired effort and archived initial-state figures are re
 From the repository root, in the supplied environment:
 
 ```powershell
-.venv/Scripts/python.exe paper_preparation/scripts/prepare.py
+.venv/Scripts/python.exe paper_preparation/scripts/build_paper_tables_and_figures.py
 ```
 
 The script resolves paths from its own location. It overwrites only its named outputs under `paper_preparation/`; all member results are read-only. It reuses existing converter, reference/gap, common-solved and paired-analysis functions. It never invokes a runner, planner, exact-state solver or API. Runtime is seconds once dependencies/data are available. It also regenerates the table validation harness, but Markdown guidance is author-maintained rather than machine-overwritten.
@@ -48,7 +48,7 @@ Fresh analysis-only environment (no project lock modification):
 ```powershell
 uv venv --python 3.12 paper_preparation/.venv-paper
 uv pip install --python paper_preparation/.venv-paper/Scripts/python.exe -r paper_preparation/requirements-analysis.txt
-paper_preparation/.venv-paper/Scripts/python.exe paper_preparation/scripts/prepare.py
+paper_preparation/.venv-paper/Scripts/python.exe paper_preparation/scripts/build_paper_tables_and_figures.py
 ```
 
 On Linux use `paper_preparation/.venv-paper/bin/python`. The task-specific environment is ignored by this directory's Git rules. Alternatively create it outside the checkout. `matplotlib` is not declared in the project's frozen lock; `requirements-analysis.txt` pins the working pandas2.2.3/numpy2.2.5/matplotlib3.10.3 combination. Other imported member functions require no network or optional LLM packages during this analysis.
@@ -74,13 +74,13 @@ The unmodified official2026 style is included; the preview uses `preprint`, actu
 
 ## Update after Ranem
 
-Follow M3_PENDING_INTEGRATION before plotting. Normalize her actual output identifiers without changing existing evidence. Convert real runner batches with the existing converter to a new CSV; audit custom-file hashes and protocol against the frozen manifest. Three labels alone do not establish independent generation.
+Follow RELIABILITY_INTEGRATION_SPEC before plotting. Normalize her actual output identifiers without changing existing evidence. Convert real runner batches with the existing converter to a new CSV; audit custom-file hashes and protocol against the frozen manifest. Three labels alone do not establish independent generation.
 
 ```powershell
-.venv/Scripts/python.exe paper_preparation/scripts/m3_displays.py --help
+.venv/Scripts/python.exe paper_preparation/scripts/reliability_displays.py --help
 # Only once actual admitted inputs exist:
-.venv/Scripts/python.exe paper_preparation/scripts/m3_displays.py --trials <real-trial-runs.csv>
-.venv/Scripts/python.exe paper_preparation/scripts/m3_displays.py --task-errors <real-task-errors.csv> --plans <real-plans.csv>
+.venv/Scripts/python.exe paper_preparation/scripts/reliability_displays.py --trials <real-trial-runs.csv>
+.venv/Scripts/python.exe paper_preparation/scripts/reliability_displays.py --task-errors <real-task-errors.csv> --plans <real-plans.csv>
 ```
 
 For R6 import `summarize_state_errors`, rename existing exact solver output `status` to `reference_status`, and save the returned task summaries. No state experiments are launched by that function. F5/F6 and their tables do not exist until real inputs are supplied. The no-input CLI fails rather than generate placeholders. Review eligible sets, actual settings, sampling dependence and exclusion counts before promoting one compact R6/R8 main composite and updating status/captions. Final prose, final submission packaging and individual defence remain author tasks.

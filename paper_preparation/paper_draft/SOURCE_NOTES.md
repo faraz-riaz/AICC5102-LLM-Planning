@@ -4,20 +4,20 @@ Checked 18 November 2026. The source of experimental claims is the repository ev
 
 ## Source hierarchy and claim map
 
-The seven preparation guides were read in full: FINAL_PAPER_BLUEPRINT, EVIDENCE_INVENTORY, KEY_FINDINGS, FIGURE_GUIDE, MAIN_VS_APPENDIX, M3_PENDING_INTEGRATION and README. The existing single-column format and display selection are followed. The prepared T2 comparison is placed in the appendix (Word Table 4), since simultaneous main inclusion would duplicate Figures 1–2. The prepared images are embedded unchanged.
+The seven preparation guides were read in full: FINAL_PAPER_BLUEPRINT, EVIDENCE_INVENTORY, KEY_FINDINGS, FIGURE_GUIDE, MAIN_VS_APPENDIX, RELIABILITY_INTEGRATION_SPEC and README. The existing single-column format and display selection are followed. The prepared T2 comparison is placed in the appendix (Word Table 4), since simultaneous main inclusion would duplicate Figures 1–2. The prepared images are embedded unchanged.
 
 | Draft content | Existing source |
 |---|---|
 | Original method, archived settings and selected file identity | UPSTREAM.md; CITATION.cff; artifacts/upstream/deepseek-r1/provenance.json; selected Python files |
 | Search priorities, duplicate rules, ordering and IDA* thresholds | src/pyperplan/search/a_star.py; ida_star.py; experiments/search_algorithms/search_adapters.py |
-| Exact-reference eligibility and UCS fallback | generate_optimal_refs.py; results/raw/faraz_optimal_refs.csv; faraz_optimal_refs_ext300s.csv |
+| Exact-reference eligibility and UCS fallback | compute_optimal_costs.py; results/raw/optimal_costs.csv; optimal_costs_extended_300s.csv |
 | Reproduction coverage | m1-r1r2/baseline_runs.csv; reproduction.csv; prepared T1; DISCREPANCIES.md for separate historical provenance |
 | Matrix coverage, quality, statuses, effort and memory | m2-official/search_runs.csv; prepared A1/A4/A5/A7/A9/A10/A12; original paired summaries |
 | Initial-state inadmissibility | cost-aware initial_h joined once per task/heuristic to proven references; prepared A11 |
 | Run environment, task scope and hash-seed handling | frozen benchmark manifest; 11 selected batch sidecars and machine profiles; result schema |
 | Plan validity | recorded plan_valid; saved plan lengths; canonical saved hashes; earlier completeness replay reports |
-| Pending reliability/trial work | M3_PENDING_INTEGRATION; no m3 batch sidecars; header-only T4 schema; experiments/heuristic_reliability/README.md |
-| Completed contributions | docs/TEAM_RESPONSIBILITIES.md and M1_M2_FINAL_INTEGRATION_STATUS.md; no pending assignment is represented as completed work |
+| Pending reliability/trial work | RELIABILITY_INTEGRATION_SPEC; no m3 batch sidecars; header-only T4 schema; experiments/heuristic_reliability/README.md |
+| Completed contributions | docs/TEAM_RESPONSIBILITIES.md and INTEGRATION_STATUS.md; no pending assignment is represented as completed work |
 
 The read-only verifier imports the existing preparation verifier and analysis functions. It does not call prepare.main or regenerate preparation outputs. EVIDENCE_CHECKS.json records the checks. The five primary input hashes still match preparation. All 870 unique batch-selected records and logs are checked; 401 saved successful-plan lengths/validity flags are checked, with canonical hashes checked for all 363 matched search successes. Prior independent PDDL replay (280 official + 83 GBFS) is described as historical evidence, not newly executed validation.
 
