@@ -55,6 +55,9 @@ PAIRED_GBFS = [
     ("gbfs", None, "llm", ("easy", "medium", "hard")),
     ("gbfs", None, "hmax", ("easy", "medium", "hard")),
 ]
+# GBFS baselines behind R1/R2 (paired arm + hFF), all 90 tasks
+GBFS_BASELINES = PAIRED_GBFS + [("gbfs", None, "hff", ("easy", "medium", "hard"))]
+MATRICES = {"official": OFFICIAL_MATRIX, "paired-gbfs": PAIRED_GBFS, "gbfs-baselines": GBFS_BASELINES}
 
 
 def heuristic_key(record: dict) -> str:
@@ -212,14 +215,14 @@ def audit(raw_dir: Path, prefixes: list[str], matrix: list) -> tuple[dict, list[
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--batches", nargs="+", required=True, help="sidecar label prefixes")
-    parser.add_argument("--matrix", choices=["official", "paired-gbfs"], default="official")
+    parser.add_argument("--matrix", choices=sorted(MATRICES), default="official")
     parser.add_argument("--raw-dir", type=Path, default=ROOT / "results" / "raw" / "pre-experiment-v2")
     parser.add_argument("--out-dir", type=Path, required=True)
     args = parser.parse_args()
     summary_path, issues_path = args.out_dir / f"completeness_{args.matrix}.json", args.out_dir / f"completeness_{args.matrix}_issues.csv"
     if summary_path.exists() or issues_path.exists():
         raise SystemExit("refusing to overwrite existing completeness outputs")
-    matrix = OFFICIAL_MATRIX if args.matrix == "official" else PAIRED_GBFS
+    matrix = MATRICES[args.matrix]
     summary, issues = audit(args.raw_dir, args.batches, matrix)
     args.out_dir.mkdir(parents=True, exist_ok=True)
     summary_path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")

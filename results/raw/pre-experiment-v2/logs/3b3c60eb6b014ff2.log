@@ -1,0 +1,32 @@
+2026-11-22 11:08:07,153 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-22 11:08:07,153 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_1joyf3v6\domain.pddl
+2026-11-22 11:08:07,153 INFO     using search: gbfs_early_goal_test
+2026-11-22 11:08:07,153 INFO     using heuristic: hFFHeuristic
+2026-11-22 11:08:07,153 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_1joyf3v6\domain.pddl
+2026-11-22 11:08:07,153 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_1joyf3v6\easy-p22.pddl
+2026-11-22 11:08:07,162 INFO     5 Predicates parsed
+2026-11-22 11:08:07,162 INFO     4 Actions parsed
+2026-11-22 11:08:07,162 INFO     22 Objects parsed
+2026-11-22 11:08:07,162 INFO     0 Constants parsed
+2026-11-22 11:08:07,162 INFO     Grounding start: blocksworld-22
+2026-11-22 11:08:07,167 INFO     Relevance analysis removed 0 facts
+2026-11-22 11:08:07,167 INFO     Grounding end: blocksworld-22
+2026-11-22 11:08:07,167 INFO     551 Variables created
+2026-11-22 11:08:07,167 INFO     1012 Operators created
+2026-11-22 11:08:07,167 INFO     Search start: blocksworld-22
+2026-11-22 11:08:07,169 INFO     Initial h value: 43.00
+2026-11-22 11:08:07,326 INFO     Found new best h: 42.00 after 59 expansions
+2026-11-22 11:08:07,326 INFO     Found new best h: 41.00 after 60 expansions
+2026-11-22 11:08:12,148 INFO     Found new best h: 39.00 after 1022 expansions
+2026-11-22 11:08:12,211 INFO     Found new best h: 38.00 after 1029 expansions
+2026-11-22 11:08:12,274 INFO     Found new best h: 37.00 after 1036 expansions
+2026-11-22 11:08:12,306 INFO     Found new best h: 36.00 after 1039 expansions
+2026-11-22 11:08:13,634 INFO     Found new best h: 35.00 after 1366 expansions
+2026-11-22 11:08:13,665 INFO     Found new best h: 34.00 after 1370 expansions
+2026-11-22 11:08:13,704 INFO     Found new best h: 33.00 after 1374 expansions
+2026-11-22 11:08:13,735 INFO     Found new best h: 32.00 after 1378 expansions
+2026-11-22 11:08:13,745 INFO     Found new best h: 31.00 after 1380 expansions
+2026-11-22 11:08:14,077 INFO     Found new best h: 29.00 after 1430 expansions
+2026-11-22 11:08:14,424 INFO     Found new best h: 28.00 after 1482 expansions
+2026-11-22 11:08:14,440 INFO     Found new best h: 27.00 after 1484 expansions
+2026-11-22 11:08:31,240 INFO     Found new best h: 26.00 after 4462 expansions
