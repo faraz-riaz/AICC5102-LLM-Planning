@@ -1,0 +1,159 @@
+from heuristics.heuristic_base import Heuristic
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+
+    # Summary
+    This heuristic estimates the number of actions required to reach the goal state.
+    It identifies which blocks are already "well-placed" (in their final position and 
+    not needing to be moved). For all other "misplaced" blocks, it assigns a base cost 
+    of 2 actions (pickup + putdown or unstack + stack), or 1 action if the block is 
+    already being held. It also detects deadlocks where a block must be temporarily 
+    placed on the table because its target position is currently blocked by itself, 
+    adding an extra 2 actions for such cases.
+
+    # Assumptions
+    - The table has infinite capacity.
+    - A block is well-placed if it is on its target support, the support is well-placed, 
+      and it does not violate any 'clear' goals or other blocks' 'on' goals.
+    - Blocks that are not well-placed must be moved at least once.
+
+    # Heuristic Initialization
+    - Extract all goals into target data structures (`target_on`, `target_clear`).
+    - Map which block each support is supposed to hold in the goal state.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to build a `current_on` mapping and identify if a block is held.
+    2. Determine all `well_placed_blocks` by tracing bottom-up from the table. A block on the 
+       table is well-placed if its goal is the table (or no goal). A block on another block 
+       is well-placed if the block below is well-placed, it matches its target, and it doesn't 
+       obstruct any goals.
+    3. Calculate the heuristic cost by iterating over all misplaced blocks:
+       - If the block is currently held: add 1 if its target is ready (well-placed and clear), 
+         otherwise add 3 (must be put on table first).
+       - If the block is not held: add 2 as base cost. Then, check for a deadlock. A deadlock 
+         occurs if the block's target is another block that is currently situated below it 
+         in the same tower. If so, add 2 extra actions, because the block must be moved to 
+         the table to uncover its target.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        # Blocksworld has no static facts, but we extract them to follow standard procedure
+        static_facts = task.static 
+        
+        self.target_on = {}
+        self.target_clear = set()
+        self.target_support_to_supported = {}
+
+        # Parse goal facts
+        for goal in self.goals:
+            parts = goal[1:-1].split()
+            if parts[0] == 'on':
+                b, y = parts[1], parts[2]
+                self.target_on[b] = y
+                self.target_support_to_supported[y] = b
+            elif parts[0] == 'on-table':
+                b = parts[1]
+                self.target_on[b] = 'table'
+            elif parts[0] == 'clear':
+                b = parts[1]
+                self.target_clear.add(b)
+
+    def __call__(self, node):
+        state = node.state
+        
+        current_on = {}
+        holding = None
+        all_blocks = set()
+
+        # Parse current state facts
+        for fact in state:
+            parts = fact[1:-1].split()
+            if parts[0] == 'on':
+                b, y = parts[1], parts[2]
+                current_on[b] = y
+                all_blocks.add(b)
+                all_blocks.add(y)
+            elif parts[0] == 'on-table':
+                b = parts[1]
+                current_on[b] = 'table'
+                all_blocks.add(b)
+            elif parts[0] == 'holding':
+                b = parts[1]
+                current_on[b] = 'holding'
+                holding = b
+                all_blocks.add(b)
+            elif parts[0] == 'clear':
+                all_blocks.add(parts[1])
+
+        # Map each support block (or 'table') to a list of blocks directly on it
+        current_support = {}
+        for b, y in current_on.items():
+            if y not in current_support:
+                current_support[y] = []
+            current_support[y].append(b)
+
+        well_placed_blocks = set()
+        queue = []
+        
+        # Base case for well-placed blocks: blocks properly on the table
+        for b in current_support.get('table', []):
+            if self.target_on.get(b, 'table') == 'table':
+                well_placed_blocks.add(b)
+                queue.append(b)
+
+        # Iteratively find blocks well-placed on top of other well-placed blocks
+        while queue:
+            b = queue.pop(0)
+            for c in current_support.get(b, []):
+                # c is well-placed if it belongs on b, b doesn't need to be clear, 
+                # and no other block needs to be on b instead
+                cond1 = (self.target_on.get(c, b) == b)
+                cond2 = (b not in self.target_clear)
+                cond3 = (self.target_support_to_supported.get(b, c) == c)
+                
+                if cond1 and cond2 and cond3:
+                    well_placed_blocks.add(c)
+                    queue.append(c)
+
+        # Misplaced blocks are those that are not well-placed
+        misplaced = all_blocks - well_placed_blocks
+        
+        if not misplaced:
+            return 0
+
+        # Blocks that currently have another block on them
+        supported_blocks = set(y for y in current_on.values() if y in all_blocks)
+
+        cost = 0
+        for b in misplaced:
+            y = current_on.get(b)
+            if y == 'holding':
+                t = self.target_on.get(b, 'table')
+                if t == 'table':
+                    cost += 1
+                else:
+                    # If target is a block, it must be well-placed and have nothing on it to be ready
+                    if t in well_placed_blocks and t not in supported_blocks:
+                        cost += 1
+                    else:
+                        # Target is not ready; must temporarily put the held block down on the table
+                        cost += 3
+            else:
+                # Base cost for a misplaced block currently in a tower
+                cost += 2
+                
+                # Deadlock detection: if the block's target is beneath it in its current tower
+                t = self.target_on.get(b)
+                if t in all_blocks:
+                    curr = current_on.get(b)
+                    while curr in all_blocks:
+                        if curr == t:
+                            # Must be moved to the table to reveal its target before it can be placed
+                            cost += 2
+                            break
+                        curr = current_on.get(curr)
+
+        return cost

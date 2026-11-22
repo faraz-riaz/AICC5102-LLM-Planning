@@ -1,0 +1,203 @@
+from heuristics.heuristic_base import Heuristic
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+
+    # Summary
+    This heuristic accurately estimates the number of actions required to reach
+    the goal state. It does this by classifying blocks as "correctly placed" or 
+    "wrongly placed" and analyzing dependencies between blocks to detect deadlocks 
+    (cycles) that require temporary unstacking.
+
+    # Assumptions
+    - Standard blocksworld rules apply (one block moved at a time).
+    - Each block out of place takes at least 2 actions to place (pickup/unstack + stack/putdown), 
+      or 1 action if it is currently held by the arm.
+    - If a deadlock (cycle of dependencies) exists between blocks, at least one block in each 
+      disjoint cycle must be temporarily placed on the table, costing an additional 2 actions.
+
+    # Heuristic Initialization
+    - The goal state is parsed to identify target locations (`on`, `on-table`), 
+      clear conditions (`clear`), and arm status (`holding`, `arm-empty`).
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Extract objects and their current positions (`on`, `on-table`, `holding`) from the state.
+    2. Determine the "correctness" of each block bottom-up (from table upwards):
+       - A block is correctly placed if it satisfies its goal and does not need to be moved 
+         to free up another block or satisfy a `clear` goal.
+    3. Calculate the base action cost: 
+       - 2 actions for each wrong block that is not currently held.
+       - 1 action for a wrong block that is currently held.
+    4. Build a dependency graph to find deadlocks:
+       - Rule 1: If a block `u` is wrong and needs to go on `v`, add an edge `u -> v`.
+       - Rule 2: If a block `v` is currently directly on `u`, add an edge `u -> v` (u needs v to move).
+    5. Count the number of vertex-disjoint cycles in the dependency graph. Each cycle requires 
+       at least one temporary placement, adding 2 actions per cycle.
+    6. The final heuristic value is the base action cost plus 2 * number of cycles.
+    """
+
+    def __init__(self, task):
+        """Initialize the heuristic by extracting goal conditions."""
+        self.goals = task.goals
+        
+        self.goal_on = {}
+        self.goal_on_table = set()
+        self.goal_clear = set()
+        self.goal_holding = None
+        self.goal_arm_empty = False
+
+        # Parse goals into easy-to-check data structures
+        for goal in self.goals:
+            parts = get_parts(goal)
+            pred = parts[0]
+            if pred == "on":
+                self.goal_on[parts[1]] = parts[2]
+            elif pred == "on-table":
+                self.goal_on_table.add(parts[1])
+            elif pred == "clear":
+                self.goal_clear.add(parts[1])
+            elif pred == "holding":
+                self.goal_holding = parts[1]
+            elif pred == "arm-empty":
+                self.goal_arm_empty = True
+
+    def __call__(self, node):
+        """Compute the heuristic value for the given state."""
+        state = node.state
+        
+        state_on = {}
+        state_on_table = set()
+        state_holding = None
+        all_blocks = set()
+
+        # 1. Parse the current state
+        for fact in state:
+            parts = get_parts(fact)
+            pred = parts[0]
+            if pred == "on":
+                state_on[parts[1]] = parts[2]
+                all_blocks.add(parts[1])
+                all_blocks.add(parts[2])
+            elif pred == "on-table":
+                state_on_table.add(parts[1])
+                all_blocks.add(parts[1])
+            elif pred == "holding":
+                state_holding = parts[1]
+                all_blocks.add(parts[1])
+            elif pred == "clear":
+                all_blocks.add(parts[1])
+
+        correct = {}
+        
+        # 2. Determine "correctness" for blocks on the table
+        for x in state_on_table:
+            if x in self.goal_on:
+                correct[x] = False
+            elif self.goal_holding == x:
+                correct[x] = False
+            else:
+                correct[x] = True
+                
+        # Evaluate block currently held (if any)
+        if state_holding:
+            x = state_holding
+            if self.goal_holding == x:
+                correct[x] = True
+            else:
+                correct[x] = False
+
+        # Evaluate remaining blocks bottom-up
+        changed = True
+        while changed:
+            changed = False
+            for x, y in state_on.items():
+                if x not in correct and y in correct:
+                    if not correct[y]:
+                        correct[x] = False
+                    elif x in self.goal_on and self.goal_on[x] != y:
+                        correct[x] = False
+                    elif x in self.goal_on_table:
+                        correct[x] = False
+                    elif self.goal_holding == x:
+                        correct[x] = False
+                    elif y in self.goal_clear:
+                        correct[x] = False
+                    else:
+                        # Ensure no other block needs to be put on y
+                        conflict = False
+                        for z, target_y in self.goal_on.items():
+                            if z != x and target_y == y:
+                                conflict = True
+                                break
+                        if conflict:
+                            correct[x] = False
+                        else:
+                            correct[x] = True
+                    changed = True
+
+        # 3. Calculate base actions
+        total_cost = 0
+        for x in all_blocks:
+            # If not yet evaluated, it defaults to False (safe fallback)
+            if not correct.get(x, False):
+                if state_holding == x:
+                    total_cost += 1
+                else:
+                    total_cost += 2
+
+        # 4. Build dependency graph to find cycles (deadlocks)
+        adj = {x: [] for x in all_blocks}
+        
+        # Rule 1: A wrong block depends on its target block
+        for u in all_blocks:
+            if not correct.get(u, False):
+                target = self.goal_on.get(u)
+                if target and target in all_blocks:
+                    adj[u].append(target)
+                    
+        # Rule 2: A block depends on the block currently sitting directly on top of it
+        for top, bottom in state_on.items():
+            adj[bottom].append(top)
+
+        # 5. Find and count vertex-disjoint cycles
+        active_nodes = sorted(list(all_blocks))  # Sorted for determinism
+        active_set = set(active_nodes)
+        cycle_count = 0
+        
+        for start in active_nodes:
+            if start not in active_set:
+                continue
+                
+            path = []
+            path_set = set()
+            
+            def dfs(u):
+                path.append(u)
+                path_set.add(u)
+                for v in sorted(adj.get(u, [])):
+                    if v not in active_set:
+                        continue
+                    if v in path_set:
+                        idx = path.index(v)
+                        return path[idx:]
+                    res = dfs(v)
+                    if res:
+                        return res
+                path.pop()
+                path_set.remove(u)
+                return None
+
+            cycle = dfs(start)
+            if cycle:
+                cycle_count += 1
+                active_set.difference_update(cycle)
+                
+        # 6. Each disjoint cycle requires one temporary block drop (+2 actions)
+        total_cost += 2 * cycle_count
+        
+        return total_cost

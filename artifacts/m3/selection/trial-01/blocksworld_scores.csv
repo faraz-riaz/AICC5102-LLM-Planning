@@ -1,0 +1,11 @@
+candidate,generation_status,training_runs,solved,expansion_score,time_score,failures,selected
+cand01,ok,20,18,12.7697,17.0269,memory_limit;timeout,False
+cand02,ok,20,20,20.0,20.0,,True
+cand03,ok,20,20,19.5735,20.0,,False
+cand04,ok,20,18,12.7697,16.9051,timeout,False
+cand05,ok,20,14,10.7165,13.1422,timeout,False
+cand06,ok,20,20,20.0,20.0,,False
+cand07,ok,20,20,19.5735,20.0,,False
+cand08,ok,20,13,10.5853,12.7823,timeout,False
+cand09,ok,20,13,10.459,12.5616,timeout,False
+cand10,ok,20,18,12.7697,16.9654,memory_limit;timeout,False

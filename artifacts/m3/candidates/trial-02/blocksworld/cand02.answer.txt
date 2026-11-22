@@ -1,0 +1,182 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+
+    # Summary
+    This heuristic estimates the number of actions required to transform the current state 
+    into a goal state by analyzing which blocks are "well-placed" (correct) and which are 
+    "wrongly-placed". It computes action costs based on the need to unstack, move to the 
+    table, and stack blocks in their final positions, carefully avoiding overestimation 
+    unless blocks are actively blocking their own targets.
+
+    # Assumptions
+    - Blocks can be stacked on top of each other or placed on the table.
+    - The robot arm can only hold one block at a time.
+    - The table has infinite capacity, so moving a block to the table is always a safe intermediate step.
+    - A block is considered well-placed if it is in its goal position (or on a valid intermediate 
+      correct block) and all blocks below it are also well-placed.
+
+    # Heuristic Initialization
+    - Extract the goal relationships from the task to create mappings of required parents (`goal_parent`), 
+      required children (`goal_child`), blocks that must be on the table (`goal_on_table`), and blocks 
+      that must be clear (`goal_clear`).
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to identify the status of each block (`on`, `on-table`, `clear`, `holding`).
+    2. Determine the "correctness" of each block starting from the table upwards. A block is correct if:
+       - It is on the table and has no specific `goal_parent`.
+       - OR it is stacked on another correct block, AND it matches both the `goal_parent` and `goal_child` 
+         requirements, AND its current parent does not need to be `clear` in the goal.
+    3. Any block that is not well-placed must be moved, accumulating cost:
+       - If the block is currently held, it requires 1 action (putdown/stack) as a baseline.
+       - If it is not held, it requires 2 actions (pickup/unstack + putdown/stack) as a baseline.
+    4. Detect necessary intermediate moves (extra +2 actions):
+       - If a block is not on the table and must be moved to its target, but it is currently positioned 
+         above its target (or above any ancestor of its target tower), it cannot be moved directly. 
+         It must be placed on the table first, adding 2 extra actions.
+    5. Sum the costs of all misplaced blocks to produce the final heuristic estimate.
+    """
+
+    def __init__(self, task):
+        """
+        Initialize the heuristic by extracting goal conditions and static facts.
+        """
+        self.goals = task.goals
+        
+        self.goal_parent = {}
+        self.goal_child = {}
+        self.goal_on_table = set()
+        self.goal_clear = set()
+
+        # Parse goal facts to build mappings for fast lookup
+        for goal in self.goals:
+            parts = goal[1:-1].split()
+            pred = parts[0]
+            if pred == 'on':
+                self.goal_parent[parts[1]] = parts[2]
+                self.goal_child[parts[2]] = parts[1]
+            elif pred == 'on-table':
+                self.goal_on_table.add(parts[1])
+            elif pred == 'clear':
+                self.goal_clear.add(parts[1])
+
+    def __call__(self, node):
+        """
+        Estimate the minimum number of actions required to reach the goal from the current state.
+        """
+        state = node.state
+        
+        on = {}
+        on_table = set()
+        clear = set()
+        holding = None
+        all_blocks = set()
+        
+        # 1. Parse current state
+        for fact in state:
+            parts = fact[1:-1].split()
+            pred = parts[0]
+            if pred == 'on':
+                on[parts[1]] = parts[2]
+                all_blocks.add(parts[1])
+                all_blocks.add(parts[2])
+            elif pred == 'on-table':
+                on_table.add(parts[1])
+                all_blocks.add(parts[1])
+            elif pred == 'clear':
+                clear.add(parts[1])
+                all_blocks.add(parts[1])
+            elif pred == 'holding':
+                holding = parts[1]
+                all_blocks.add(parts[1])
+
+        correct = {}
+        current_child = {y: x for x, y in on.items()}
+
+        # 2. Determine correctness of blocks bottom-up from the table
+        for b in on_table:
+            # A block on the table is correct if it is not required to be on another block.
+            correct[b] = (b not in self.goal_parent)
+            
+            curr = b
+            visited = {curr}
+            
+            # Trace the tower upwards
+            while curr in current_child:
+                child = current_child[curr]
+                if child in visited:
+                    break  # Prevent infinite loops in case of anomalous cycles
+                visited.add(child)
+                
+                # The child is correct if its parent is correct, and all goal conditions align perfectly
+                correct[child] = (
+                    correct[curr] and
+                    (curr not in self.goal_clear) and
+                    (self.goal_parent.get(child, curr) == curr) and
+                    (self.goal_child.get(curr, child) == child) and
+                    (child not in self.goal_on_table)
+                )
+                curr = child
+
+        if holding:
+            correct[holding] = False
+
+        # Any block not traced from the table (or explicitly held) is considered incorrect
+        for b in all_blocks:
+            if b not in correct:
+                correct[b] = False
+                
+        def is_above_any_target_ancestor(block, target_parent):
+            """
+            Checks if 'block' is positioned anywhere above 'target_parent' or any of 
+            the expected goal ancestors of 'target_parent'.
+            """
+            ancestors = set()
+            curr_p = target_parent
+            visited_p = set()
+            # Build the set of all blocks that will eventually be below 'block'
+            while curr_p and curr_p not in visited_p:
+                visited_p.add(curr_p)
+                ancestors.add(curr_p)
+                curr_p = self.goal_parent.get(curr_p)
+                
+            curr_b = block
+            visited_b = set()
+            # Traverse downwards from 'block' in the current state
+            while curr_b in on and curr_b not in visited_b:
+                visited_b.add(curr_b)
+                curr_b = on[curr_b]
+                if curr_b in ancestors:
+                    return True
+            return False
+
+        # 3. Calculate action costs
+        cost = 0
+        for b in all_blocks:
+            if not correct[b]:
+                if b == holding:
+                    # Block is held: requires at least 1 action (putdown or stack)
+                    cost += 1
+                    
+                    p = self.goal_parent.get(b)
+                    # If its target parent is not ready yet, it must go to the table first (+2 extra actions later)
+                    if p and not correct.get(p, False):
+                        cost += 2
+                else:
+                    # Block is in a tower or on the table: requires at least 2 actions (unstack/pickup + putdown/stack)
+                    cost += 2
+                    
+                    # If block is on the table, it can just wait there. No extra moves needed.
+                    if b not in on_table:
+                        p = self.goal_parent.get(b)
+                        # If block is actively blocking the construction of its own target tower,
+                        # it MUST be temporarily moved to the table (+2 extra actions).
+                        if p and is_above_any_target_ancestor(b, p):
+                            cost += 2
+                            
+        return cost
+```

@@ -1,0 +1,125 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+class miconicLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Miconic domain.
+
+    # Summary
+    The heuristic estimates the number of actions required to serve all passengers.
+    It calculates the cost independently for each passenger based on their current status 
+    (waiting, boarded, or served) and sums these costs. The heuristic naturally encourages 
+    the elevator to group passengers and avoids local minima by ensuring any productive 
+    action strictly decreases the heuristic value.
+
+    # Assumptions
+    - The elevator can travel directly between any two distinct floors in 1 action 
+      (`up` or `down`), because the static `above` relation in this domain is transitive.
+    - Each passenger requires up to 4 actions to be served: moving to their origin, 
+      boarding, moving to their destination, and departing.
+    - The goal is to serve a specific set of passengers, which can be extracted from the goal state.
+
+    # Heuristic Initialization
+    - The passengers that need to be served are identified from the goal facts.
+    - The static destinations for all passengers are extracted from the static facts since 
+      they never change.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Retrieve the current floor of the elevator from the state (`lift-at` fact).
+    2. Extract the current status of all passengers: which are `served`, `boarded`, and 
+       the `origin` floor of those who are still waiting.
+    3. For each passenger that needs to be served:
+       - If they are already `served`, their cost is 0.
+       - If they are `boarded`, they require at least 1 action (`depart`). 
+         If the elevator's current floor is not their destination, they also require 1 action to move there.
+       - If they are waiting (neither boarded nor served), they require at least 3 actions 
+         (`board`, move to destination, and `depart`). 
+         If the elevator's current floor is not their origin, they require 1 additional action to move to the origin.
+    4. Sum the costs for all passengers. 
+    (This sum overestimates the total cost when elevator moves overlap for multiple passengers, 
+    but provides a perfectly monotonically decreasing gradient for Greedy Best-First Search, heavily 
+    rewarding moves that progress multiple passengers).
+    """
+
+    def __init__(self, task):
+        """
+        Initialize the heuristic by extracting the goal passengers and their static destinations.
+        """
+        self.goals = task.goals
+        self.static = task.static
+
+        # Extract passengers that need to be served from the goal facts
+        self.passengers = []
+        for goal in self.goals:
+            # goal is represented as a string, e.g., "(served p1)"
+            if goal.startswith('(served '):
+                # Ignore the surrounding brackets and extract the passenger's name
+                passenger = goal[1:-1].split()[1]
+                self.passengers.append(passenger)
+
+        # Extract static destinations for each passenger
+        self.destinations = {}
+        for fact in self.static:
+            # fact is represented as a string, e.g., "(destin p1 f10)"
+            if fact.startswith('(destin '):
+                parts = fact[1:-1].split()
+                passenger = parts[1]
+                destin = parts[2]
+                self.destinations[passenger] = destin
+
+    def __call__(self, node):
+        """
+        Estimate the minimum number of actions needed to achieve the goal from the current state.
+        """
+        state = node.state
+
+        current_floor = None
+        served_set = set()
+        boarded_set = set()
+        origins = {}
+
+        # Parse the current state to find the elevator and passenger statuses
+        for fact in state:
+            if fact.startswith('(lift-at '):
+                current_floor = fact[1:-1].split()[1]
+            elif fact.startswith('(served '):
+                passenger = fact[1:-1].split()[1]
+                served_set.add(passenger)
+            elif fact.startswith('(boarded '):
+                passenger = fact[1:-1].split()[1]
+                boarded_set.add(passenger)
+            elif fact.startswith('(origin '):
+                parts = fact[1:-1].split()
+                passenger = parts[1]
+                origin = parts[2]
+                origins[passenger] = origin
+
+        total_cost = 0
+
+        # Calculate the heuristic cost by summing the independent costs of all passengers
+        for p in self.passengers:
+            if p in served_set:
+                # Passenger is already served; no more actions needed.
+                continue
+            
+            elif p in boarded_set:
+                # Passenger is on board and needs to depart (1 action).
+                total_cost += 1
+                
+                # Needs an elevator move if not currently at their destination.
+                destin = self.destinations.get(p)
+                if current_floor != destin:
+                    total_cost += 1
+                    
+            else:
+                # Passenger is waiting at their origin.
+                # Needs to board (1 action), move to destination (1 action), and depart (1 action).
+                total_cost += 3
+                
+                # Needs an elevator move if not currently at their origin.
+                origin = origins.get(p)
+                if origin and current_floor != origin:
+                    total_cost += 1
+
+        return total_cost
+```

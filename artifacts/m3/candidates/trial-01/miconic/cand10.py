@@ -1,0 +1,137 @@
+from heuristics.heuristic_base import Heuristic
+
+def get_parts(fact):
+    """
+    Extract the components of a PDDL fact by removing parentheses and splitting the string.
+    Example: '(origin p1 f2)' -> ['origin', 'p1', 'f2']
+    """
+    return fact[1:-1].split()
+
+class miconicLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the miconic domain.
+
+    # Summary
+    This heuristic accurately estimates the number of necessary actions (board, depart, up, down) 
+    to serve all goal passengers. Since the elevator can move directly to any floor in a single 
+    action (the `above` relation includes its transitive closure), the number of required movement 
+    actions is fundamentally tied to the number of unique floors that must be visited. The heuristic 
+    is carefully constructed to be strictly monotonically decreasing along optimal paths, providing 
+    exceptional guidance for Greedy Best-First Search by eliminating plateaus and local minima.
+
+    # Assumptions
+    - The elevator capacity is infinite, so any number of passengers can board and depart without restriction.
+    - Any floor can be reached from any other floor in 1 step because the `above` predicate is completely defined for all pairs of ordered floors in standard miconic instances.
+    - Each unserved passenger requires one `board` action and one `depart` action.
+    - A passenger that is already boarded requires only a `depart` action.
+
+    # Heuristic Initialization
+    - Extract the set of passengers that need to be served from `task.goals`.
+    - Extract the destination floor (`destin`) for each passenger from the static facts (`task.static` and `task.initial_state`).
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the Current State:
+       - Identify the elevator's current floor (`lift-at`).
+       - Identify the sets of currently boarded passengers (`boarded`) and already served passengers (`served`).
+       - Record the current waiting floor (`origin`) of unboarded passengers.
+    
+    2. Analyze Required Visits and Actions:
+       - Maintain a set `F_visit` representing all distinct floors that the elevator must visit.
+       - Maintain a set `F_actionable` representing floors where a useful action (board or depart) can be performed immediately.
+       - For each goal passenger that is not yet served:
+           - If they are already boarded, they need 1 passenger action (depart). Add their destination to `F_visit` and `F_actionable`.
+           - If they are not boarded, they need 2 passenger actions (board, depart). Add their origin to `F_visit` and `F_actionable`, and add their destination to `F_visit`.
+           
+    3. Compute Movement Cost and Penalty:
+       - Every floor in `F_visit` will require at least one movement step.
+       - If the elevator's `current_floor` is in `F_actionable`, it can immediately perform a passenger action, so no penalty is applied (penalty = 0).
+       - If the elevator's `current_floor` is NOT in `F_actionable` (but `F_visit` is not empty), it must make a movement step first before doing anything useful, applying a penalty of 1.
+       
+    4. Compute Final Heuristic:
+       - Total cost = |F_visit| + penalty + 2 * (passenger actions).
+       - The factor of 2 on passenger actions ensures that whenever a passenger boards or departs, the overall heuristic strictly decreases, counterbalancing any temporary penalty increases. This guarantees a steep, steady gradient towards the goal.
+    """
+
+    def __init__(self, task):
+        """Initialize the heuristic by extracting goal conditions and static facts."""
+        self.goals = task.goals
+        self.static = task.static
+        self.initial_state = task.initial_state
+        
+        # Identify all passengers that need to be served according to the goal state.
+        self.goal_passengers = set()
+        for goal in self.goals:
+            parts = get_parts(goal)
+            if parts[0] == "served":
+                self.goal_passengers.add(parts[1])
+                
+        # Extract the destination of each passenger (which is static information).
+        self.destinations = {}
+        # Checking both static and initial_state to be robust against different parser configurations.
+        for fact in (self.static | self.initial_state):
+            parts = get_parts(fact)
+            if parts[0] == "destin":
+                self.destinations[parts[1]] = parts[2]
+
+    def __call__(self, node):
+        """Estimate the minimum cost to serve all remaining goal passengers."""
+        state = node.state
+        
+        current_floor = None
+        boarded_passengers = set()
+        served_passengers = set()
+        passenger_origins = {}
+        
+        # 1. Parse the Current State
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == "lift-at":
+                current_floor = parts[1]
+            elif parts[0] == "boarded":
+                boarded_passengers.add(parts[1])
+            elif parts[0] == "served":
+                served_passengers.add(parts[1])
+            elif parts[0] == "origin":
+                passenger_origins[parts[1]] = parts[2]
+                
+        F_visit = set()
+        F_actionable = set()
+        actions = 0
+        
+        # 2. Analyze Required Visits and Actions
+        for p in self.goal_passengers:
+            # If the passenger is already successfully served, no more actions are needed.
+            if p in served_passengers:
+                continue
+                
+            dest = self.destinations.get(p)
+            
+            if p in boarded_passengers:
+                # The passenger is in the elevator; needs to be dropped off at their destination.
+                actions += 1
+                if dest:
+                    F_visit.add(dest)
+                    F_actionable.add(dest)
+            else:
+                # The passenger is still waiting at their origin; needs to be picked up and dropped off.
+                actions += 2
+                orig = passenger_origins.get(p)
+                if orig:
+                    F_visit.add(orig)
+                    F_actionable.add(orig)
+                if dest:
+                    F_visit.add(dest)
+                    
+        # 3. Compute Movement Cost and Penalty
+        if len(F_visit) == 0:
+            penalty = 0
+        elif current_floor in F_actionable:
+            # The elevator is currently at a floor where it can perform a board or depart action.
+            penalty = 0
+        else:
+            # The elevator is not at an actionable floor; it must move first.
+            penalty = 1
+            
+        # 4. Compute Final Heuristic
+        total_cost = len(F_visit) + penalty + 2 * actions
+        return total_cost

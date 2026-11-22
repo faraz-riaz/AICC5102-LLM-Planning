@@ -1,0 +1,24 @@
+2026-11-22 11:13:13,044 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-22 11:13:13,044 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_rjh8dp03\domain.pddl
+2026-11-22 11:13:13,044 INFO     using search: gbfs_early_goal_test
+2026-11-22 11:13:13,044 INFO     using heuristic: hFFHeuristic
+2026-11-22 11:13:13,044 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_rjh8dp03\domain.pddl
+2026-11-22 11:13:13,044 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_rjh8dp03\medium-p09.pddl
+2026-11-22 11:13:13,065 INFO     5 Predicates parsed
+2026-11-22 11:13:13,065 INFO     3 Actions parsed
+2026-11-22 11:13:13,065 INFO     57 Objects parsed
+2026-11-22 11:13:13,065 INFO     0 Constants parsed
+2026-11-22 11:13:13,065 INFO     Grounding start: transport-09
+2026-11-22 11:13:13,515 INFO     Relevance analysis removed 0 facts
+2026-11-22 11:13:13,531 INFO     Grounding end: transport-09
+2026-11-22 11:13:13,531 INFO     915 Variables created
+2026-11-22 11:13:13,531 INFO     36696 Operators created
+2026-11-22 11:13:13,658 INFO     Search start: transport-09
+2026-11-22 11:13:13,689 INFO     Initial h value: 57.00
+2026-11-22 11:13:15,161 INFO     Found new best h: 52.00 after 1 expansions
+2026-11-22 11:13:16,662 INFO     Found new best h: 51.00 after 2 expansions
+2026-11-22 11:13:18,291 INFO     Found new best h: 50.00 after 3 expansions
+2026-11-22 11:13:20,090 INFO     Found new best h: 49.00 after 4 expansions
+2026-11-22 11:13:54,102 INFO     Found new best h: 48.00 after 23 expansions
+2026-11-22 11:13:55,934 INFO     Found new best h: 47.00 after 24 expansions
+2026-11-22 11:13:57,512 INFO     Found new best h: 46.00 after 25 expansions

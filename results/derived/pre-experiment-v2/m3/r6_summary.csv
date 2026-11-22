@@ -1,0 +1,13 @@
+domain,heuristic_trial_id,sampled_states,eligible_states,excluded_no_proven_hstar,invalid_h_values,overestimated_states,overestimate_rate,task_macro_overestimate_rate,signed_error_mean,absolute_error_mean,positive_error_mean,max_overestimate,median_signed_error,median_absolute_error,states_error_above_1000
+blocksworld,archived,42,42,0,0,26,0.619,0.619,4.429,5.0,4.714,22.0,4.0,4.0,0
+blocksworld,trial-01,42,42,0,0,16,0.381,0.381,0.81,0.81,0.81,4.0,0.0,0.0,0
+blocksworld,trial-02,42,42,0,0,17,0.4048,0.4048,0.857,0.857,0.857,4.0,0.0,0.0,0
+blocksworld,trial-03,42,42,0,0,17,0.4048,0.4048,0.857,0.857,0.857,4.0,0.0,0.0,0
+miconic,archived,198,185,13,0,171,0.9243,0.8762,2.946,2.946,2.946,8.0,2.0,2.0,0
+miconic,trial-01,198,185,13,0,0,0.0,0.0,-0.47,0.47,0.0,0.0,0.0,0.0,0
+miconic,trial-02,198,185,13,0,0,0.0,0.0,-0.286,0.286,0.0,0.0,0.0,0.0,0
+miconic,trial-03,198,185,13,0,183,0.9892,0.9778,14.2,14.2,14.2,30.0,13.0,13.0,0
+transport,archived,105,78,27,0,39,0.5,0.5921,0.923,0.949,0.936,6.0,0.5,1.0,0
+transport,trial-01,105,78,27,0,78,1.0,1.0,3.859,3.859,3.859,10.0,3.0,3.0,0
+transport,trial-02,105,78,27,0,33,0.4231,0.5095,0.641,0.667,0.654,4.0,0.0,0.0,0
+transport,trial-03,105,78,27,0,78,1.0,1.0,193336.154,193336.154,193336.154,400005.0,200002.0,200002.0,78

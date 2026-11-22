@@ -1,0 +1,192 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+
+    # Summary
+    This heuristic estimates the minimum number of actions required to reach a goal state from the current state.
+    It does so by identifying which blocks are already "well-placed" in their final positions and which ones 
+    must be moved, accurately calculating the required number of actions based on the arm's state and stack dependencies.
+
+    # Assumptions
+    - Blocks can be either on the table, stacked on other blocks, or held by the robotic arm.
+    - An arm can hold at most one block at a time.
+    - Moving a block typically requires 2 actions (e.g., `pickup` + `stack` or `unstack` + `putdown`).
+    - If a block is currently held by the arm, it takes 1 action to put it in its final position if the target is ready, 
+      or 3 actions if it must be temporarily placed on the table first.
+    - If a block is resting on its own goal target (or above it in the same pile), it must be moved out of the way 
+      first, requiring at least 4 actions (move to table, then later move to target).
+
+    # Heuristic Initialization
+    - Parses the goal conditions to extract where each block needs to be (`goal_on`, `goal_on_table`, `goal_holding`) 
+      and which blocks must be clear (`goal_clear`).
+    - This allows fast lookups during state evaluation.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Goal Check: If the current state satisfies all goal conditions, the heuristic returns 0.
+    2. State Parsing: Extracts the current locations of all blocks (`current_on`, `current_on_table`, `current_holding`) 
+       and identifies blocks that are clear.
+    3. Well-Placed Identification: 
+       - Base cases are blocks on the table that do not violate any goals.
+       - Iteratively finds blocks resting on well-placed blocks that also do not violate any goals (e.g., they belong 
+         there, they don't block another block's goal, and their supporting block doesn't need to be clear).
+    4. Cost Calculation:
+       - For each block that is not well-placed:
+           - If it is held by the arm:
+               - Cost is +1 if its goal target is completely ready (well-placed and clear) or if it can go to the table.
+               - Cost is +3 if its goal target is not yet ready (it must be put down and moved again later).
+           - If it is not held:
+               - Cost is +4 if it is currently stacked above its own goal target (it must be moved to the table to free the target).
+               - Cost is +2 in all other cases (unstack/pickup + putdown/stack).
+    5. Sums the computed costs for all misplaced blocks to produce the final estimate.
+    """
+
+    def __init__(self, task):
+        """Initialize the heuristic by extracting goal conditions."""
+        self.goals = task.goals
+        # static facts are unused in Blocksworld, but we assign them for completeness
+        self.static_facts = task.static
+        
+        self.goal_on = {}
+        self.goal_on_table = set()
+        self.goal_clear = set()
+        self.goal_holding = set()
+        self.goal_arm_empty = False
+
+        # Parse goals
+        for goal in self.goals:
+            parts = goal[1:-1].split()
+            pred = parts[0]
+            if pred == "on":
+                self.goal_on[parts[1]] = parts[2]
+            elif pred == "on-table":
+                self.goal_on_table.add(parts[1])
+            elif pred == "clear":
+                self.goal_clear.add(parts[1])
+            elif pred == "holding":
+                self.goal_holding.add(parts[1])
+            elif pred == "arm-empty":
+                self.goal_arm_empty = True
+
+    def __call__(self, node):
+        """Compute the heuristic value for the given state."""
+        state = node.state
+        
+        # 1. Check if the current state perfectly satisfies the goals
+        if self.goals <= state:
+            return 0
+            
+        # 2. Parse the current state
+        current_on = {}
+        current_on_table = set()
+        current_clear = set()
+        current_holding = None
+        blocks = set()
+
+        for fact in state:
+            parts = fact[1:-1].split()
+            pred = parts[0]
+            if pred == "on":
+                current_on[parts[1]] = parts[2]
+                blocks.add(parts[1])
+                blocks.add(parts[2])
+            elif pred == "on-table":
+                current_on_table.add(parts[1])
+                blocks.add(parts[1])
+            elif pred == "clear":
+                current_clear.add(parts[1])
+                blocks.add(parts[1])
+            elif pred == "holding":
+                current_holding = parts[1]
+                blocks.add(parts[1])
+                
+        # 3. Identify all well-placed blocks
+        well_placed = set()
+        
+        # A held block is well-placed if the goal is exactly to hold it
+        if current_holding and current_holding in self.goal_holding:
+            well_placed.add(current_holding)
+            
+        # Base case: blocks on the table that don't need to be elsewhere
+        for b in current_on_table:
+            if b not in self.goal_on and b not in self.goal_holding:
+                well_placed.add(b)
+                
+        # Iteratively find well-placed stacked blocks
+        changed = True
+        while changed:
+            changed = False
+            for b, c in current_on.items():
+                if b not in well_placed and c in well_placed:
+                    # Block 'b' cannot be well-placed if it violates any goal
+                    if b in self.goal_holding:
+                        continue
+                    if b in self.goal_on_table:
+                        continue
+                    if b in self.goal_on and self.goal_on[b] != c:
+                        continue
+                        
+                    # Block 'b' cannot be well-placed if another block MUST be on 'c'
+                    conflict = False
+                    for z, target in self.goal_on.items():
+                        if target == c and z != b:
+                            conflict = True
+                            break
+                    if conflict:
+                        continue
+                        
+                    # Block 'b' cannot be well-placed if 'c' must remain clear
+                    if c in self.goal_clear:
+                        continue
+                        
+                    # If no constraints are violated, 'b' is well-placed
+                    well_placed.add(b)
+                    changed = True
+
+        # Helper function to check if block x is resting (directly or indirectly) on block y
+        def is_above(x, y):
+            curr = x
+            while curr in current_on:
+                curr = current_on[curr]
+                if curr == y:
+                    return True
+            return False
+
+        # 4. Compute heuristic cost
+        total_cost = 0
+        for x in blocks:
+            if x in well_placed:
+                continue
+                
+            if x == current_holding:
+                target_ready = False
+                if x in self.goal_on_table:
+                    target_ready = True
+                elif x in self.goal_on:
+                    target = self.goal_on[x]
+                    # Target is ready if it is well-placed and currently clear
+                    if target in well_placed and target in current_clear:
+                        target_ready = True
+                else:
+                    # If x has no specific goal location, it can be put on the table immediately
+                    target_ready = True
+                    
+                if target_ready:
+                    total_cost += 1  # Just put down or stack
+                else:
+                    total_cost += 3  # Put down temporarily, pickup later, stack
+            else:
+                if x in self.goal_on:
+                    target = self.goal_on[x]
+                    # If a block is stacked above its own target, it must be moved out of the way first
+                    if is_above(x, target):
+                        total_cost += 4  # Unstack to table, later pickup and stack
+                    else:
+                        total_cost += 2  # Standard unstack/pickup and putdown/stack
+                else:
+                    total_cost += 2
+                    
+        return total_cost
+```

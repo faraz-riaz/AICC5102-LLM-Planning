@@ -1,0 +1,12 @@
+heuristic,method,attempted,success,invalid_plan,unsolved,timeout,memory_limit,planner_error,configuration_error,validator_error,interrupted,coverage_pct
+deepseek-r1,astar,30,30,0,0,0,0,0,0,0,0,100.0
+deepseek-r1,gbfs,30,30,0,0,0,0,0,0,0,0,100.0
+deepseek-r1,ida_star,30,23,0,0,7,0,0,0,0,0,76.66666666666667
+deepseek-r1,weighted_astar-w1.5,30,30,0,0,0,0,0,0,0,0,100.0
+deepseek-r1,weighted_astar-w2,30,30,0,0,0,0,0,0,0,0,100.0
+hff,gbfs,30,27,0,0,3,0,0,0,0,0,90.0
+hmax,astar,30,13,0,0,17,0,0,0,0,0,43.333333333333336
+hmax,gbfs,30,19,0,0,11,0,0,0,0,0,63.333333333333336
+hmax,ida_star,30,7,0,0,23,0,0,0,0,0,23.333333333333332
+hmax,weighted_astar-w1.5,30,14,0,0,16,0,0,0,0,0,46.666666666666664
+hmax,weighted_astar-w2,30,15,0,0,15,0,0,0,0,0,50.0

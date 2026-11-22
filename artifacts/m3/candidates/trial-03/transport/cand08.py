@@ -1,0 +1,194 @@
+from heuristics.heuristic_base import Heuristic
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+class transportLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Transport domain.
+
+    # Summary
+    This heuristic estimates the number of actions required to transport all unfulfilled 
+    packages to their respective goal locations. It handles routing empty vehicles to 
+    unpicked packages, and loaded vehicles to their delivery destinations, while breaking 
+    plateaus and local minima to guide a Greedy Best-First Search efficiently.
+
+    # Assumptions
+    - Vehicles travel across a static road network using `drive` actions.
+    - Packages are loaded (`pick-up`) and unloaded (`drop`), modifying the vehicle's capacity.
+    - `capacity-predecessor` facts form a hierarchy. The size that never appears as a 
+      successor (the second argument) represents a zero capacity (i.e., a full vehicle).
+    - To prevent plateaus, unpicked packages incur a large constant penalty, and packages 
+      in a vehicle incur a medium constant penalty. This provides massive gradients when 
+      packages are picked up or dropped off.
+
+    # Heuristic Initialization
+    1. Goal Locations: Extracts target locations for all packages from `task.goals`.
+    2. Road Network: Reads `road` facts from both static and initial facts to build an adjacency list.
+    3. Shortest Paths: Computes All-Pairs Shortest Path (APSP) using Breadth-First Search (BFS).
+    4. Capacity Analysis: Extracts non-zero capacities to identify which vehicles are capable of picking up packages.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. State Parsing: 
+       - Identify the locations of all vehicles and unfulfilled packages.
+       - Track which packages are currently loaded inside which vehicles.
+       - Identify which vehicles have available (non-zero) capacity.
+    2. Package Evaluation:
+       - Goal: Cost is 0.
+       - Unpicked: Add a large penalty (100,000) plus 2 * distance to the goal.
+       - In-vehicle: Add a medium penalty (10,000) plus 1 for the drop action.
+    3. Loaded Vehicle Routing:
+       - For each vehicle carrying packages, find the minimum distance to any of its cargo's goals.
+       - Multiply this by 2 and add to the cost, creating a gradient to deliver the nearest package.
+    4. Empty Vehicle Routing:
+       - If there are unpicked packages, calculate the minimum distance from any capable vehicle to any unpicked package.
+       - If no capable vehicles can reach, fallback to using all vehicles to prevent dead-end pruning.
+       - Add this distance to guide vehicles toward unpicked packages.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        self.static_facts = task.static
+        self.initial_state = task.initial_state
+        
+        # 1. Extract goal locations for packages
+        self.goal_locations = {}
+        for goal in self.goals:
+            parts = get_parts(goal)
+            if parts[0] == "at":
+                self.goal_locations[parts[1]] = parts[2]
+                
+        # 2. Extract road network (combining static and init to be safe)
+        self.adj = {}
+        for fact in list(self.static_facts) + list(self.initial_state):
+            parts = get_parts(fact)
+            if parts[0] == "road":
+                l1, l2 = parts[1], parts[2]
+                self.adj.setdefault(l1, []).append(l2)
+                self.adj.setdefault(l2, [])
+                
+        # 3. Compute All-Pairs Shortest Path using BFS
+        self.distances = {}
+        for start_node in self.adj:
+            self.distances[start_node] = {start_node: 0}
+            queue = [start_node]
+            while queue:
+                curr = queue.pop(0)
+                d = self.distances[start_node][curr]
+                for neighbor in self.adj[curr]:
+                    if neighbor not in self.distances[start_node]:
+                        self.distances[start_node][neighbor] = d + 1
+                        queue.append(neighbor)
+                        
+        # 4. Extract non-zero capacities
+        # A size is non-zero if it appears as the successor in capacity-predecessor
+        self.non_zero_sizes = set()
+        for fact in list(self.static_facts) + list(self.initial_state):
+            parts = get_parts(fact)
+            if parts[0] == "capacity-predecessor":
+                self.non_zero_sizes.add(parts[2])
+
+    def __call__(self, node):
+        state = node.state
+        
+        capable_vehicles = set()
+        vehicles = set()
+        vehicle_locations = {}
+        package_locations = {}
+        package_in_vehicle = {}
+        
+        # Parse capabilities and vehicle associations
+        for fact in state:
+            parts = get_parts(fact)
+            pred = parts[0]
+            if pred == "capacity":
+                v, size = parts[1], parts[2]
+                vehicles.add(v)
+                if size in self.non_zero_sizes:
+                    capable_vehicles.add(v)
+            elif pred == "in":
+                pkg, veh = parts[1], parts[2]
+                package_in_vehicle[pkg] = veh
+
+        # Parse physical locations
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == "at":
+                obj, loc = parts[1], parts[2]
+                if obj in vehicles:
+                    vehicle_locations[obj] = loc
+                else:
+                    if obj in self.goal_locations:
+                        package_locations[obj] = loc
+
+        total_cost = 0
+        unpicked_packages = set()
+        packages_in_v = {}
+        
+        # Evaluate packages and compute static costs
+        for p, g_loc in self.goal_locations.items():
+            if p in package_locations:
+                p_loc = package_locations[p]
+                if p_loc == g_loc:
+                    continue
+                
+                unpicked_packages.add(p_loc)
+                dist = self.distances.get(p_loc, {}).get(g_loc, float('inf'))
+                
+                if dist == float('inf'):
+                    return float('inf')  # Dead end: package disconnected from goal
+                
+                total_cost += 100000 + 2 + 2 * dist
+                
+            elif p in package_in_vehicle:
+                v = package_in_vehicle[p]
+                packages_in_v.setdefault(v, []).append(p)
+                total_cost += 10000 + 1
+
+        # Loaded vehicle movement: route to the nearest goal among carried packages
+        for v, pkgs in packages_in_v.items():
+            v_loc = vehicle_locations.get(v)
+            if v_loc:
+                min_dist = float('inf')
+                for p in pkgs:
+                    g_loc = self.goal_locations[p]
+                    d = self.distances.get(v_loc, {}).get(g_loc, float('inf'))
+                    if d < min_dist:
+                        min_dist = d
+                
+                if min_dist == float('inf'):
+                    return float('inf')
+                
+                total_cost += 2 * min_dist
+        
+        # Empty vehicle movement: route the closest capable vehicle to an unpicked package
+        if unpicked_packages:
+            min_m = float('inf')
+            
+            # Prefer capable vehicles first
+            for p_loc in unpicked_packages:
+                for v in capable_vehicles:
+                    v_loc = vehicle_locations.get(v)
+                    if v_loc:
+                        d = self.distances.get(v_loc, {}).get(p_loc, float('inf'))
+                        if d < min_m:
+                            min_m = d
+            
+            # Fallback to all vehicles if no capable vehicle can immediately reach it
+            # (e.g., all vehicles are currently full but will eventually empty out)
+            if min_m == float('inf'):
+                for p_loc in unpicked_packages:
+                    for v in vehicles:
+                        v_loc = vehicle_locations.get(v)
+                        if v_loc:
+                            d = self.distances.get(v_loc, {}).get(p_loc, float('inf'))
+                            if d < min_m:
+                                min_m = d
+            
+            if min_m != float('inf'):
+                total_cost += min_m
+            else:
+                return float('inf')  # Dead end: unreachable packages
+                
+        return total_cost

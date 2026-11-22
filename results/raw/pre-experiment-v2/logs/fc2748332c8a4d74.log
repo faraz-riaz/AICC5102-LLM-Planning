@@ -1,0 +1,56 @@
+2026-11-22 11:12:29,923 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-22 11:12:29,923 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_zzob3xrg\domain.pddl
+2026-11-22 11:12:29,923 INFO     using search: gbfs_early_goal_test
+2026-11-22 11:12:29,923 INFO     using heuristic: hFFHeuristic
+2026-11-22 11:12:29,923 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_zzob3xrg\domain.pddl
+2026-11-22 11:12:29,923 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_zzob3xrg\easy-p20.pddl
+2026-11-22 11:12:29,947 INFO     5 Predicates parsed
+2026-11-22 11:12:29,947 INFO     3 Actions parsed
+2026-11-22 11:12:29,947 INFO     29 Objects parsed
+2026-11-22 11:12:29,947 INFO     0 Constants parsed
+2026-11-22 11:12:29,947 INFO     Grounding start: transport-20
+2026-11-22 11:12:29,970 INFO     Relevance analysis removed 0 facts
+2026-11-22 11:12:29,971 INFO     Grounding end: transport-20
+2026-11-22 11:12:29,971 INFO     230 Variables created
+2026-11-22 11:12:29,971 INFO     2510 Operators created
+2026-11-22 11:12:29,972 INFO     Search start: transport-20
+2026-11-22 11:12:29,972 INFO     Initial h value: 32.00
+2026-11-22 11:12:30,018 INFO     Found new best h: 31.00 after 1 expansions
+2026-11-22 11:12:30,081 INFO     Found new best h: 30.00 after 2 expansions
+2026-11-22 11:12:30,129 INFO     Found new best h: 29.00 after 3 expansions
+2026-11-22 11:12:30,303 INFO     Found new best h: 28.00 after 7 expansions
+2026-11-22 11:12:30,350 INFO     Found new best h: 27.00 after 8 expansions
+2026-11-22 11:12:30,456 INFO     Found new best h: 26.00 after 10 expansions
+2026-11-22 11:12:30,571 INFO     Found new best h: 25.00 after 12 expansions
+2026-11-22 11:12:30,618 INFO     Found new best h: 24.00 after 13 expansions
+2026-11-22 11:12:30,729 INFO     Found new best h: 23.00 after 15 expansions
+2026-11-22 11:12:30,839 INFO     Found new best h: 22.00 after 17 expansions
+2026-11-22 11:12:30,907 INFO     Found new best h: 21.00 after 18 expansions
+2026-11-22 11:12:31,258 INFO     Found new best h: 20.00 after 24 expansions
+2026-11-22 11:12:31,789 INFO     Found new best h: 19.00 after 34 expansions
+2026-11-22 11:12:31,836 INFO     Found new best h: 18.00 after 35 expansions
+2026-11-22 11:12:31,900 INFO     Found new best h: 17.00 after 36 expansions
+2026-11-22 11:12:36,661 INFO     Found new best h: 16.00 after 112 expansions
+2026-11-22 11:12:36,775 INFO     Found new best h: 15.00 after 114 expansions
+2026-11-22 11:12:36,856 INFO     Found new best h: 14.00 after 115 expansions
+2026-11-22 11:12:36,914 INFO     Found new best h: 13.00 after 116 expansions
+2026-11-22 11:12:36,994 INFO     Found new best h: 12.00 after 117 expansions
+2026-11-22 11:12:43,708 INFO     Found new best h: 10.00 after 228 expansions
+2026-11-22 11:12:43,772 INFO     Found new best h: 9.00 after 229 expansions
+2026-11-22 11:12:43,835 INFO     Found new best h: 8.00 after 230 expansions
+2026-11-22 11:12:48,893 INFO     Found new best h: 7.00 after 316 expansions
+2026-11-22 11:12:48,941 INFO     Found new best h: 6.00 after 317 expansions
+2026-11-22 11:12:48,972 INFO     Found new best h: 5.00 after 318 expansions
+2026-11-22 11:12:49,009 INFO     Found new best h: 4.00 after 319 expansions
+2026-11-22 11:12:49,019 INFO     Found new best h: 3.00 after 320 expansions
+2026-11-22 11:12:49,044 INFO     Found new best h: 2.00 after 321 expansions
+2026-11-22 11:12:49,067 INFO     Found new best h: 1.00 after 322 expansions
+2026-11-22 11:12:49,067 INFO     Early goal reached via operator (drop v5 l3 p5 c1 c2).
+2026-11-22 11:12:49,067 INFO     323 Nodes expanded
+2026-11-22 11:12:49,067 INFO     Max open list size: 9759
+2026-11-22 11:12:49,083 INFO     Search end: transport-20
+2026-11-22 11:12:49,083 INFO     Search time: 19.06
+2026-11-22 11:12:49,083 INFO     Total time: 19.08
+2026-11-22 11:12:49,083 INFO     Plan length: 43
+2026-11-22 11:12:49,083 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-22 11:12:49,083 WARNING  warning: could not determine peak memory

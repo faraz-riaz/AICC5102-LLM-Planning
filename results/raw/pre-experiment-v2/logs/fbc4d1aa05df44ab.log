@@ -1,0 +1,11 @@
+2026-11-22 09:17:29,587 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-22 09:17:29,587 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_qovo7c60\domain.pddl
+2026-11-22 09:17:29,592 INFO     using search: gbfs_early_goal_test
+2026-11-22 09:17:29,592 INFO     using heuristic: transportLLMHeuristic
+2026-11-22 09:17:29,592 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_qovo7c60\domain.pddl
+2026-11-22 09:17:29,595 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_qovo7c60\hard-p12.pddl
+2026-11-22 09:17:29,611 INFO     5 Predicates parsed
+2026-11-22 09:17:29,611 INFO     3 Actions parsed
+2026-11-22 09:17:29,611 INFO     202 Objects parsed
+2026-11-22 09:17:29,611 INFO     0 Constants parsed
+2026-11-22 09:17:29,611 INFO     Grounding start: transport-12

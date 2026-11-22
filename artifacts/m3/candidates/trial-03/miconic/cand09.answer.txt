@@ -1,0 +1,107 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+class miconicLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the miconic domain.
+
+    # Summary
+    This heuristic computes the sum of remaining required actions for each passenger.
+    Since the elevator has no capacity limits and can move directly between any two
+    distinct floors in a single action, each passenger requires at most 4 actions
+    to be served: moving the lift to their origin, boarding, moving the lift to 
+    their destination, and departing. The heuristic tracks each passenger's 
+    progress through these stages.
+
+    # Assumptions
+    - The lift can hold an unlimited number of passengers.
+    - The lift can travel directly from any floor to any other floor in 1 step 
+      (due to the transitive `above` predicate allowing `up` or `down` directly).
+    - Passengers need to be boarded at their `origin` and departed at their `destin`.
+    - Once a passenger is departed at their destination, they are `served`.
+    - The goals only consist of `(served ?p)` facts.
+
+    # Heuristic Initialization
+    - Extract the list of passengers that need to be served from the goal conditions.
+    - Extract the destination (`destin`) of each passenger from the static facts 
+      (as well as the initial state, for robustness).
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to find the elevator's location (`lift-at`).
+    2. Determine the status of each passenger: whether they are `boarded`, 
+       `served`, or waiting (unboarded, tracked by `origin` in the state).
+    3. For each passenger, calculate their individual remaining cost:
+       - If `served`: cost is 0.
+       - If `boarded`:
+           - If the lift is currently at their destination: cost is 1 (just `depart`).
+           - If the lift is not at their destination: cost is 2 (`move` to destin, then `depart`).
+       - If unboarded:
+           - If the lift is currently at their origin: cost is 3 (`board`, `move` to destin, `depart`).
+           - If the lift is not at their origin: cost is 4 (`move` to origin, `board`, `move` to destin, `depart`).
+    4. Sum these individual costs to get the total heuristic value. This sum strictly 
+       decreases with every productive action, creating a perfect gradient for GBFS 
+       with no local minima.
+    """
+
+    def __init__(self, task):
+        self.passengers = []
+        for goal in task.goals:
+            parts = goal[1:-1].split()
+            if parts[0] == "served":
+                self.passengers.append(parts[1])
+
+        self.destinations = {}
+        # Destinations are static, but we check both static and initial_state to be robust
+        for fact in task.static:
+            parts = fact[1:-1].split()
+            if parts[0] == "destin":
+                self.destinations[parts[1]] = parts[2]
+                
+        for fact in task.initial_state:
+            parts = fact[1:-1].split()
+            if parts[0] == "destin":
+                self.destinations[parts[1]] = parts[2]
+
+    def __call__(self, node):
+        state = node.state
+        
+        lift_pos = None
+        boarded = set()
+        served = set()
+        origins = {}
+        
+        # Parse the current state dynamically
+        for fact in state:
+            parts = fact[1:-1].split()
+            predicate = parts[0]
+            if predicate == "lift-at":
+                lift_pos = parts[1]
+            elif predicate == "boarded":
+                boarded.add(parts[1])
+            elif predicate == "served":
+                served.add(parts[1])
+            elif predicate == "origin":
+                origins[parts[1]] = parts[2]
+                
+        total_cost = 0
+        
+        # Calculate action cost independently for each passenger
+        for p in self.passengers:
+            if p in served:
+                continue
+                
+            if p in boarded:
+                dest = self.destinations.get(p)
+                if lift_pos == dest:
+                    total_cost += 1
+                else:
+                    total_cost += 2
+            else:
+                orig = origins.get(p)
+                if lift_pos == orig:
+                    total_cost += 3
+                else:
+                    total_cost += 4
+                    
+        return total_cost
+```

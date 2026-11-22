@@ -1,0 +1,12 @@
+heuristic,method,difficulty,attempted,solved,median_nodes_expanded,median_wall_time_s,median_plan_length
+deepseek-r1,astar,easy,30,30,29.5,0.198,27.5
+deepseek-r1,gbfs,easy,30,30,29.5,0.1555,28.0
+deepseek-r1,ida_star,easy,30,23,32.0,0.14,23.0
+deepseek-r1,weighted_astar-w1.5,easy,30,30,29.5,0.1425,27.5
+deepseek-r1,weighted_astar-w2,easy,30,30,29.5,0.167,27.5
+hff,gbfs,easy,30,27,34.0,0.195,30.0
+hmax,astar,easy,30,13,583.0,0.271,13.0
+hmax,gbfs,easy,30,19,437.0,0.324,17.0
+hmax,ida_star,easy,30,7,70409.0,10.212,10.0
+hmax,weighted_astar-w1.5,easy,30,14,1408.0,0.309,13.0
+hmax,weighted_astar-w2,easy,30,15,1514.0,0.357,14.0

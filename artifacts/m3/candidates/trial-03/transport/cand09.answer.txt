@@ -1,0 +1,163 @@
+```python
+from collections import deque, defaultdict
+from heuristics.heuristic_base import Heuristic
+
+def get_parts(fact):
+    """
+    Extract the components of a PDDL fact by removing parentheses and splitting the string.
+    Example: '(at p1 l8)' -> ['at', 'p1', 'l8']
+    """
+    return fact[1:-1].split()
+
+class transportLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Transport domain.
+    
+    # Summary
+    The heuristic estimates the total number of actions (pick-ups, drops, and driving) 
+    required to deliver all packages and vehicles to their respective goal locations.
+    
+    # Assumptions
+    - Packages need to be picked up by vehicles, transported via roads, and dropped at goals.
+    - We estimate each package's distance cost independently. This might slightly overestimate 
+      the actual cost if vehicles transport multiple packages together, but it provides a strong 
+      and informative gradient for a greedy best-first search.
+    - Vehicles are identified by having a `capacity` predicate in the initial state.
+    
+    # Heuristic Initialization
+    - Extract all goal locations for objects (packages or vehicles).
+    - Parse the `road` network from static facts into an adjacency list.
+    - Compute all-pairs shortest paths between locations using Breadth-First Search (BFS), 
+      since driving between any two connected locations costs exactly 1 action.
+    - Identify all vehicles from the initial state facts to differentiate them from packages.
+    
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Traverse the current state to find the locations of all vehicles and packages. 
+       Also track if any packages are currently inside vehicles.
+    2. For each object that has a goal location:
+       - If it is a package at a location other than its goal, it needs to be picked up (+1), 
+         transported to the goal (+ drive distance), and dropped (+1). We add these to the total cost 
+         and mark the current location as needing a vehicle for pickup.
+       - If it is a package already inside a vehicle, it needs to be transported 
+         (+ drive distance from the vehicle's current location to the goal) and dropped (+1).
+       - If it is a vehicle with a goal location, it simply needs to drive there (+ drive distance).
+       - If any object is already at its goal location, it requires 0 actions.
+    3. For all packages on the ground that still need to be picked up, find the minimum 
+       driving distance from any available vehicle to any of these pickup locations, and add this 
+       to the total cost. This effectively accounts for the initial vehicle routing cost.
+    4. Return the total estimated cost. If any goal is completely unreachable, return infinity.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        self.static = task.static
+        
+        # Extract goal locations for packages or vehicles
+        self.goal_locations = {}
+        for goal in self.goals:
+            parts = get_parts(goal)
+            if parts[0] == "at":
+                self.goal_locations[parts[1]] = parts[2]
+                
+        # Parse roads and locations from static facts
+        self.roads = defaultdict(list)
+        self.locations = set()
+        for fact in self.static:
+            parts = get_parts(fact)
+            if parts[0] == "road":
+                l1, l2 = parts[1], parts[2]
+                self.roads[l1].append(l2)
+                self.locations.add(l1)
+                self.locations.add(l2)
+                
+        # Compute all-pairs shortest path distances using BFS
+        self.dist = {}
+        for loc in self.locations:
+            self.dist[loc] = {}
+            # Initialize all distances with infinity
+            for l in self.locations:
+                self.dist[loc][l] = float('inf')
+            self.dist[loc][loc] = 0
+            
+            queue = deque([loc])
+            while queue:
+                curr = queue.popleft()
+                d = self.dist[loc][curr]
+                for nxt in self.roads[curr]:
+                    if self.dist[loc][nxt] == float('inf'):
+                        self.dist[loc][nxt] = d + 1
+                        queue.append(nxt)
+                        
+        # Identify vehicles from the initial state
+        # Vehicles are the only locatable objects that possess a 'capacity' property.
+        self.vehicles = set()
+        for fact in task.initial_state:
+            parts = get_parts(fact)
+            if parts[0] == "capacity":
+                self.vehicles.add(parts[1])
+
+    def __call__(self, node):
+        state = node.state
+        
+        package_locations = {}
+        package_in_vehicle = {}
+        vehicle_locations = {}
+        
+        # Parse the current state facts
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == "at":
+                obj, loc = parts[1], parts[2]
+                if obj in self.vehicles:
+                    vehicle_locations[obj] = loc
+                else:
+                    package_locations[obj] = loc
+            elif parts[0] == "in":
+                pkg, veh = parts[1], parts[2]
+                package_in_vehicle[pkg] = veh
+                
+        total_cost = 0
+        needs_pickup = set()
+        
+        # Calculate the direct action costs for fulfilling each goal
+        for obj, goal_loc in self.goal_locations.items():
+            if obj in package_locations:
+                curr_loc = package_locations[obj]
+                if curr_loc != goal_loc:
+                    needs_pickup.add(curr_loc)
+                    d = self.dist.get(curr_loc, {}).get(goal_loc, float('inf'))
+                    if d == float('inf'):
+                        return float('inf')
+                    total_cost += d + 2  # drive distance + pick-up + drop
+            elif obj in package_in_vehicle:
+                veh = package_in_vehicle[obj]
+                veh_loc = vehicle_locations.get(veh)
+                if veh_loc is None:
+                    return float('inf')
+                d = self.dist.get(veh_loc, {}).get(goal_loc, float('inf'))
+                if d == float('inf'):
+                    return float('inf')
+                total_cost += d + 1  # drive distance + drop
+            elif obj in vehicle_locations:
+                curr_loc = vehicle_locations[obj]
+                if curr_loc != goal_loc:
+                    d = self.dist.get(curr_loc, {}).get(goal_loc, float('inf'))
+                    if d == float('inf'):
+                        return float('inf')
+                    total_cost += d  # Only drive distance for vehicles
+                    
+        # Add the cost for a vehicle to reach the first package that needs to be picked up
+        if needs_pickup:
+            min_to_pickup = float('inf')
+            for loc in needs_pickup:
+                for v, v_loc in vehicle_locations.items():
+                    d = self.dist.get(v_loc, {}).get(loc, float('inf'))
+                    if d < min_to_pickup:
+                        min_to_pickup = d
+                        
+            if min_to_pickup == float('inf'):
+                return float('inf')
+            total_cost += min_to_pickup
+            
+        return total_cost
+```

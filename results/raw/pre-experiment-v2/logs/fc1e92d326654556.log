@@ -1,0 +1,17 @@
+2026-11-22 11:13:43,814 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-22 11:13:43,814 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_ebr1syr8\domain.pddl
+2026-11-22 11:13:43,814 INFO     using search: gbfs_early_goal_test
+2026-11-22 11:13:43,814 INFO     using heuristic: hFFHeuristic
+2026-11-22 11:13:43,814 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_ebr1syr8\domain.pddl
+2026-11-22 11:13:43,814 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_ebr1syr8\medium-p26.pddl
+2026-11-22 11:13:43,829 INFO     5 Predicates parsed
+2026-11-22 11:13:43,829 INFO     3 Actions parsed
+2026-11-22 11:13:43,829 INFO     100 Objects parsed
+2026-11-22 11:13:43,829 INFO     0 Constants parsed
+2026-11-22 11:13:43,829 INFO     Grounding start: transport-26
+2026-11-22 11:13:47,593 INFO     Relevance analysis removed 0 facts
+2026-11-22 11:13:47,641 INFO     Grounding end: transport-26
+2026-11-22 11:13:47,641 INFO     2982 Variables created
+2026-11-22 11:13:47,641 INFO     234308 Operators created
+2026-11-22 11:13:48,983 INFO     Search start: transport-26
+2026-11-22 11:13:49,347 INFO     Initial h value: 126.00

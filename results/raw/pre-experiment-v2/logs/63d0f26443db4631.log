@@ -1,0 +1,31 @@
+2026-11-22 09:17:24,845 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-22 09:17:24,845 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_e6ny2w98\domain.pddl
+2026-11-22 09:17:24,855 INFO     using search: gbfs_early_goal_test
+2026-11-22 09:17:24,855 INFO     using heuristic: transportLLMHeuristic
+2026-11-22 09:17:24,855 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_e6ny2w98\domain.pddl
+2026-11-22 09:17:24,857 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_e6ny2w98\easy-p03.pddl
+2026-11-22 09:17:24,857 INFO     5 Predicates parsed
+2026-11-22 09:17:24,857 INFO     3 Actions parsed
+2026-11-22 09:17:24,857 INFO     13 Objects parsed
+2026-11-22 09:17:24,857 INFO     0 Constants parsed
+2026-11-22 09:17:24,857 INFO     Grounding start: transport-03
+2026-11-22 09:17:24,857 INFO     Relevance analysis removed 0 facts
+2026-11-22 09:17:24,857 INFO     Grounding end: transport-03
+2026-11-22 09:17:24,857 INFO     40 Variables created
+2026-11-22 09:17:24,860 INFO     174 Operators created
+2026-11-22 09:17:24,860 INFO     Search start: transport-03
+2026-11-22 09:17:24,860 INFO     Initial h value: 200008.00
+2026-11-22 09:17:24,860 INFO     Found new best h: 110008.00 after 1 expansions
+2026-11-22 09:17:24,860 INFO     Found new best h: 110005.00 after 2 expansions
+2026-11-22 09:17:24,860 INFO     Found new best h: 20002.00 after 3 expansions
+2026-11-22 09:17:24,860 INFO     Found new best h: 10003.00 after 4 expansions
+2026-11-22 09:17:24,860 INFO     Found new best h: 10001.00 after 5 expansions
+2026-11-22 09:17:24,860 INFO     Early goal reached via operator (drop v3 l4 p1 c1 c2).
+2026-11-22 09:17:24,860 INFO     6 Nodes expanded
+2026-11-22 09:17:24,860 INFO     Max open list size: 50
+2026-11-22 09:17:24,860 INFO     Search end: transport-03
+2026-11-22 09:17:24,860 INFO     Search time: 0.00
+2026-11-22 09:17:24,860 INFO     Total time: 0.00
+2026-11-22 09:17:24,860 INFO     Plan length: 6
+2026-11-22 09:17:24,861 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-22 09:17:24,861 WARNING  warning: could not determine peak memory

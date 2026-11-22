@@ -1,0 +1,190 @@
+import collections
+from fnmatch import fnmatch
+from heuristics.heuristic_base import Heuristic
+
+
+def get_parts(fact):
+    """
+    Extract the components of a PDDL fact by removing parentheses and splitting the string.
+    Example: '(at p1 l1)' -> ['at', 'p1', 'l1']
+    """
+    return fact[1:-1].split()
+
+
+class transportLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the transport domain.
+
+    # Summary
+    This heuristic estimates the minimum number of actions required to transport all packages 
+    to their goal locations. It computes a per-package cost based on shortest path distances 
+    and adds a penalty for loading/unloading. It intelligently handles vehicle capacities and 
+    dynamically assigns available vehicles to unpicked packages.
+
+    # Assumptions
+    - Driving between connected locations takes 1 action.
+    - Loading (pick-up) and unloading (drop) each take 1 action.
+    - Shortest path distance via roads is a good proxy for drive actions.
+    - Capacity is modeled by 'capacity-predecessor' chains; a vehicle is full when its capacity size has no predecessor.
+    
+    # Heuristic Initialization
+    - Parses static facts to build a graph of roads.
+    - Computes all-pairs shortest paths using BFS.
+    - Extracts vehicle objects from initial and static capacity facts.
+    - Identifies 'zero capacity' sizes to dynamically determine when vehicles are full.
+    - Extracts package goals.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. For each state, locate all vehicles and determine if they are full.
+    2. Map which packages are inside which vehicles and their goals.
+    3. For each package with a goal:
+       a. If it's at its goal location, cost is 0.
+       b. If it's inside a vehicle, the cost is the distance from the vehicle's location to the package's goal + 1 (for dropping).
+       c. If it's at a location (not its goal), it requires pick-up, driving, and dropping. The cost includes the distance to the goal + 2, plus the minimum approach distance from any vehicle.
+    4. Vehicle approach distance is computed as:
+       - If a vehicle is NOT full, it can directly approach the package: distance is `dist(v_loc, pkg_loc)`.
+       - If a vehicle is full, it must first drop off at least one of its passengers. The approach distance is estimated by routing through one of the passengers' goals: `min_g(dist(v_loc, g) + dist(g, pkg_loc))`.
+    5. Summing the individual package costs gives a strong gradient that guides empty or partially full vehicles towards packages, and loaded vehicles towards their destinations.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        self.static = task.static
+        self.initial_state = task.initial_state
+        
+        self.roads = collections.defaultdict(list)
+        self.locations = set()
+        
+        pred_first = set()
+        pred_second = set()
+        
+        # Parse static facts for roads and capacity chains
+        for fact in self.static:
+            parts = get_parts(fact)
+            if not parts:
+                continue
+            pred = parts[0]
+            if pred == "road":
+                l1, l2 = parts[1], parts[2]
+                self.roads[l1].append(l2)
+                self.locations.add(l1)
+                self.locations.add(l2)
+            elif pred == "capacity-predecessor":
+                pred_first.add(parts[1])
+                pred_second.add(parts[2])
+                
+        # Identify zero capacity (elements that are never the larger capacity in the chain)
+        self.zero_capacities = pred_first - pred_second
+        
+        # Compute all-pairs shortest paths for accurate drive action estimation
+        self.dist = {}
+        for start in self.locations:
+            self.dist[start] = {start: 0}
+            queue = collections.deque([start])
+            while queue:
+                curr = queue.popleft()
+                d = self.dist[start][curr]
+                for neighbor in self.roads[curr]:
+                    if neighbor not in self.dist[start]:
+                        self.dist[start][neighbor] = d + 1
+                        queue.append(neighbor)
+                        
+        # Extract all vehicle objects
+        self.vehicles = set()
+        # Look in both initial_state and static to be safe
+        for fact in list(self.initial_state) + list(self.static):
+            parts = get_parts(fact)
+            if parts and parts[0] == "capacity":
+                self.vehicles.add(parts[1])
+                
+        # Parse goals for packages
+        self.goal_locations = {}
+        for goal in self.goals:
+            parts = get_parts(goal)
+            if parts and parts[0] == "at":
+                pkg, loc = parts[1], parts[2]
+                self.goal_locations[pkg] = loc
+                
+        self.INF = 999999
+
+    def get_dist(self, l1, l2):
+        """Helper to safely fetch precomputed shortest path distances."""
+        return self.dist.get(l1, {}).get(l2, self.INF)
+
+    def __call__(self, node):
+        state = node.state
+        
+        v_loc = {}
+        p_loc = {}
+        p_in = {}
+        v_full = {v: False for v in self.vehicles}
+        p_in_v = collections.defaultdict(list)
+        
+        # Extract dynamic state information
+        for fact in state:
+            parts = get_parts(fact)
+            if not parts:
+                continue
+            pred = parts[0]
+            if pred == "at":
+                obj, loc = parts[1], parts[2]
+                if obj in self.vehicles:
+                    v_loc[obj] = loc
+                else:
+                    p_loc[obj] = loc
+            elif pred == "in":
+                pkg, v = parts[1], parts[2]
+                p_in[pkg] = v
+                p_in_v[v].append(pkg)
+            elif pred == "capacity":
+                v, cap = parts[1], parts[2]
+                if cap in self.zero_capacities:
+                    v_full[v] = True
+                    
+        total_cost = 0
+        
+        # Calculate necessary actions for each package to reach its goal
+        for pkg, g in self.goal_locations.items():
+            if pkg in p_loc:
+                l = p_loc[pkg]
+                if l == g:
+                    # Package is already at its goal
+                    continue
+                
+                # Package is at a location and needs to be picked up
+                best_approach = self.INF
+                for v in self.vehicles:
+                    if v not in v_loc:
+                        continue
+                    vl = v_loc[v]
+                    
+                    if v_full[v]:
+                        # If vehicle is full, it must first head to drop off an existing passenger
+                        passenger_goals = [self.goal_locations[p] for p in p_in_v[v] if p in self.goal_locations]
+                        if passenger_goals:
+                            approach = min(self.get_dist(vl, pg) + self.get_dist(pg, l) for pg in passenger_goals)
+                        else:
+                            approach = self.get_dist(vl, l)
+                    else:
+                        # If vehicle has space, it can head directly to the package
+                        approach = self.get_dist(vl, l)
+                        
+                    if approach < best_approach:
+                        best_approach = approach
+                        
+                # Cost: Best vehicle approach + 1 (pick-up) + Drive to goal + 1 (drop)
+                total_cost += best_approach + self.get_dist(l, g) + 2
+                
+            elif pkg in p_in:
+                v = p_in[pkg]
+                if v in v_loc:
+                    vl = v_loc[v]
+                    # Cost: Drive to goal + 1 (drop)
+                    total_cost += self.get_dist(vl, g) + 1
+                else:
+                    total_cost += self.INF
+            else:
+                # Package is unreachable/unseen
+                total_cost += self.INF
+                
+        return total_cost
