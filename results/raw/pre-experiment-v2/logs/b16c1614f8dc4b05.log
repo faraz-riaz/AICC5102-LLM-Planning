@@ -1,0 +1,14 @@
+ERROR:root:A* search failed
+Traceback (most recent call last):
+  File "C:\Users\HMC-ADMIN\Desktop\AI_Project-ranem\src\pyperplan\search\a_star.py", line 346, in astar_search_result
+    task.get_successor_states(state),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HMC-ADMIN\Desktop\AI_Project-ranem\src\pyperplan\task.py", line 112, in get_successor_states
+    return [(op, op.apply(state)) for op in self.operators if op.applicable(state)]
+                 ^^^^^^^^^^^^^^^
+  File "C:\Users\HMC-ADMIN\Desktop\AI_Project-ranem\src\pyperplan\task.py", line 48, in apply
+    return (state - self.del_effects) | self.add_effects
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+MemoryError
+
+{"worker_ok": true, "initial_h": 103.0, "setup_time_s": 0.10741409996990114, "status": "error", "failure_detail": "MemoryError: ", "nodes_generated": 2271219, "nodes_expanded": 59604, "nodes_reopened": 0, "stale_nodes_skipped": 0, "dead_ends_pruned": 0, "cycles_pruned": null, "iterations": null, "final_bound": null, "search_time_s": 49.57510630006436, "plan_cost": null, "plan_length": null, "plan_valid": null, "validation_detail": "no plan returned", "replay_cost": null, "plan_sha256": null, "plan": null, "self_peak_rss_mib": null, "python_hash_seed": "2053150995"}
