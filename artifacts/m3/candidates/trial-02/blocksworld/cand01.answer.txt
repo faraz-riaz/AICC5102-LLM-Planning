@@ -1,0 +1,201 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Blocksworld domain.
+
+    # Summary
+    Estimates the number of actions required to reach the goal by identifying blocks 
+    that are in incorrect positions and counting the necessary unstack/pickup and 
+    putdown/stack actions to place them correctly. It specifically detects and penalizes
+    simple inevitable deadlocks where a block is blocking its own target position.
+
+    # Assumptions
+    - Each block that is not currently in a valid position must be moved.
+    - A block is considered "correct" (valid) if it satisfies its explicit goal condition, 
+      does not violate any clear/empty constraints, and all blocks below it are also "correct".
+    - Moving an incorrectly placed block generally requires 2 actions (e.g., unstack + putdown, or pickup + stack).
+    - If the robot is already holding an incorrect block, it requires only 1 action to place it.
+    - If the robot's goal is to hold a specific block, picking it up is only 1 action.
+    - If a block needs to be placed on a target that is in the same tower, it creates a 
+      deadlock. The block must be moved to the table temporarily, incurring an additional 2 actions.
+
+    # Heuristic Initialization
+    - The goal conditions (which block should be on which, which should be on the table, etc.) 
+      are extracted from the task and stored in dictionaries and sets for fast O(1) lookup.
+    - The blocksworld domain generally doesn't have complex static facts, so only goals are processed.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to identify the status of all blocks (`on`, `on-table`, `clear`, `holding`).
+    2. Evaluate block correctness bottom-up using memoized recursion. A block is "correct" if:
+       - It is on the table, the goal does not require it to be on another block, and it is not meant to be held.
+       - It is on another correct block, the goal does not contradict this placement, the block below 
+         is not required to be clear, and it is not meant to be on the table or held.
+    3. Any block not deemed "correct" is added to the `incorrect` set.
+    4. Calculate base cost: 2 actions for each incorrect block (unstack/pickup + putdown/stack). 
+       Adjust to 1 action if the block is currently held or if the final goal is merely to hold it.
+    5. Add deadlock penalty (+2 actions) if:
+       - A held block needs to go on a target that is not yet ready (not correct or not clear).
+       - An unheld block needs to go on a target located in the exact same tower (sharing the same base),
+         forcing a temporary placement on the table.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        self.goal_on = {}
+        self.goal_on_table = set()
+        self.goal_clear = set()
+        self.goal_holding = None
+        self.goal_arm_empty = False
+
+        # Parse goals
+        for goal in self.goals:
+            parts = get_parts(goal)
+            pred = parts[0]
+            if pred == "on":
+                self.goal_on[parts[1]] = parts[2]
+            elif pred == "on-table":
+                self.goal_on_table.add(parts[1])
+            elif pred == "clear":
+                self.goal_clear.add(parts[1])
+            elif pred == "holding":
+                self.goal_holding = parts[1]
+            elif pred == "arm-empty":
+                self.goal_arm_empty = True
+
+    def __call__(self, node):
+        state = node.state
+        state_on = {}
+        state_on_table = set()
+        state_clear = set()
+        state_holding = None
+
+        blocks = set()
+
+        # Parse current state
+        for fact in state:
+            parts = get_parts(fact)
+            pred = parts[0]
+            if pred == "on":
+                state_on[parts[1]] = parts[2]
+                blocks.add(parts[1])
+                blocks.add(parts[2])
+            elif pred == "on-table":
+                state_on_table.add(parts[1])
+                blocks.add(parts[1])
+            elif pred == "clear":
+                state_clear.add(parts[1])
+                blocks.add(parts[1])
+            elif pred == "holding":
+                state_holding = parts[1]
+                blocks.add(parts[1])
+
+        correct = set()
+        incorrect = set()
+
+        def check_correctness(b):
+            """Recursively determine if a block and all blocks below it are in correct positions."""
+            if b in correct:
+                return True
+            if b in incorrect:
+                return False
+            
+            # If the block is currently held
+            if b == state_holding:
+                if self.goal_holding == b:
+                    correct.add(b)
+                    return True
+                else:
+                    incorrect.add(b)
+                    return False
+
+            # If the block is on the table
+            if b in state_on_table:
+                if b in self.goal_on or self.goal_holding == b:
+                    incorrect.add(b)
+                    return False
+                else:
+                    correct.add(b)
+                    return True
+            
+            # If the block is on another block
+            if b in state_on:
+                c = state_on[b]
+                
+                # The block below must also be correct
+                if not check_correctness(c):
+                    incorrect.add(b)
+                    return False
+                
+                # Check goal contradictions for this specific block
+                if b in self.goal_on_table or self.goal_holding == b:
+                    incorrect.add(b)
+                    return False
+                
+                if b in self.goal_on and self.goal_on[b] != c:
+                    incorrect.add(b)
+                    return False
+                
+                # The block below should not be forced to be clear
+                if c in self.goal_clear:
+                    incorrect.add(b)
+                    return False
+                
+                correct.add(b)
+                return True
+            
+            # Fallback for invalid states
+            incorrect.add(b)
+            return False
+
+        # Evaluate correctness of all blocks
+        for b in blocks:
+            check_correctness(b)
+
+        # Build base mapping to find out which tower each block belongs to
+        base = {}
+        for b in blocks:
+            curr = b
+            while curr in state_on:
+                curr = state_on[curr]
+            base[b] = curr
+
+        def is_ready(c):
+            """A block is ready to receive another block if it is correct and currently clear."""
+            return (c in correct) and (c in state_clear)
+
+        cost = 0
+
+        # Calculate costs based on incorrect blocks
+        for b in incorrect:
+            if b == state_holding:
+                # If we are holding it, but shouldn't be holding it
+                if self.goal_holding != b:
+                    cost += 1
+                    # Deadlock: we are holding a block that must go on a target that isn't ready
+                    if b in self.goal_on:
+                        target = self.goal_on[b]
+                        if not is_ready(target):
+                            cost += 2
+            else:
+                # If it's not held
+                if self.goal_holding == b:
+                    cost += 1  # Just pick it up once it is cleared
+                else:
+                    cost += 2  # Unstack/pickup + Putdown/stack
+                
+                # Deadlock check: block is currently unheld, but located in the same tower as its target
+                if b in self.goal_on and b not in state_on_table:
+                    target = self.goal_on[b]
+                    if target in base and base[b] == base[target]:
+                        cost += 2
+
+        return cost
+```

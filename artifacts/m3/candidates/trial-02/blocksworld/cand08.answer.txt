@@ -1,0 +1,168 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+    
+    # Summary
+    This heuristic estimates the minimum number of actions required to achieve the goal state. 
+    It evaluates the "correctness" of each block's current position and computes an estimated 
+    action cost for moving incorrect blocks to their target positions.
+    
+    # Assumptions
+    - Standard Blocksworld rules apply: a block can be on the table or on exactly one other block.
+    - Only one block can be held at a time.
+    - A block is considered "correct" if it is in its goal position, and all blocks below it are also correct.
+    - A block that is correct does not need to be moved unless it rests on an incorrect block, or 
+      must be cleared for another block, or violates a clear/holding goal.
+    
+    # Heuristic Initialization
+    - Parses the goal conditions to map each block to its required support (`goal_on`, `goal_on_table`).
+    - Maps the reverse relationships to know which block should rest on which (`goal_on_rev`).
+    - Identifies blocks that must be held (`goal_holding`) or clear (`goal_clear`).
+    
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to find the current support of each block (`current_on`, `current_on_table`, `current_holding`, `current_clear`).
+    2. Determine the correctness of each block recursively:
+       - A block is incorrect if it is held (and shouldn't be), or its current support doesn't match its goal.
+       - A block is also incorrect if the block below it is incorrect, or if the block below it needs to be cleared, 
+         or if the block below it needs a different block on top of it.
+    3. Calculate the action cost for each incorrect block:
+       - Identify its target support. If it has no specific goal, its target is the table.
+       - Check if the target support is "ready" (it is correct and clear, or it is the table).
+       - If held: 1 action to stack/put down. If its target is not ready, it requires 3 actions (put down, pickup, stack later).
+       - If on the table: 2 actions (pickup, stack).
+       - If on another block: 2 actions (unstack, stack/put down). If its target is a block and it's not ready, it requires 4 actions (unstack, put on table, pickup, stack later).
+    4. Sum the action costs. A value of 0 indicates a goal state.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        self.static = task.static
+
+        self.goal_on = {}
+        self.goal_on_rev = {}
+        self.goal_on_table = set()
+        self.goal_clear = set()
+        self.goal_holding = None
+        self.goal_arm_empty = False
+
+        for goal in self.goals:
+            parts = goal[1:-1].split()
+            if parts[0] == "on":
+                self.goal_on[parts[1]] = parts[2]
+                self.goal_on_rev[parts[2]] = parts[1]
+            elif parts[0] == "on-table":
+                self.goal_on_table.add(parts[1])
+            elif parts[0] == "clear":
+                self.goal_clear.add(parts[1])
+            elif parts[0] == "holding":
+                self.goal_holding = parts[1]
+            elif parts[0] == "arm-empty":
+                self.goal_arm_empty = True
+
+    def __call__(self, node):
+        state = node.state
+        
+        current_on = {}
+        current_on_table = set()
+        current_clear = set()
+        current_holding = None
+        all_blocks = set()
+
+        for fact in state:
+            parts = fact[1:-1].split()
+            if parts[0] == "on":
+                current_on[parts[1]] = parts[2]
+                all_blocks.add(parts[1])
+                all_blocks.add(parts[2])
+            elif parts[0] == "on-table":
+                current_on_table.add(parts[1])
+                all_blocks.add(parts[1])
+            elif parts[0] == "clear":
+                current_clear.add(parts[1])
+                all_blocks.add(parts[1])
+            elif parts[0] == "holding":
+                current_holding = parts[1]
+                all_blocks.add(parts[1])
+        
+        # Add any blocks that might solely be mentioned in goals
+        for b in self.goal_on.keys(): all_blocks.add(b)
+        for b in self.goal_on.values(): all_blocks.add(b)
+        for b in self.goal_on_table: all_blocks.add(b)
+        for b in self.goal_clear: all_blocks.add(b)
+        if self.goal_holding: all_blocks.add(self.goal_holding)
+
+        memo = {}
+
+        def is_correct(x):
+            if x in memo:
+                return memo[x]
+            
+            if current_holding == x:
+                if self.goal_holding == x:
+                    memo[x] = True
+                    return True
+                else:
+                    memo[x] = False
+                    return False
+            
+            if self.goal_holding == x:
+                memo[x] = False
+                return False
+                
+            if x in self.goal_on:
+                if current_on.get(x) != self.goal_on[x]:
+                    memo[x] = False
+                    return False
+                    
+            if x in self.goal_on_table:
+                if x not in current_on_table:
+                    memo[x] = False
+                    return False
+                    
+            if x in current_on:
+                y = current_on[x]
+                if y in self.goal_clear:
+                    memo[x] = False
+                    return False
+                if y in self.goal_on_rev and self.goal_on_rev[y] != x:
+                    memo[x] = False
+                    return False
+                if not is_correct(y):
+                    memo[x] = False
+                    return False
+                    
+            memo[x] = True
+            return True
+
+        cost = 0
+
+        for x in all_blocks:
+            if not is_correct(x):
+                if self.goal_holding == x:
+                    if x in current_on_table or x in current_on:
+                        cost += 1
+                else:
+                    if x in self.goal_on:
+                        y = self.goal_on[x]
+                        is_y_ready = is_correct(y) and y in current_clear
+                    else:
+                        is_y_ready = True
+                        
+                    if current_holding == x:
+                        if is_y_ready:
+                            cost += 1
+                        else:
+                            cost += 3
+                    elif x in current_on_table:
+                        cost += 2
+                    elif x in current_on:
+                        if is_y_ready:
+                            cost += 2
+                        else:
+                            cost += 4
+
+        return cost
+```

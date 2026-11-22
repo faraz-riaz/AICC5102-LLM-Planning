@@ -1,0 +1,62 @@
+2026-11-22 09:17:25,112 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-22 09:17:25,116 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_lg8m4u3k\domain.pddl
+2026-11-22 09:17:25,121 INFO     using search: gbfs_early_goal_test
+2026-11-22 09:17:25,121 INFO     using heuristic: transportLLMHeuristic
+2026-11-22 09:17:25,121 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_lg8m4u3k\domain.pddl
+2026-11-22 09:17:25,123 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_lg8m4u3k\easy-p21.pddl
+2026-11-22 09:17:25,123 INFO     5 Predicates parsed
+2026-11-22 09:17:25,123 INFO     3 Actions parsed
+2026-11-22 09:17:25,123 INFO     31 Objects parsed
+2026-11-22 09:17:25,123 INFO     0 Constants parsed
+2026-11-22 09:17:25,123 INFO     Grounding start: transport-21
+2026-11-22 09:17:25,145 INFO     Relevance analysis removed 0 facts
+2026-11-22 09:17:25,145 INFO     Grounding end: transport-21
+2026-11-22 09:17:25,145 INFO     262 Variables created
+2026-11-22 09:17:25,145 INFO     3110 Operators created
+2026-11-22 09:17:25,145 INFO     Search start: transport-21
+2026-11-22 09:17:25,145 INFO     Initial h value: 1100046.00
+2026-11-22 09:17:25,145 INFO     Found new best h: 1010045.00 after 1 expansions
+2026-11-22 09:17:25,145 INFO     Found new best h: 920045.00 after 2 expansions
+2026-11-22 09:17:25,145 INFO     Found new best h: 920043.00 after 3 expansions
+2026-11-22 09:17:25,145 INFO     Found new best h: 910041.00 after 4 expansions
+2026-11-22 09:17:25,145 INFO     Found new best h: 820041.00 after 5 expansions
+2026-11-22 09:17:25,145 INFO     Found new best h: 820039.00 after 6 expansions
+2026-11-22 09:17:25,154 INFO     Found new best h: 810037.00 after 7 expansions
+2026-11-22 09:17:25,154 INFO     Found new best h: 720037.00 after 8 expansions
+2026-11-22 09:17:25,154 INFO     Found new best h: 720035.00 after 9 expansions
+2026-11-22 09:17:25,154 INFO     Found new best h: 710034.00 after 10 expansions
+2026-11-22 09:17:25,157 INFO     Found new best h: 710032.00 after 11 expansions
+2026-11-22 09:17:25,157 INFO     Found new best h: 700030.00 after 12 expansions
+2026-11-22 09:17:25,157 INFO     Found new best h: 610030.00 after 13 expansions
+2026-11-22 09:17:25,159 INFO     Found new best h: 610028.00 after 14 expansions
+2026-11-22 09:17:25,159 INFO     Found new best h: 600027.00 after 15 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 600026.00 after 16 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 510025.00 after 17 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 420023.00 after 18 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 420021.00 after 19 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 410022.00 after 20 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 410020.00 after 21 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 400019.00 after 22 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 400018.00 after 23 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 310018.00 after 24 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 310016.00 after 25 expansions
+2026-11-22 09:17:25,161 INFO     Found new best h: 310013.00 after 26 expansions
+2026-11-22 09:17:25,169 INFO     Found new best h: 220011.00 after 27 expansions
+2026-11-22 09:17:25,169 INFO     Found new best h: 210011.00 after 28 expansions
+2026-11-22 09:17:25,170 INFO     Found new best h: 120009.00 after 29 expansions
+2026-11-22 09:17:25,170 INFO     Found new best h: 120007.00 after 30 expansions
+2026-11-22 09:17:25,170 INFO     Found new best h: 110008.00 after 31 expansions
+2026-11-22 09:17:25,170 INFO     Found new best h: 110006.00 after 32 expansions
+2026-11-22 09:17:25,173 INFO     Found new best h: 100005.00 after 33 expansions
+2026-11-22 09:17:25,173 INFO     Found new best h: 100004.00 after 34 expansions
+2026-11-22 09:17:25,173 INFO     Found new best h: 10003.00 after 35 expansions
+2026-11-22 09:17:25,173 INFO     Found new best h: 10001.00 after 36 expansions
+2026-11-22 09:17:25,176 INFO     Early goal reached via operator (drop v4 l11 p6 c1 c2).
+2026-11-22 09:17:25,176 INFO     37 Nodes expanded
+2026-11-22 09:17:25,176 INFO     Max open list size: 1688
+2026-11-22 09:17:25,176 INFO     Search end: transport-21
+2026-11-22 09:17:25,176 INFO     Search time: 0.02
+2026-11-22 09:17:25,176 INFO     Total time: 0.05
+2026-11-22 09:17:25,177 INFO     Plan length: 37
+2026-11-22 09:17:25,181 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-22 09:17:25,181 WARNING  warning: could not determine peak memory

@@ -1,0 +1,114 @@
+from heuristics.heuristic_base import Heuristic
+
+class miconicLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Miconic domain.
+
+    # Summary
+    This heuristic estimates the minimal number of remaining actions (board, depart, 
+    and elevator movements) required to serve all passengers. It provides a highly 
+    accurate, strictly decreasing value that expertly guides a greedy best-first search.
+
+    # Assumptions
+    - Elevator movements (`up` and `down`) can jump directly between any two valid floors. 
+      Thus, each floor visited costs exactly 1 move, unless the elevator is already at that floor.
+    - Each unboarded passenger requires exactly 2 actions (board and depart).
+    - Each boarded passenger requires exactly 1 action (depart).
+    - Capacity of the elevator is infinite, so it is always optimal to board a passenger 
+      when at their origin.
+
+    # Heuristic Initialization
+    - Parses the static facts (and initial state, as a defensive fallback) to extract the 
+      `destin` (destination) of each passenger. This mapping remains constant throughout.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to identify:
+       - Passengers who are currently unboarded (they have an `origin` fact).
+       - Passengers who are currently boarded (they have a `boarded` fact).
+       - The current floor of the elevator (`lift-at`).
+    2. If there are no unboarded and no boarded passengers, all passengers are served. 
+       Return 0.
+    3. Determine the set of required stops:
+       - The origin floors of all unboarded passengers.
+       - The destination floors of all unboarded and boarded passengers.
+    4. Compute the required number of elevator movements:
+       - Every distinct floor in the required stops adds 1 move.
+       - If the elevator is currently at a "useful" floor (an origin of an unboarded 
+         passenger or a destination of an already boarded passenger), we save 1 move because 
+         we can immediately perform a required action without moving.
+    5. Compute the required number of boarding and departing actions:
+       - 2 actions for each unboarded passenger.
+       - 1 action for each boarded passenger.
+    6. Combine the action counts and movements into a base cost.
+    7. Tie-breaking modification:
+       - To prevent plateaus when multiple optimal actions are possible (like boarding a 
+         passenger versus moving to a different floor), we scale the base cost by a large factor 
+         (10000) and subtract the number of currently boarded passengers.
+       - This guarantees that the heuristic strictly prefers states where passengers 
+         have been boarded, preventing the search from delaying `board` actions and 
+         effectively resolving tie-breaking automatically.
+    """
+
+    def __init__(self, task):
+        """
+        Initialize the heuristic by extracting the static destinations of each passenger.
+        """
+        self.destin = {}
+        # Parse both static and initial_state to safely guarantee we find all 'destin' facts
+        for fact in list(task.static) + list(task.initial_state):
+            parts = fact[1:-1].split()
+            if parts[0] == "destin":
+                person = parts[1]
+                floor = parts[2]
+                self.destin[person] = floor
+
+    def __call__(self, node):
+        """
+        Estimate the cost to reach the goal from the current state.
+        """
+        state = node.state
+        
+        origins = set()
+        unboarded_passengers = set()
+        boarded_passengers = set()
+        current_floor = None
+        
+        # 1. Parse current state for dynamic facts
+        for fact in state:
+            parts = fact[1:-1].split()
+            if parts[0] == "origin":
+                unboarded_passengers.add(parts[1])
+                origins.add(parts[2])
+            elif parts[0] == "boarded":
+                boarded_passengers.add(parts[1])
+            elif parts[0] == "lift-at":
+                current_floor = parts[1]
+                
+        # 2. Check for Goal state
+        if not unboarded_passengers and not boarded_passengers:
+            return 0
+            
+        # 3. Determine required stops
+        unboarded_destinations = {self.destin[p] for p in unboarded_passengers}
+        boarded_destinations = {self.destin[p] for p in boarded_passengers}
+        
+        stops = origins | unboarded_destinations | boarded_destinations
+        
+        # 4. Compute required elevator movements
+        moves = len(stops)
+        
+        if current_floor is not None:
+            # A floor is useful right now if we can board someone or drop off someone already boarded
+            useful_current = (current_floor in origins) or (current_floor in boarded_destinations)
+            if useful_current:
+                moves -= 1
+                
+        moves = max(0, moves)
+        
+        # 5. Compute required passenger interactions
+        actions = len(unboarded_passengers) * 2 + len(boarded_passengers)
+        
+        # 6 & 7. Calculate final score with tie-breaker
+        total_cost = 10000 * (actions + moves) - len(boarded_passengers)
+        
+        return total_cost
