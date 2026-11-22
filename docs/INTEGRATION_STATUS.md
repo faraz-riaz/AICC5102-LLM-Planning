@@ -11,7 +11,7 @@ document. Status labels: **DONE AND VERIFIED**, **DONE BUT NOT INTEGRATED**,
 |---|---|
 | M1 (Amina) reproduction + shared runner | **DONE AND VERIFIED** (integrated as committed; runner fixes added on the integration branch, awaiting her review) |
 | M2 (Faraz) algorithms, references, official matrix, R3–R5, audit | **DONE AND VERIFIED** (exact references limited to 17/90 tasks, see §3.4) |
-| M3 (Ranem) | **NOT STARTED** (no branch, no artifacts); infrastructure ready, §6 |
+| M3 (Ranem) | **DONE AND VERIFIED**: added after this summary was written; see §7 |
 
 ## 2. M1 — Amina (concise)
 
@@ -432,7 +432,7 @@ history and are not overwritten.
 |---|---|---:|---|
 | M2 search matrix (A*, WA* 1.5/2.0, IDA* easy × DeepSeek-R1/hmax) | `w8-m2-*` | 600 | `main` |
 | GBFS baselines (DeepSeek-R1, hmax, hFF) = R1/R2 inputs | `w8-gbfs-*` | 270 | `main` |
-| M3 trial heuristics (9 frozen × GBFS, A*, WA* 1.5/2, IDA* easy) | `m3-*` | 1,170 | branch `feature/ranem-heuristics` (commit `102ea68`), plus `results/derived/heuristic_reliability/trial_heuristic_runs.csv` |
+| M3 trial heuristics (9 frozen × GBFS, A*, WA* 1.5/2, IDA* easy) | `m3-*` | 1,170 | `main` (merged from `feature/ranem-heuristics`, commit `102ea68`), plus `results/derived/heuristic_reliability/trial_heuristic_runs.csv` |
 
 **Checks.**
 - Completeness: 600/600 and 270/270, 0 missing, 0 duplicates.

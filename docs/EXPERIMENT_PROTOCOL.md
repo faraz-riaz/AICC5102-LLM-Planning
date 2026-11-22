@@ -1,6 +1,6 @@
 # Shared experiment protocol
 
-This document freezes pre-experiment decisions. It does not implement the member-owned algorithms, generation trials, exact-cost solver, or full shared runner.
+This document records the experiment decisions that were frozen before any test run. All of them are now implemented: the shared runners in `experiments/reproduction/`, the search algorithms and exact-cost solver in `experiments/search_algorithms/` and `src/pyperplan/search/`, and the generation trials in `experiments/heuristic_reliability/`.
 
 ## Data boundary and heuristic trials
 
@@ -14,7 +14,7 @@ The three files in `artifacts/upstream/deepseek-r1/` are the paper's original se
 
 The main algorithm identifiers are `gbfs`, `astar`, `weighted_astar`, and `ida_star`. Weighted A* uses weights `1.0`, `1.5`, and `2.0`; weight 1.0 is the correctness-equivalence check against A*. A heuristic weight is null for algorithms where it does not apply.
 
-Only inherited GBFS is exercised in this foundation. A*, Weighted A*, and IDA* remain Faraz's pending implementations and must be validated before experiments. Do not treat upstream `ids` as IDA*.
+A*, Weighted A* and IDA* are implemented in `src/pyperplan/search/` and validated by `tests/test_astar.py` and `tests/test_search_algorithms.py`. The final experiments used Weighted A* weights 1.5 and 2.0; weight 1.0 is checked in the tests only. Do not treat upstream `ids` as IDA*.
 
 ## Exact optimal-cost references
 
@@ -62,7 +62,7 @@ Put a concise machine-readable explanation in `failure_detail`; do not collapse 
 
 ## Result records and review
 
-Every record must satisfy `configs/result.schema.json`. Use JSON null only where permitted; do not use sentinel costs or times. Raw records go to `results/raw/<config_id>/`, derived tables to `results/derived/<config_id>/`, and figures to `results/figures/<config_id>/`. Raw records are immutable.
+Every record must satisfy `configs/result.schema.json`. Use JSON null only where permitted; do not use sentinel costs or times. Raw records go to `results/raw/run_records/`, derived tables to `results/derived/`, and figures to `results/figures/`. Raw records are immutable.
 
 Search implementations must report both generated and expanded nodes. For the
 project A* implementation, generated nodes include the root and every
@@ -76,8 +76,8 @@ Pyperplan grounding and the hFF heuristic iterate over Python sets of strings,
 whose order depends on the per-process string-hash seed. Without a fixed
 `PYTHONHASHSEED`, grounded operator order (hence GBFS tie-breaking) and hFF
 values vary between processes, so identical runs can return different plans.
-Every run process must therefore set `PYTHONHASHSEED` explicitly (Faraz's
-tools use the run's SHA-256-derived seed) and record it. *(Proposed in the
-search workstream on 2026-11-04; requires cross-workstream review.)*
+Every run process therefore sets `PYTHONHASHSEED` explicitly and records it.
+The final runs use one SHA-256-derived seed per task (`--hash-seed-scope task`),
+shared by every algorithm and heuristic on that task.
 
 All experiment changes use member feature branches and reviewed pull requests into `main`. Configuration, schema, benchmark, shared planner, and monitoring changes require cross-workstream review and passing CI.

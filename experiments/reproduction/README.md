@@ -73,7 +73,7 @@ It summarizes only GBFS records that belong to a batch sidecar (A*/WA*/IDA* reco
 3. Runs `python src/pyperplan/pyperplan.py -s gbfs_early_goal_test -H <heuristic> <task>` with `PYTHONHASHSEED` fixed (per task by default; see `--hash-seed-scope`).
 4. Windows: the child runs in a Job Object (hard memory cap on the whole process tree, process tree killed at the time limit). Linux/macOS: `RLIMIT_AS` and process-group kill, peak memory not measured.
 5. Validates every plan with `tools/validate_plan.py` (exit 0 = valid; exit 1 with a reason = `invalid_plan`; unreadable inputs or a crash = `validator_error`).
-6. Writes `results/raw/run_records/<run_id>.json` (all required fields of `configs/result.schema.json`), the raw log in `logs/`, solved plans in `plans/`, and a batch file in `batches/`. Existing files are never overwritten. `results/raw` is git-ignored.
+6. Writes `results/raw/run_records/<run_id>.json` (all required fields of `configs/result.schema.json`), the raw log in `logs/`, solved plans in `plans/`, and a batch file in `batches/`. Existing files are never overwritten. New local runs are not tracked by Git (`results/raw/**` is ignored); the reported run records are committed (see `results/raw/README.md`).
 
 Statuses the runner can write: `success`, `unsolved`, `timeout`, `memory_limit`, `invalid_plan`, `planner_error`, `validator_error`. Our 270 real runs produced only `success` and `timeout`.
 

@@ -1,21 +1,30 @@
 # Raw results
 
-Immutable schema-conformant run records belong under `results/raw/<config_id>/`. Large run data is ignored by Git and should be archived separately.
+Immutable run records and the inputs every reported number traces back to.
 
-## Committed run records (force-added; 2026-11-10)
+| Path | Contents |
+|---|---|
+| `run_records/<run_id>.json` | One schema-checked record per run (`configs/result.schema.json`) |
+| `run_records/logs/`, `run_records/plans/` | Raw planner log per run; plan file per solved run |
+| `run_records/batches/` | One file per batch: command, git commit, machine profile, run IDs and the `PYTHONHASHSEED` of every run |
+| `optimal_costs.csv` | Proven optimal plan cost per task (17 proven, all easy); unknown costs stay empty with a status |
+| `optimal_costs_extended_300s.csv` | Extra 300 s attempt on the 13 unproven easy tasks (none proven) |
+| `optimal_cost_runs_60s.csv`, `optimal_cost_runs_300s.csv` | Every solver run behind those two tables |
+| `sampled_states/` | Frozen state sample (345 states), sampling protocol and proven h*(s) per state |
+| `astar_validation.*`, `pilot_search_*.csv`, `validation_weighted_astar_and_idastar.csv` | A* validation and early pilot/validation batches |
 
-So that every reported number traces to raw run files, the following records from Faraz's machine (`machine-f922a64c5235`) are committed despite the ignore rule (about 10 MB in total):
+## Batches used for reporting
 
-| Batch label prefix (`pre-experiment-v2/batches/`) | Runs | Content |
+All at 60 s / 4096 MiB, 8 workers, one seed per task, on one machine (`machine-f922a64c5235`):
+
+| Batch label prefix | Runs | Content |
 |---|---:|---|
-| `m2-official-` | 600 | Official M2 search matrix (A*, WA* 1.5/2.0 × DeepSeek-R1/hmax × 90 tasks; IDA* × 2 × 30 easy tasks) |
-| `m2-paired-gbfs-` | 180 | GBFS + DeepSeek-R1 / hmax, 90 tasks (also R1/R2 inputs) |
-| `m1-r1r2-gbfs-hff` | 90 | GBFS + hFF, 90 tasks (R1/R2 input) |
+| `w8-gbfs-` | 270 | GBFS with the archived LLM heuristic, hFF and hmax: reproduction (R1/R2) |
+| `w8-m2-` | 600 | A*, WA* 1.5/2.0 with the archived LLM heuristic and hmax on 90 tasks; IDA* on 30 easy tasks (R3–R5) |
+| `m3-` | 1,170 | The 9 frozen trial heuristics with GBFS, A*, WA* 1.5/2.0 (90 tasks) and IDA* (30 easy tasks) (R7–R9) |
 
-For each run: `pre-experiment-v2/<run_id>.json` (schema record), `logs/<run_id>.log`, `plans/<run_id>.soln` (solved runs) and the batch sidecar (run IDs, PYTHONHASHSEED per run, machine profile). All used `--hash-seed-scope task`, 60 s / 4096 MiB, 3 workers.
+Earlier batches are kept for traceability but are not used for reporting: `m2-official-`, `m2-paired-gbfs-`, `m1-r1r2-` (the same experiments with 3 workers) and `faraz-` (optimal-cost runs, validation and pilots).
 
-Also committed: `pre-experiment-v2/faraz-*.json`. These are search-workstream records from `run_with_limits_windows.py`: exact references (`faraz-refs-*`), the WA*/IDA* validation batch and the easy-tier pilots. The `faraz_*.csv` tables here summarize them, and `docs/SEARCH_ALGORITHMS_LOG.md` explains each one.
+Batch labels and run IDs are the original values written when the runs were made. They are not renamed, so every record still matches its batch file.
 
-**Final 8-worker configuration (2026-11-22):** `w8-m2-` (600 runs, M2 search matrix) and `w8-gbfs-` (270 runs, GBFS + DeepSeek-R1 / hmax / hFF), both at 60 s / 4096 MiB, 8 workers, per-task seeds. This is the set to use for comparisons. Ranem's M3 test runs (`m3-`, 1,170 runs, same settings) are on branch `feature/ranem-heuristics`. See `docs/INTEGRATION_STATUS.md` §7.
-
-Not committed: smoke-test batches (`smoke-*`) and synthetic test fixtures.
+New local runs are not tracked by Git (`results/raw/**` is ignored); add a run set deliberately with `git add -f` once it is reviewed.

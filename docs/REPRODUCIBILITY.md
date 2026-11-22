@@ -61,7 +61,7 @@ The expected archive is 200,032,733 bytes with MD5 `8e20619169553ec6eb8b5f10e262
 
 The repository uses POSIX-style relative paths in manifests; Python resolves them on Windows and Linux. File hashes are calculated from raw bytes, so line endings in PDDL must not be normalized or rewritten.
 
-Linux and Windows do not expose identical memory metrics. Configuration v2 standardizes process-tree scope, monotonic timing, 0.1-second sampling, backend/metric recording, Linux summed RSS, and Windows summed working set. The future runner must record whether each cap was hard-enforced or sampling-enforced. The provisional limits remain configurable in `configs/experiment.v2.toml`.
+Linux and Windows do not expose identical memory metrics. Configuration v2 standardizes process-tree scope, monotonic timing, 0.1-second sampling, backend/metric recording, Linux summed RSS, and Windows summed working set. The shared runners record whether each cap was hard-enforced or sampling-enforced. The limits (60 s, 4096 MiB) are set in `configs/experiment.v2.toml`.
 
 Capture a machine profile with:
 
