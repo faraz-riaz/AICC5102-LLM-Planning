@@ -151,7 +151,15 @@ No expensive experiments or external LLM calls run in CI.
 
 ## Reproduce the results
 
-Run every command from the repository root after the setup above. There are two levels.
+Run every command from the repository root after the setup above.
+
+**Verify everything with one command (about 2 minutes).** This re-checks every reported number from the committed data. It checks the benchmark and heuristic hashes, confirms every planned run exists exactly once with the right limits and seed, replays every saved plan, rebuilds the run tables, and recomputes all result tables R1–R9 to compare them with the committed ones. It prints PASS/FAIL per check and exits with code 1 if anything differs:
+
+```bash
+uv run --frozen python tools/verify_all.py
+```
+
+To regenerate individual results, there are two levels.
 
 ### 1. Recompute every table and figure from the committed run records (minutes)
 
@@ -232,7 +240,7 @@ results/
   figures/                        final figures, same structure as derived/
 paper_preparation/                paper tables, figures and draft
 tests/                            planner, search algorithm, runner and analysis tests
-tools/                            benchmark selection/verification, plan validation, machine profile
+tools/                            verify_all.py, benchmark selection/verification, plan validation, machine profile
 docs/                             protocol, reproducibility notes, logs and integration status
 ```
 
