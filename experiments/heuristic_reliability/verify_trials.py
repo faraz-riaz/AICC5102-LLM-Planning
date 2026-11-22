@@ -4,7 +4,10 @@ For every frozen (trial, domain) in artifacts/m3/heuristic_manifest.csv it check
   1. generation: 10 finished candidates, the protocol model, one prompt hash per domain
   2. training runs: exactly 10 candidates x 20 TRAINING tasks, no duplicates,
      no task outside the training list (no test leakage), no run longer than 61 s
-     (a longer run would mean the Mac slept or something disturbed the timing)
+     (a longer run would mean the Mac slept or something disturbed the timing).
+     Crashes of a candidate's own code (planner_error) are legitimate results
+     (counted as unsolved) and are only reported; invalid plans or validator
+     errors are flagged, because GBFS should never return an invalid plan.
   3. scores: recomputed from the raw runs with the same functions as the
      selection script, and equal to <domain>_scores.csv
   4. winner: re-ranked from the raw runs, equal to the frozen winner
@@ -76,10 +79,12 @@ def audit(root: Path, row: dict, prompt_hashes: dict) -> list[str]:
             for r in runs if float(r["wall_time_s"]) > 61]
     if slow:
         problems.append(f"runs longer than 61 s (sleep?): {slow}")
+    expected_statuses = ("success", "timeout", "memory_limit", "unsolved", "planner_error")
     bad_status = Counter(r["status"] for r in runs) - Counter(
-        {s: 10**9 for s in ("success", "timeout", "memory_limit", "unsolved")})
+        {s: 10**9 for s in expected_statuses})
     if bad_status:
         problems.append(f"unusual run statuses (check logs): {dict(bad_status)}")
+    crashes = Counter(r["candidate"] for r in runs if r["status"] == "planner_error")
 
     # 3. scores recomputed from the raw runs
     saved = {s["candidate"]: s for s in read_csv(root / "selection" / trial / f"{domain}_scores.csv")}
@@ -133,6 +138,9 @@ def audit(root: Path, row: dict, prompt_hashes: dict) -> list[str]:
 
     summary = (f"winner {frozen_cand} solved {top['solved'] if top else '?'}/20, "
                f"tied with {len(ties) - 1} other(s)" if ties else "")
+    if crashes:
+        summary += ("\n        info: candidate code crashed (planner_error, counted as unsolved): "
+                    + ", ".join(f"{c} on {n} task(s)" for c, n in sorted(crashes.items())))
     return problems, summary
 
 

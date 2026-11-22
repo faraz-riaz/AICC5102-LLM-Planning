@@ -1,0 +1,159 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+
+    # Summary
+    This heuristic estimates the number of actions required to reach the goal
+    by identifying which blocks are already in their final correct positions ("done")
+    and calculating the cost to move the remaining "bad" blocks.
+
+    # Assumptions
+    - A block is "done" if it is in its final position, all blocks below it are "done",
+      and no other block needs to be placed on its current support.
+    - Moving a block to its final position generally takes 2 actions (pickup/unstack + putdown/stack).
+    - If a block is currently held and its target is ready, it takes 1 action.
+    - If a block is held and its target is not ready, it must be put on the table first, taking 3 actions.
+    - If a block's goal destination is currently below it in the same tower, it must be moved to the table first to free the destination, adding 2 actions.
+
+    # Heuristic Initialization
+    - The goal state is parsed to extract required `on`, `on-table`, `clear`, and `holding` relations.
+    - The set of all blocks is extracted from the initial state to know the universe of objects.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to determine `on`, `on-table`, `clear`, and `holding` relations.
+    2. Iteratively find all "done" blocks. A block is "done" if:
+       - It is held and its goal explicitly requires it to be held.
+       - It is on the table, it has no `on` or `holding` goals.
+       - It is on another block, its support is "done", it matches its `on` goal (or has no specific position goal), its support does not need to be `clear`, and no other block's goal requires it to be on that support.
+    3. For every block that is not "done", evaluate its cost to move.
+    4. If a block is held: check if its target is ready. If so, add 1. If not, add 3 (requires putting down and picking up again later).
+    5. If a block is not held: add a base cost of 2. Additionally, if the block is in a tower and its target block is located anywhere below it in the same tower, add 2 because the block must be placed on the table to access its target.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        
+        # Data structures to hold goal facts
+        self.goal_on = {}
+        self.goal_on_table = set()
+        self.goal_clear = set()
+        self.goal_holding = set()
+        
+        for g in self.goals:
+            parts = g[1:-1].split()
+            if parts[0] == "on":
+                self.goal_on[parts[1]] = parts[2]
+            elif parts[0] == "on-table":
+                self.goal_on_table.add(parts[1])
+            elif parts[0] == "clear":
+                self.goal_clear.add(parts[1])
+            elif parts[0] == "holding":
+                self.goal_holding.add(parts[1])
+
+        # Extract all blocks from the initial state
+        self.all_blocks = set()
+        for f in task.initial_state:
+            parts = f[1:-1].split()
+            if len(parts) > 1:
+                self.all_blocks.update(parts[1:])
+
+    def __call__(self, node):
+        state = node.state
+        
+        on = {}
+        on_table = set()
+        clear = set()
+        holding = None
+        
+        # Parse the current state
+        for f in state:
+            parts = f[1:-1].split()
+            if parts[0] == "on":
+                on[parts[1]] = parts[2]
+            elif parts[0] == "on-table":
+                on_table.add(parts[1])
+            elif parts[0] == "clear":
+                clear.add(parts[1])
+            elif parts[0] == "holding":
+                holding = parts[1]
+                
+        # Iteratively identify which blocks are "done" (already in their final valid position)
+        done = set()
+        changed = True
+        while changed:
+            changed = False
+            for b in self.all_blocks:
+                if b in done:
+                    continue
+                
+                is_b_done = False
+                if holding == b:
+                    if b in self.goal_holding:
+                        is_b_done = True
+                elif b in on_table:
+                    if b not in self.goal_on and b not in self.goal_holding:
+                        is_b_done = True
+                elif b in on:
+                    support = on[b]
+                    if support in done:
+                        if b not in self.goal_on_table and b not in self.goal_holding:
+                            if self.goal_on.get(b, support) == support:
+                                if support not in self.goal_clear:
+                                    # Ensure no other block explicitly needs to be on this support
+                                    other_needs_support = any(self.goal_on[other] == support for other in self.goal_on if other != b)
+                                    if not other_needs_support:
+                                        is_b_done = True
+                                        
+                if is_b_done:
+                    done.add(b)
+                    changed = True
+                    
+        # Compute the heuristic based on the non-done ("bad") blocks
+        heuristic_value = 0
+        
+        for b in self.all_blocks:
+            if b in done:
+                continue
+                
+            if holding == b:
+                # Block is held. Is its target ready?
+                target_ready = False
+                if b in self.goal_on_table:
+                    target_ready = True
+                elif b in self.goal_on:
+                    target = self.goal_on[b]
+                    if target in done and target in clear:
+                        target_ready = True
+                else:
+                    # If it has no specific goal, dropping it on the table is a valid move
+                    target_ready = True
+                    
+                if target_ready:
+                    heuristic_value += 1
+                else:
+                    heuristic_value += 3
+            else:
+                # Base cost for a block that must be unstacked/picked up and eventually stacked/put down
+                heuristic_value += 2
+                
+                # Check for deadlocks: if a block's target is below it in the same tower,
+                # it needs an extra trip to the table to free the target.
+                if b in on:
+                    target = self.goal_on.get(b)
+                    if target:
+                        curr_below = on.get(b)
+                        target_is_below = False
+                        while curr_below:
+                            if curr_below == target:
+                                target_is_below = True
+                                break
+                            curr_below = on.get(curr_below)
+                            
+                        if target_is_below:
+                            heuristic_value += 2
+                            
+        return heuristic_value
+```

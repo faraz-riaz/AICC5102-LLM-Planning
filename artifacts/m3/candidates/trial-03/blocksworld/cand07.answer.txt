@@ -1,0 +1,185 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Blocksworld domain.
+
+    # Summary
+    This heuristic estimates the minimum number of actions required to reach a goal 
+    state from the current state. It classifies blocks as either "well-placed" 
+    (already in their final correct positions) or "must_move". By tracking the state 
+    of each block, it assigns base costs for picking up, putting down, unstacking, 
+    and stacking operations, and adds penalties for dependencies that require a block 
+    to be temporarily parked on the table.
+
+    # Assumptions
+    - A block is considered well-placed if it and all blocks below it meet their 
+      specified goal conditions, and they do not need to be moved to satisfy any 
+      other block's goal.
+    - Blocks with unspecified goals are well-placed if they are resting on the table 
+      or on other well-placed blocks, as long as they do not obstruct other goals.
+    - All actions (pickup, putdown, stack, unstack) cost exactly 1.
+    - Unstacking/picking up a block and placing it directly in its final position takes 2 actions.
+    - If a block must be temporarily parked on the table to resolve a dependency 
+      or deadlock, it takes an additional 2 actions (total 4 actions).
+
+    # Heuristic Initialization
+    - Parses the goal conditions to map each block to its target support (`goal_on`), 
+      extracts blocks that must be on the table (`goal_on_table`), and identifies 
+      blocks that must be clear (`goal_clear`).
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Extract Current State Relations:
+       - Parse current facts to map where each block is (`current_on`, `current_on_table`), 
+         what is held (`holding`), and what blocks are clear (`current_clear`).
+       - Compute `current_support_for`, which maps a block to the block immediately on top of it.
+    2. Identify Well-Placed Blocks:
+       - Starting from the blocks currently on the table, perform a bottom-up traversal 
+         along the towers.
+       - A block on the table is well-placed if it is not required to be on another block.
+       - A block on top of a well-placed block is also well-placed if it satisfies its own 
+         goals, does not violate `clear` goals, and does not occupy a spot that another block 
+         needs.
+    3. Calculate Action Costs:
+       - Iterate through all blocks. If a block is well-placed, its cost is 0.
+       - If a block is currently held by the robotic arm:
+         - If its target destination is ready (well-placed and clear), it costs 1 action.
+         - If its target destination is not ready, it must be put on the table first, costing 3 actions.
+       - If a block is not held and must move:
+         - It incurs a base cost of 2 actions (unstack/pickup + putdown/stack).
+         - If the block's target is another block, and that target is either NOT well-placed 
+           or located directly below the block in the same tower, it means the target is not 
+           ready to receive the block. The block must be temporarily parked on the table, 
+           incurring an additional penalty of 2 actions.
+    4. Summing the Actions:
+       - The total estimated cost is the sum of costs across all blocks.
+    """
+
+    def __init__(self, task):
+        """
+        Initialize the heuristic by extracting the goal configuration.
+        """
+        self.goals = task.goals
+        self.static_facts = task.static
+
+        self.goal_on = {}
+        self.goal_on_table = set()
+        self.goal_clear = set()
+
+        for goal in self.goals:
+            parts = goal[1:-1].split()
+            pred = parts[0]
+            if pred == "on":
+                self.goal_on[parts[1]] = parts[2]
+            elif pred == "on-table":
+                self.goal_on_table.add(parts[1])
+            elif pred == "clear":
+                self.goal_clear.add(parts[1])
+
+    def __call__(self, node):
+        """
+        Compute an estimate of the minimum number of required actions to reach the goal.
+        """
+        state = node.state
+
+        current_on = {}
+        current_on_table = set()
+        current_clear = set()
+        holding = None
+        blocks = set()
+
+        # Parse current state facts
+        for fact in state:
+            parts = fact[1:-1].split()
+            pred = parts[0]
+            if pred == "on":
+                current_on[parts[1]] = parts[2]
+                blocks.add(parts[1])
+                blocks.add(parts[2])
+            elif pred == "on-table":
+                current_on_table.add(parts[1])
+                blocks.add(parts[1])
+            elif pred == "clear":
+                current_clear.add(parts[1])
+                blocks.add(parts[1])
+            elif pred == "holding":
+                holding = parts[1]
+                blocks.add(parts[1])
+
+        # Reverse mapping: maps a block to the block immediately on top of it
+        current_support_for = {under: top for top, under in current_on.items()}
+
+        # Bottom-up evaluation to determine well-placed blocks
+        well_placed = set()
+        for b in current_on_table:
+            # A block on the table that needs to be on another block is not well-placed
+            if b in self.goal_on:
+                continue
+                
+            well_placed.add(b)
+            current = b
+            
+            # Trace the tower upwards
+            while current in current_support_for:
+                top = current_support_for[current]
+                
+                # Check if the top block violates any specific conditions
+                if top in self.goal_on_table:
+                    break
+                
+                goal_target = self.goal_on.get(top)
+                if goal_target is not None and goal_target != current:
+                    break
+                    
+                if current in self.goal_clear:
+                    break
+                    
+                # If some other block is supposed to be on 'current', 'top' must move
+                other_wants_current = any(self.goal_on.get(x) == current for x in blocks if x != top)
+                if other_wants_current:
+                    break
+                    
+                well_placed.add(top)
+                current = top
+
+        # Calculate heuristic cost based on actions needed
+        cost = 0
+        for b in blocks:
+            if b in well_placed:
+                continue
+                
+            if holding == b:
+                target = self.goal_on.get(b)
+                if target:
+                    # If target is not ready, we must putdown, wait, pickup, stack (3 actions remaining)
+                    if target not in well_placed or target not in current_clear:
+                        cost += 3
+                    else:
+                        # Stack directly
+                        cost += 1
+                else:
+                    # Target is table, just putdown
+                    cost += 1
+            else:
+                # Block is not held and must move (base cost: unstack/pickup + stack/putdown = 2 actions)
+                cost += 2
+                target = self.goal_on.get(b)
+                
+                # Check for parking penalty on the table
+                if target and b not in current_on_table:
+                    if target not in well_placed:
+                        # Target itself needs to be moved -> b must be parked on the table
+                        cost += 2
+                    else:
+                        # Trace down to check if the well-placed target is below b in the same tower
+                        curr = current_on.get(b)
+                        while curr:
+                            if curr == target:
+                                cost += 2  # b must be cleared before target is ready -> parking needed
+                                break
+                            curr = current_on.get(curr)
+
+        return cost
+```

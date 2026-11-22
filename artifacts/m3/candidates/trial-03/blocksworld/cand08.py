@@ -1,0 +1,157 @@
+from fnmatch import fnmatch
+from heuristics.heuristic_base import Heuristic
+
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+
+class BlocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+
+    # Summary
+    This heuristic estimates the number of actions required to reach the goal state. 
+    It assigns a specific action cost to each block based on whether it is well-placed 
+    or misplaced, and whether its target location is ready to receive it. This creates 
+    a strictly monotonically decreasing cost for optimal actions, effectively guiding 
+    the greedy best-first search without plateaus or local minima in most cases.
+
+    # Assumptions
+    - A block is "well-placed" if it is in its final position and all blocks below it 
+      are also well-placed. A well-placed block never needs to be moved.
+    - If a block is not well-placed, it must be moved at least once.
+    - Table space is infinite, so any block can be placed on the table.
+    - Valid PDDL goal states do not contain contradictory rules.
+
+    # Heuristic Initialization
+    - Extract goal states and map them to dictionaries and sets (`goal_on`, `goal_on_table`, `goal_clear`)
+      for easy O(1) lookups during search.
+    
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to identify block relationships (`current_on`, `current_on_table`, `current_clear`, `holding`).
+    2. Identify all participating blocks (`all_blocks`) from the state facts.
+    3. Iteratively determine the set of `well_placed` blocks from the bottom up.
+       - A block on the table is well-placed if it does not have a goal to be on another block.
+       - A block on another well-placed block is well-placed if it satisfies its specific goal, or 
+         has no conflicting goals for itself or its support (e.g. support must not be clear).
+    4. Compute the cost for each block based on its state:
+       - well_placed: 0 cost.
+       - holding: If its target is ready (well-placed and clear), cost is 1. If not ready, cost is 3.
+       - misplaced on table: cost is 2.
+       - misplaced on a block: cost is 4.
+    5. Return the sum of costs for all blocks. The cost reaches 0 if and only if it's a valid goal state.
+    """
+
+    def __init__(self, task):
+        """Initialize the heuristic by extracting goal conditions."""
+        self.goals = task.goals
+        self.goal_on = {}
+        self.goal_on_table = set()
+        self.goal_clear = set()
+        
+        for goal in self.goals:
+            parts = get_parts(goal)
+            if parts[0] == "on":
+                self.goal_on[parts[1]] = parts[2]
+            elif parts[0] == "on-table":
+                self.goal_on_table.add(parts[1])
+            elif parts[0] == "clear":
+                self.goal_clear.add(parts[1])
+
+    def __call__(self, node):
+        """Estimate the minimum cost to reach the goal state from the current node."""
+        state = node.state
+        
+        current_on = {}
+        current_on_table = set()
+        current_clear = set()
+        holding = None
+        all_blocks = set()
+
+        # Parse current state facts
+        for fact in state:
+            parts = get_parts(fact)
+            predicate = parts[0]
+            if predicate == "on":
+                current_on[parts[1]] = parts[2]
+                all_blocks.add(parts[1])
+                all_blocks.add(parts[2])
+            elif predicate == "on-table":
+                current_on_table.add(parts[1])
+                all_blocks.add(parts[1])
+            elif predicate == "clear":
+                current_clear.add(parts[1])
+                all_blocks.add(parts[1])
+            elif predicate == "holding":
+                holding = parts[1]
+                all_blocks.add(parts[1])
+        
+        # Iteratively build the well-placed blocks (starting from table up)
+        well_placed = set()
+        changed = True
+        while changed:
+            changed = False
+            for b in all_blocks:
+                if b in well_placed:
+                    continue
+                
+                is_well_placed = False
+                
+                if b in current_on_table:
+                    # A table block is well-placed as long as it doesn't strictly need to be on a block.
+                    if b not in self.goal_on:
+                        is_well_placed = True
+                elif b in current_on:
+                    c = current_on[b]
+                    if c in well_placed:
+                        if b in self.goal_on and self.goal_on[b] == c:
+                            # Safely parked on its correct goal block.
+                            is_well_placed = True
+                        elif b not in self.goal_on and b not in self.goal_on_table:
+                            # Has no explicit goal. Can stay if it doesn't disturb other goals.
+                            if c not in self.goal_clear:
+                                someone_else = False
+                                for x, target in self.goal_on.items():
+                                    if target == c and x != b:
+                                        someone_else = True
+                                        break
+                                if not someone_else:
+                                    is_well_placed = True
+
+                if is_well_placed:
+                    well_placed.add(b)
+                    changed = True
+
+        # Calculate the heuristic cost by evaluating misplaced blocks
+        total_cost = 0
+        for b in all_blocks:
+            if b in well_placed:
+                continue
+            
+            if b == holding:
+                # Is the target for this currently held block ready?
+                is_ready = False
+                if b in self.goal_on:
+                    target = self.goal_on[b]
+                    if target in well_placed and target in current_clear:
+                        is_ready = True
+                else:
+                    # Target is table, which is always ready and clear
+                    is_ready = True
+                
+                if is_ready:
+                    total_cost += 1
+                else:
+                    total_cost += 3
+                    
+            elif b in current_on_table:
+                # Misplaced, but safely on the table
+                total_cost += 2
+                
+            else:
+                # Misplaced and on top of another block. Eagerly encourage unstacking.
+                total_cost += 4
+
+        return total_cost

@@ -1,0 +1,128 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+
+class miconicLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Miconic domain.
+    
+    # Summary
+    This heuristic estimates the total number of remaining actions (board, depart, and lift movements) 
+    required to serve all unserved passengers. It achieves this by counting the exact number of required 
+    board and depart actions for all waiting and boarded passengers, and estimating the required lift 
+    movements to visit their origin and destination floors.
+    
+    # Assumptions
+    - Each passenger needs to board the lift at their origin floor and depart at their destination floor.
+    - Lift movements (up/down) between any two valid floors take exactly 1 action because the `above` relation 
+      is transitive and provides a direct path between any pair of floors in this Miconic formulation.
+    - Multiple passengers can board and depart at the same floor, meaning a single lift movement can serve 
+      multiple passengers simultaneously.
+    - The elevator has unlimited capacity.
+    - A passenger that is neither `boarded` nor waiting (indicated by `origin` in the state) is already `served`.
+    
+    # Heuristic Initialization
+    - Extract the static destination floors for all passengers from the task's static facts.
+    - If any destinations are missing (due to alternative planner representations), fallback to checking the 
+      initial state facts.
+    - Store these static locations in a dictionary mapping passenger names to their destination floors.
+    
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to find the lift's current floor (`lift-at`), the waiting passengers 
+       along with their origin floors (`origin`), and the passengers currently in the lift (`boarded`).
+    2. If there are no waiting or boarded passengers, the goal has been reached. Return 0.
+    3. Calculate the number of `board` and `depart` actions required:
+       - For each waiting passenger, 2 actions are needed (`board` and `depart`). Add their origin to 
+         the active origins set, and their destination to the required destinations set.
+       - For each boarded passenger, 1 action is needed (`depart`). Add their destination to the active 
+         destinations set.
+    4. Compute the set of all distinct floors that need to be visited (the union of all required origins 
+       and destinations). The size of this set represents the baseline number of lift movements.
+    5. Check the lift's current position. If it is already at an active origin (a floor where someone is 
+       waiting) or an active destination (a floor where a boarded passenger wants to depart), the lift 
+       can perform a useful action immediately without moving. Therefore, subtract 1 from the required movements.
+    6. Sum the required `board`/`depart` actions and the estimated lift movements to form the final 
+       heuristic value.
+    """
+
+    def __init__(self, task):
+        """
+        Initialize the heuristic by extracting destination floors for each passenger.
+        """
+        self.destinations = {}
+        
+        # Extract destination facts from static information
+        for fact in task.static:
+            parts = get_parts(fact)
+            if parts[0] == "destin":
+                self.destinations[parts[1]] = parts[2]
+                
+        # Fallback to initial state in case some planners keep 'destin' there instead of in static facts
+        for fact in task.initial_state:
+            parts = get_parts(fact)
+            if parts[0] == "destin" and parts[1] not in self.destinations:
+                self.destinations[parts[1]] = parts[2]
+
+    def __call__(self, node):
+        """
+        Compute an estimate of the minimum number of required actions to serve all passengers.
+        """
+        state = node.state
+        
+        waiting_passengers = {}
+        boarded_passengers = set()
+        lift_at = None
+        
+        # Parse the current state facts
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == "origin":
+                waiting_passengers[parts[1]] = parts[2]
+            elif parts[0] == "boarded":
+                boarded_passengers.add(parts[1])
+            elif parts[0] == "lift-at":
+                lift_at = parts[1]
+                
+        # If no passengers are waiting or boarded, all passengers must be served (Goal State)
+        if not waiting_passengers and not boarded_passengers:
+            return 0
+            
+        actions = 0
+        origin_floors = set()
+        dest_floors = set()
+        active_origins = set()
+        active_dests = set()
+        
+        # Process waiting passengers that still need to board and depart
+        for p, orig_floor in waiting_passengers.items():
+            actions += 2
+            origin_floors.add(orig_floor)
+            active_origins.add(orig_floor)
+            dest = self.destinations.get(p)
+            if dest:
+                dest_floors.add(dest)
+                
+        # Process passengers currently in the elevator that only need to depart
+        for p in boarded_passengers:
+            actions += 1
+            dest = self.destinations.get(p)
+            if dest:
+                dest_floors.add(dest)
+                active_dests.add(dest)
+                
+        # Calculate minimum required lift movements
+        floors_to_visit = origin_floors | dest_floors
+        moves = len(floors_to_visit)
+        
+        # If the lift is currently positioned at a floor where an immediate useful 
+        # action (board or depart) can take place, it saves us one initial move.
+        if lift_at in active_origins or lift_at in active_dests:
+            moves = max(0, moves - 1)
+            
+        return actions + moves
+```

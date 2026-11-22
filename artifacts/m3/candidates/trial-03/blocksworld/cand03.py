@@ -1,0 +1,199 @@
+from heuristics.heuristic_base import Heuristic
+
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Blocksworld domain.
+
+    # Summary
+    Estimates the number of actions required to reach the goal state by calculating 
+    the number of misplaced blocks and detecting dependency cycles (deadlocks) 
+    that necessitate temporary drops to the table.
+
+    # Assumptions
+    - Standard Blocksworld rules: one arm, blocks can be stacked on other blocks or the table.
+    - Moving a block generally takes 2 actions (unstack/pickup + putdown/stack).
+    - Moving a block that is already held takes 1 action.
+    - If a block must be moved but its target position is not ready (due to a dependency cycle), 
+      it requires a temporary drop to the table, adding 2 actions to the cost.
+    - The table has infinite capacity.
+
+    # Heuristic Initialization
+    - Parses the goals to establish each block's target support (`goal_on`), 
+      blocks that must be clear (`goal_clear`), and hand status (`goal_holding`).
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to find the physical support of each block (`current_on`).
+    2. Identify well-placed blocks from the bottom up. A block is well-placed if:
+       - It is currently on its correct goal support (or correctly on the table).
+       - Its current support is also well-placed.
+       - It does not violate any `clear` goals for its support.
+       - It is not occupying a block that is exclusively needed as the goal support of another block.
+    3. Blocks that are not well-placed are considered "misplaced".
+    4. For each misplaced block, determine its target support. If no explicit goal exists, 
+       its target defaults to the table since it only needs to be moved out of the way.
+    5. Calculate base cost for each misplaced block:
+       - 1 action if it is currently held and its target is ready or is the table.
+       - 3 actions if it is currently held but its target requires dropping it first to free the arm.
+       - 2 actions if it is not currently held.
+    6. Detect dependency cycles: Build a future placement chain for the block's target. 
+       If a misplaced block is currently resting above any block in its target's future chain, 
+       it cannot be placed directly. It must be temporarily dropped to the table to break the cycle, 
+       adding 2 actions to the cost.
+    """
+
+    def __init__(self, task):
+        self.goal_on = {}
+        self.goal_clear = set()
+        
+        for goal in task.goals:
+            parts = get_parts(goal)
+            pred = parts[0]
+            if pred == 'on':
+                self.goal_on[parts[1]] = parts[2]
+            elif pred == 'on-table':
+                self.goal_on[parts[1]] = 'table'
+            elif pred == 'clear':
+                self.goal_clear.add(parts[1])
+            elif pred == 'holding':
+                self.goal_on[parts[1]] = 'held'
+
+    def __call__(self, node):
+        state = node.state
+        
+        current_on = {}
+        blocks = set()
+        
+        # 1. Parse the current state
+        for fact in state:
+            parts = get_parts(fact)
+            pred = parts[0]
+            if pred == 'on':
+                current_on[parts[1]] = parts[2]
+                blocks.add(parts[1])
+                blocks.add(parts[2])
+            elif pred == 'on-table':
+                current_on[parts[1]] = 'table'
+                blocks.add(parts[1])
+            elif pred == 'holding':
+                current_on[parts[1]] = 'held'
+                blocks.add(parts[1])
+                
+        # 2. Identify well-placed blocks
+        well_placed = set()
+        changed = True
+        while changed:
+            changed = False
+            for x in blocks:
+                if x in well_placed:
+                    continue
+                
+                is_wp = False
+                supp = current_on.get(x)
+                
+                if supp == 'table':
+                    if self.goal_on.get(x, 'table') == 'table':
+                        is_wp = True
+                elif supp == 'held':
+                    if self.goal_on.get(x) == 'held':
+                        is_wp = True
+                elif supp is not None:
+                    # If its support is a well-placed block
+                    if supp in well_placed:
+                        # Checks if it perfectly satisfies goal alignment
+                        if self.goal_on.get(x, supp) == supp:
+                            # Verify the support isn't strictly required to be clear
+                            if supp not in self.goal_clear:
+                                conflict = False
+                                for z, targ in self.goal_on.items():
+                                    if targ == supp and z != x:
+                                        conflict = True
+                                        break
+                                if not conflict:
+                                    is_wp = True
+                
+                if is_wp:
+                    well_placed.add(x)
+                    changed = True
+                    
+        def get_target(b):
+            """Determines the ultimate destination of a block b."""
+            if b in self.goal_on:
+                return self.goal_on[b]
+            if b in well_placed:
+                return current_on.get(b, 'table')
+            return 'table'
+            
+        def get_future_chain(b):
+            """Builds the chain of supports that must be placed before b can be placed."""
+            chain = set()
+            curr = b
+            while curr not in chain:
+                chain.add(curr)
+                if curr in ('table', 'held'):
+                    break
+                curr = get_target(curr)
+            return chain
+
+        above_cache = {}
+        def is_above(a, b, visited=None):
+            """Checks if block a is currently physically supported (directly or indirectly) by b."""
+            if visited is None:
+                visited = set()
+            if (a, b) in above_cache:
+                return above_cache[(a, b)]
+            if a in visited:
+                return False
+            visited.add(a)
+            
+            curr = current_on.get(a)
+            if curr == b:
+                ans = True
+            elif curr in (None, 'table', 'held'):
+                ans = False
+            else:
+                ans = is_above(curr, b, visited)
+            above_cache[(a, b)] = ans
+            return ans
+
+        # 3. Process misplaced blocks and compute cost
+        cost = 0
+        misplaced = blocks - well_placed
+        
+        for x in misplaced:
+            supp = current_on.get(x)
+            targ = get_target(x)
+            
+            if supp == 'held':
+                if targ == 'table':
+                    cost += 1
+                elif targ == 'held':
+                    pass  # x would be well_placed if it is held and target is held
+                else:
+                    # If target is ready and free of misplaced blocks, stack directly. Otherwise drop first.
+                    if targ in well_placed and not any(is_above(z, targ) for z in misplaced):
+                        cost += 1
+                    else:
+                        cost += 3
+            else:
+                if targ == 'held':
+                    # If block needs to be held eventually, verify if we can pick it up and keep it.
+                    if any(is_above(x, z) for z in misplaced if z != x):
+                        cost += 3  # Must be moved out of the way first.
+                    else:
+                        cost += 1
+                else:
+                    c = 2  # Standard unstack + stack cost
+                    if targ not in ('table', 'held'):
+                        fc = get_future_chain(targ)
+                        # Check for dependency cycle: x needs to move out of the way to place something in its own future chain.
+                        if any(is_above(x, v) for v in fc if v not in ('table', 'held')):
+                            c += 2  # Temporary drop penalty
+                    cost += c
+                    
+        return cost
