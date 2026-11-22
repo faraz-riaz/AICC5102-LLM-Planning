@@ -417,3 +417,57 @@ profile). Convert for analysis with `convert_runner_records.py --batches m3-`.
 **Limitations to note.** 60 s / 4 GiB; 10 Transport hard tasks cannot even be
 grounded in 60 s; hmax is a lower bound, not h*; references exist for 17 easy
 tasks only.
+
+## 7. Final configuration: 8-worker rerun (2026-11-22)
+
+To run every member's experiments under identical conditions, the M1/M2 matrix
+was rerun with **8 workers** on the same machine, alongside Ranem's M3 test
+runs. Settings: 60 s / 4096 MiB, per-task hash seeds, code commit `69b990e`
+(clean tree). Ranem's runs executed byte-identical code at her commit `155b341`.
+**The 8-worker results are the consistent set to use in the paper.** The
+3-worker results (§3, tags `m2-official`, `m2-final-*`, `m1-r1r2`) are kept as
+history and are not overwritten.
+
+| Set | Batches | Runs | Location |
+|---|---|---:|---|
+| M2 search matrix (A*, WA* 1.5/2.0, IDA* easy × DeepSeek-R1/hmax) | `w8-m2-*` | 600 | `main` |
+| GBFS baselines (DeepSeek-R1, hmax, hFF) = R1/R2 inputs | `w8-gbfs-*` | 270 | `main` |
+| M3 trial heuristics (9 frozen × GBFS, A*, WA* 1.5/2, IDA* easy) | `m3-*` | 1,170 | branch `feature/ranem-heuristics` (commit `102ea68`), plus `results/derived/pre-experiment-v2/m3/m3_trial_runs.csv` |
+
+**Checks.**
+- Completeness: 600/600 and 270/270, 0 missing, 0 duplicates.
+- All 387 successful plans independently re-validated.
+- 0 schema violations, every run on its task seed.
+- Audit: 0 guarantee violations, 0 negative gaps.
+
+**Coverage (of 90; IDA* of 30 easy).**
+
+| Heuristic | GBFS | A* | WA* 1.5 | WA* 2.0 | IDA* |
+|---|---:|---:|---:|---:|---:|
+| DeepSeek-R1 | 62 | 63 | 67 | 67 | 23 |
+| hmax | 19 | 13 | 14 | 15 | 7 |
+| hFF | 37 | — | — | — | — |
+
+There are 14 fewer solves in total than with 3 workers: runs close to 60 s
+slow down under heavier parallel load. Rankings are unchanged.
+
+**R1** (LLM/hFF coverage ratio, ours vs the paper's): Blocksworld 2.86 vs 2.75,
+Miconic 1.35 vs 1.22, Transport 1.50 vs 2.03.
+
+**R4 gaps** (17 easy tasks with proven L*):
+
+| Heuristic | Method | Mean gap |
+|---|---|---:|
+| DeepSeek-R1 | A* | 2.79 % |
+| DeepSeek-R1 | WA* 1.5 / 2.0 | 2.79 % |
+| DeepSeek-R1 | GBFS | 3.31 % |
+| DeepSeek-R1 | IDA* | 21.8 % |
+| hmax | A* / WA* 1.5 / IDA* | 0 % |
+| hmax | WA* 2.0 | 1.62 % |
+| hmax | GBFS | 6.03 % |
+| hFF | GBFS | 11.98 % (max 75 %) |
+
+**Outputs.**
+- `results/derived/pre-experiment-v2/w8-official/`: completeness, `search_runs.csv`, paired analysis, audit.
+- `results/derived|figures/pre-experiment-v2/w8-final-all90/` and `w8-final-easy30/`: R3/R4/R5.
+- `results/derived/pre-experiment-v2/w8-m1-r1r2/` and `results/figures/pre-experiment-v2/w8-m1-r1r2/coverage.png`: R1/R2, made with Amina's `summarize_results.py`, unchanged.

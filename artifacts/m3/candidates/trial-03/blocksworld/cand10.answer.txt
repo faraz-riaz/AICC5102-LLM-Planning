@@ -1,0 +1,232 @@
+```python
+import copy
+from fnmatch import fnmatch
+from heuristics.heuristic_base import Heuristic
+
+def get_parts(fact):
+    """
+    Extract the components of a PDDL fact by removing parentheses and splitting the string.
+    - `fact`: The complete fact as a string, e.g., "(on b1 b2)".
+    - Returns a list of strings, e.g., ["on", "b1", "b2"].
+    """
+    return fact[1:-1].split()
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+
+    # Summary
+    This heuristic estimates the minimum number of actions required to transform the current 
+    state into the goal state. It does this by identifying which blocks are already in their 
+    final goal position ("well-placed") and calculating the cost to move the misplaced blocks.
+
+    # Assumptions
+    - Every block not in its goal position must be moved at least once.
+    - Moving a block that is not currently held involves an `unstack`/`pickup` and a `stack`/`putdown`, requiring exactly 2 actions.
+    - If a block is currently held, it requires only 1 action to be placed.
+    - Blocks involved in circular dependencies (deadlocks) require an additional move to the table to break the cycle, which adds 2 actions per cycle.
+    - The table has infinite capacity, so blocks can always be put down on the table.
+
+    # Heuristic Initialization
+    - Extract the goal facts to identify target positions for each block (`target_on`) and blocks that must remain clear (`goal_clear`).
+    - Gather a set of all known blocks.
+    - Extract any static facts (though standard blocksworld lacks static facts, this fulfills architectural requirements).
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Identify the current configuration of the blocks from the state facts (what is on what, and what is being held).
+    2. Determine which blocks are "well-placed." A block is well-placed if:
+        a. It is on the table and its goal is to be on the table (or no goal is specified).
+        b. It is on another well-placed block `C`, and its goal is to be on `C`.
+        c. It is on another well-placed block `C`, it has no specific goal, and no other block needs to be on `C`, nor does `C` need to be clear.
+    3. All blocks that are not well-placed belong to a set `U` (unplaced blocks).
+    4. If `U` is empty, the goal is reached, so the heuristic returns 0.
+    5. Assign a base cost: 2 actions for each block in `U` (1 action for the currently held block, if any).
+    6. Build a dependency graph among blocks in `U` to detect deadlocks (cycles):
+        a. State edge: If `X` is on `Y` and `Y` is in `U`, `X` must move before `Y`. Add edge `X -> Y`.
+        b. Goal edge: If `X`'s target is `T` and `T` is in `U`, `T` must be placed before `X`. Add edge `T -> X`.
+        c. Goal edge (blocked target): If `X`'s target `T` is well-placed, but there is a block `D` currently on `T` (which must be in `U`), `D` must move before `X` can be placed. Add edge `D -> X`.
+    7. Check if the currently held block (if any) cannot be placed on its target because its target is not ready (either in `U` or blocked by a block in `U`). If so, it must be temporarily put on the table, adding an extra 2 actions.
+    8. Find and break all cycles in the dependency graph using Depth First Search. Each cycle requires moving one block to the table temporarily, adding an extra 2 actions to the total cost.
+    9. Return the final accumulated cost.
+    """
+
+    def __init__(self, task):
+        """Initialize the heuristic by extracting goal conditions and static facts."""
+        self.goals = task.goals
+        self.static_facts = task.static
+
+        self.target_on = {}
+        self.goal_clear = {}
+        self.all_blocks = set()
+
+        for goal in self.goals:
+            parts = get_parts(goal)
+            if parts[0] == 'on':
+                self.target_on[parts[1]] = parts[2]
+                self.all_blocks.add(parts[1])
+                self.all_blocks.add(parts[2])
+            elif parts[0] == 'on-table':
+                self.target_on[parts[1]] = 'table'
+                self.all_blocks.add(parts[1])
+            elif parts[0] == 'clear':
+                self.goal_clear[parts[1]] = True
+                self.all_blocks.add(parts[1])
+
+    def __call__(self, node):
+        """Estimate the minimum cost to place all remaining blocks in their goal positions."""
+        state = node.state
+        current_on = {}
+        held_block = None
+        all_blocks = set(self.all_blocks)
+        
+        # 1. Parse current state configuration
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == 'on':
+                current_on[parts[1]] = parts[2]
+                all_blocks.add(parts[1])
+                all_blocks.add(parts[2])
+            elif parts[0] == 'on-table':
+                current_on[parts[1]] = 'table'
+                all_blocks.add(parts[1])
+            elif parts[0] == 'holding':
+                held_block = parts[1]
+                current_on[parts[1]] = 'held'
+                all_blocks.add(parts[1])
+
+        # 2. Iteratively identify well-placed blocks
+        well_placed = set()
+        changed = True
+        while changed:
+            changed = False
+            for b in all_blocks:
+                if b in well_placed or b == held_block:
+                    continue
+                
+                pos = current_on.get(b)
+                if pos == 'table':
+                    t_on = self.target_on.get(b)
+                    if t_on in ('table', None):
+                        well_placed.add(b)
+                        changed = True
+                elif pos in well_placed:
+                    c = pos
+                    t_on = self.target_on.get(b)
+                    if t_on == c:
+                        well_placed.add(b)
+                        changed = True
+                    elif t_on is None:
+                        # Ensure no conflict with goal expectations
+                        if self.goal_clear.get(c, False):
+                            continue
+                        conflict = False
+                        for other, other_target in self.target_on.items():
+                            if other_target == c and other != b:
+                                conflict = True
+                                break
+                        if not conflict:
+                            well_placed.add(b)
+                            changed = True
+
+        # 3. Formulate the Unplaced set U
+        U = all_blocks - well_placed
+
+        # 4. If nothing is unplaced, goal is completely satisfied
+        if not U:
+            return 0
+        
+        # 5. Base cost calculations
+        cost = 0
+        for u in U:
+            if u == held_block:
+                cost += 1
+            else:
+                cost += 2
+                
+        def get_block_on(t):
+            """Helper to find what block is immediately resting on top of `t`"""
+            for b, pos in current_on.items():
+                if pos == t:
+                    return b
+            return None
+
+        # 6. Build the deadlock dependency graph
+        graph = {u: set() for u in U}
+        for x in U:
+            if x == held_block:
+                continue
+            
+            # State edge
+            y = current_on.get(x)
+            if y in U:
+                graph[x].add(y)
+                
+            # Goal edge
+            t = self.target_on.get(x)
+            if t and t != 'table':
+                if t in U:
+                    graph[t].add(x)
+                else:
+                    d = get_block_on(t)
+                    if d and d in U:
+                        graph[d].add(x)
+                        
+        # 7. Add extra cost if the held block's target isn't readily available
+        if held_block:
+            t = self.target_on.get(held_block)
+            if t and t != 'table':
+                if t in U:
+                    cost += 2
+                else:
+                    d = get_block_on(t)
+                    if d and d in U:
+                        cost += 2
+
+        # 8. Traverse the graph to find and break all cycle deadlocks
+        g = copy.deepcopy(graph)
+        cycle_count = 0
+        while True:
+            cycle = None
+            visited = set()
+            for node_x in g:
+                if node_x in visited:
+                    continue
+                curr_path = []
+                curr_set = set()
+                
+                def dfs(n):
+                    nonlocal cycle
+                    if cycle: return
+                    curr_path.append(n)
+                    curr_set.add(n)
+                    visited.add(n)
+                    for neighbor in g.get(n, []):
+                        if neighbor in curr_set:
+                            idx = curr_path.index(neighbor)
+                            cycle = curr_path[idx:]
+                            return
+                        if neighbor not in visited:
+                            dfs(neighbor)
+                    curr_path.pop()
+                    curr_set.remove(n)
+                
+                dfs(node_x)
+                if cycle:
+                    break
+            
+            if not cycle:
+                break
+                
+            cycle_count += 1
+            
+            # Determine best cycle break node utilizing simple highest degree heuristic 
+            remove_node = max(cycle, key=lambda n: len(g[n]) + sum(1 for v in g.values() if n in v))
+            
+            del g[remove_node]
+            for v in g.values():
+                v.discard(remove_node)
+                
+        # 9. Augment total cost according to deadlocks encountered
+        cost += cycle_count * 2
+        return cost
+```

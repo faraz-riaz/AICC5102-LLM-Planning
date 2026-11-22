@@ -1,0 +1,133 @@
+{
+  "protocol_id": "m3-r6-states-v1",
+  "created": "2026-11-22T03:44:19Z",
+  "rule": "per task: the initial state plus STATES_PER_TASK distinct states, each the end of a random walk from the initial state; walk length uniform in 1..L*; at each step a uniformly random applicable operator (operators sorted by name); a walk that repeats a kept state is discarded; seeded per task",
+  "states_per_task": 20,
+  "base_seed": 5102,
+  "seed_string": "<base_seed>:<protocol_id>:<domain>:<problem_id>",
+  "task_source": "results/raw/faraz_optimal_refs.csv rows with optimality_proven == True",
+  "tasks": [
+    {
+      "domain": "blocksworld",
+      "problem_id": "easy-p03",
+      "optimal_cost": 20,
+      "states": 21,
+      "attempts": 67
+    },
+    {
+      "domain": "blocksworld",
+      "problem_id": "easy-p04",
+      "optimal_cost": 24,
+      "states": 21,
+      "attempts": 59
+    },
+    {
+      "domain": "miconic",
+      "problem_id": "easy-p02",
+      "optimal_cost": 4,
+      "states": 9,
+      "attempts": 2000
+    },
+    {
+      "domain": "miconic",
+      "problem_id": "easy-p07",
+      "optimal_cost": 10,
+      "states": 21,
+      "attempts": 86
+    },
+    {
+      "domain": "miconic",
+      "problem_id": "easy-p08",
+      "optimal_cost": 11,
+      "states": 21,
+      "attempts": 85
+    },
+    {
+      "domain": "miconic",
+      "problem_id": "easy-p09",
+      "optimal_cost": 10,
+      "states": 21,
+      "attempts": 86
+    },
+    {
+      "domain": "miconic",
+      "problem_id": "easy-p11",
+      "optimal_cost": 13,
+      "states": 21,
+      "attempts": 72
+    },
+    {
+      "domain": "miconic",
+      "problem_id": "easy-p14",
+      "optimal_cost": 17,
+      "states": 21,
+      "attempts": 42
+    },
+    {
+      "domain": "miconic",
+      "problem_id": "easy-p17",
+      "optimal_cost": 20,
+      "states": 21,
+      "attempts": 36
+    },
+    {
+      "domain": "miconic",
+      "problem_id": "easy-p23",
+      "optimal_cost": 26,
+      "states": 21,
+      "attempts": 23
+    },
+    {
+      "domain": "miconic",
+      "problem_id": "easy-p25",
+      "optimal_cost": 28,
+      "states": 21,
+      "attempts": 31
+    },
+    {
+      "domain": "miconic",
+      "problem_id": "easy-p27",
+      "optimal_cost": 31,
+      "states": 21,
+      "attempts": 36
+    },
+    {
+      "domain": "transport",
+      "problem_id": "easy-p01",
+      "optimal_cost": 3,
+      "states": 21,
+      "attempts": 54
+    },
+    {
+      "domain": "transport",
+      "problem_id": "easy-p03",
+      "optimal_cost": 6,
+      "states": 21,
+      "attempts": 23
+    },
+    {
+      "domain": "transport",
+      "problem_id": "easy-p06",
+      "optimal_cost": 13,
+      "states": 21,
+      "attempts": 22
+    },
+    {
+      "domain": "transport",
+      "problem_id": "easy-p07",
+      "optimal_cost": 14,
+      "states": 21,
+      "attempts": 21
+    },
+    {
+      "domain": "transport",
+      "problem_id": "easy-p08",
+      "optimal_cost": 15,
+      "states": 21,
+      "attempts": 20
+    }
+  ],
+  "total_states": 345,
+  "inventory": "results/raw/m3/frozen_state_inventory.jsonl",
+  "inventory_sha256": "b00e03d9fd4d082a88db68d7790afc632a2f391fff7972cd511c71be72365a8b"
+}

@@ -1,0 +1,247 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+
+    # Summary
+    This heuristic computes a highly accurate estimate of the minimum number of actions required
+    to reach a goal state. It does this by evaluating which blocks are already correctly placed 
+    and identifying cyclic dependencies among improperly placed blocks that force extra movements to the table.
+
+    # Assumptions
+    - Each block can only be on one other block, on the table, or held by the arm.
+    - An action takes exactly 1 cost (pickup/putdown/stack/unstack).
+    - Unstacking a block and placing it on its final correct location takes 2 actions.
+    - Deadlocks (cycles of dependencies) require putting a block temporarily on the table, which costs an additional 2 actions.
+
+    # Heuristic Initialization
+    - Extract from the goals the target support for each block (`goal_on`), which blocks must 
+      be clear (`goal_clear`), what block must be held (`goal_holding`), and whether the arm must be empty.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Reconstruct the current physical state, mapping each block to its support (`state_on`) and keeping track of all blocks above it (`above`).
+    2. Determine "good blocks" (blocks that are already in their final position and don't need to be moved).
+       - Base cases are blocks on the table that satisfy their goal conditions.
+       - A block on top of a good block is also good if it satisfies its goal conditions, the supporting block does not need to be clear, and no other block belongs on the supporting block.
+    3. Any block not in the "good blocks" set is a "bad block". Each bad block requires a base cost of 2 actions to be moved (e.g., unstack and stack).
+       - Subtract 1 if the block is currently held (it only needs 1 action to be placed).
+       - Subtract 1 if the block's final goal state is to be held.
+    4. Build a dependency graph among bad blocks to detect deadlocks.
+       - A directed edge U -> V means U must move before V can be finally placed.
+       - U -> V is added if U is V's target, U is currently above V's target, or U is currently above V.
+    5. Resolve cycles in the dependency graph.
+       - Any self-loop (U -> U) indicates a direct physical deadlock, meaning U MUST be temporarily placed on the table, costing +2 actions.
+       - Find Strongly Connected Components (SCCs) in the remaining graph using an iterative Tarjan's algorithm. 
+       - Every cycle (SCC of size >= 2) requires at least one block to go to the table, adding +2 actions.
+    6. Return the total computed cost.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        self.goal_on = {}
+        self.goal_clear = set()
+        self.goal_holding = None
+        self.goal_arm_empty = False
+        
+        for g in self.goals:
+            parts = get_parts(g)
+            pred = parts[0]
+            if pred == 'on':
+                self.goal_on[parts[1]] = parts[2]
+            elif pred == 'on-table':
+                self.goal_on[parts[1]] = 'table'
+            elif pred == 'clear':
+                self.goal_clear.add(parts[1])
+            elif pred == 'holding':
+                self.goal_holding = parts[1]
+            elif pred == 'arm-empty':
+                self.goal_arm_empty = True
+
+    def __call__(self, node):
+        state = node.state
+        state_on = {}
+        state_holding = None
+        blocks = set()
+
+        # Parse current state
+        for f in state:
+            parts = get_parts(f)
+            pred = parts[0]
+            if pred == 'on':
+                state_on[parts[1]] = parts[2]
+                blocks.add(parts[1])
+                blocks.add(parts[2])
+            elif pred == 'on-table':
+                state_on[parts[1]] = 'table'
+                blocks.add(parts[1])
+            elif pred == 'holding':
+                state_holding = parts[1]
+                state_on[parts[1]] = 'holding'
+                blocks.add(parts[1])
+            elif pred == 'clear':
+                blocks.add(parts[1])
+
+        good_blocks = set()
+
+        # Base good blocks (blocks correctly on the table or correctly held)
+        for b in blocks:
+            if state_on.get(b) == 'table':
+                if self.goal_holding == b:
+                    continue
+                if self.goal_on.get(b, 'table') == 'table': 
+                    good_blocks.add(b)
+            elif state_on.get(b) == 'holding':
+                if self.goal_holding == b:
+                    good_blocks.add(b)
+
+        # Iteratively add good blocks on top of already established good blocks
+        while True:
+            added = False
+            for b in blocks:
+                if b not in good_blocks and state_on.get(b) in good_blocks:
+                    if self.goal_holding == b:
+                        continue
+                    
+                    y = state_on[b]
+                    goal_b = self.goal_on.get(b)
+                    
+                    # Target must be correct
+                    if goal_b not in (None, y):
+                        continue
+                    # Underlying block must not be required to be clear
+                    if y in self.goal_clear:
+                        continue
+                    
+                    # No other block must have a goal to be on y
+                    another_wants_y = False
+                    for d, target in self.goal_on.items():
+                        if target == y and d != b:
+                            another_wants_y = True
+                            break
+                    if another_wants_y:
+                        continue
+                    
+                    good_blocks.add(b)
+                    added = True
+            if not added:
+                break
+
+        bad_blocks = blocks - good_blocks
+        if not bad_blocks:
+            return 0
+
+        # Base cost estimation
+        cost = 2 * len(bad_blocks)
+        if state_holding in bad_blocks:
+            cost -= 1
+        if self.goal_holding in bad_blocks:
+            cost -= 1
+
+        # Track what is directly above each block
+        on_top = {}
+        for b, under in state_on.items():
+            if under not in ('table', 'holding', None):
+                on_top[under] = b
+
+        # Build sets of all blocks strictly above a specific block
+        above = {b: set() for b in blocks}
+        for b in blocks:
+            curr = on_top.get(b)
+            while curr is not None:
+                above[b].add(curr)
+                curr = on_top.get(curr)
+
+        # Build dependency graph between bad blocks
+        # U -> V indicates that U must move before V can be finally placed
+        adj = {b: set() for b in bad_blocks}
+        for v in bad_blocks:
+            target = self.goal_on.get(v)
+            if target in bad_blocks:
+                adj[target].add(v)
+            if target in blocks:
+                for u in above.get(target, []):
+                    if u in bad_blocks:
+                        adj[u].add(v)
+            for u in above.get(v, []):
+                if u in bad_blocks:
+                    adj[u].add(v)
+
+        extra_table_moves = 0
+        remaining_nodes = set(bad_blocks)
+
+        # Handle direct self-loops (immediate deadlock, block must go to table)
+        for v in list(remaining_nodes):
+            if v in adj[v]:
+                extra_table_moves += 1
+                remaining_nodes.remove(v)
+
+        # Find cycles in the remaining dependency graph using iterative Tarjan's SCC algorithm
+        if remaining_nodes:
+            adj_rem = {v: set() for v in remaining_nodes}
+            for v in remaining_nodes:
+                for u in adj[v]:
+                    if u in remaining_nodes:
+                        adj_rem[v].add(u)
+
+            index = 0
+            indices = {}
+            lowlink = {}
+            on_stack = set()
+            stack = []
+            sccs = []
+
+            for v in remaining_nodes:
+                if v not in indices:
+                    call_stack = [(v, iter(adj_rem[v]))]
+                    indices[v] = index
+                    lowlink[v] = index
+                    index += 1
+                    stack.append(v)
+                    on_stack.add(v)
+
+                    while call_stack:
+                        curr, neighbors = call_stack[-1]
+                        try:
+                            w = next(neighbors)
+                            if w not in indices:
+                                indices[w] = index
+                                lowlink[w] = index
+                                index += 1
+                                stack.append(w)
+                                on_stack.add(w)
+                                call_stack.append((w, iter(adj_rem[w])))
+                            elif w in on_stack:
+                                lowlink[curr] = min(lowlink[curr], indices[w])
+                        except StopIteration:
+                            call_stack.pop()
+                            if call_stack:
+                                prev, _ = call_stack[-1]
+                                lowlink[prev] = min(lowlink[prev], lowlink[curr])
+
+                            if lowlink[curr] == indices[curr]:
+                                scc = []
+                                while True:
+                                    w = stack.pop()
+                                    on_stack.remove(w)
+                                    scc.append(w)
+                                    if w == curr:
+                                        break
+                                sccs.append(scc)
+
+            # Each multi-node strongly connected component needs at least one extra table move to resolve
+            for scc in sccs:
+                if len(scc) >= 2:
+                    extra_table_moves += 1
+
+        cost += 2 * extra_table_moves
+        
+        return cost
+```

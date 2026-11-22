@@ -1,0 +1,162 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+
+    # Summary
+    This heuristic computes the number of necessary actions to reach the goal configuration. 
+    It calculates which blocks are currently in a wrong position (i.e., "must move") and assigns 
+    an appropriate cost based on the sequence of actions required.
+
+    # Assumptions
+    - All blocks are either on the table, on another block, or held by the arm.
+    - Only one block can be moved at a time.
+    - The goal states a partial or complete specification of block positions (on another block or on the table) and clearances.
+    - An arm-empty goal is naturally satisfied when there are no held blocks.
+
+    # Heuristic Initialization
+    - The target support for each block is extracted from the `on` and `on-table` goal predicates.
+    - The `clear` goal predicates are stored to know which blocks must not have any blocks on them.
+    - A mapping from support block to the block that should be on it (`goal_has_support`) is created to easily check if a block's current support expects a different block or needs to be clear.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Extract current state information: support of each block (`curr_on`), which block is held (`curr_held`), and which blocks are clear (`curr_clear`).
+    2. Identify all blocks in the domain from these facts.
+    3. Determine which blocks "must move" using a bottom-up evaluation:
+       - A block held by the arm must move.
+       - A block on the table must move if its goal support is specified and is not the table.
+       - A block on another block `sup` must move if:
+         - `sup` itself must move.
+         - Its goal support is specified and is not `sup`.
+         - `sup` is expected by the goal to support a different block, or `sup` is expected to be clear.
+    4. Calculate the cost for each block that must move:
+       - Base cost for a block that must move is 2 (e.g., unstack/pickup + putdown/stack).
+       - If the block is currently held, its base cost is 1, since it only needs to be placed. However, if its target support is another block that is not ready (needs to move or is not clear), it must be temporarily dropped on the table, increasing its cost to 3.
+       - If a block is not held, must move, and its target support is a block, we check if it is currently situated above its target support. If so, it must be temporarily moved to the table to uncover its target, adding 2 to the cost (total 4 actions).
+    5. The sum of these costs provides a highly accurate estimate of the minimum number of remaining actions to reach the goal.
+    """
+
+    def __init__(self, task):
+        self.goal_on = {}
+        self.goal_clear = set()
+        
+        for goal in task.goals:
+            # Extract objects without brackets
+            parts = goal[1:-1].split()
+            if parts[0] == 'on':
+                self.goal_on[parts[1]] = parts[2]
+            elif parts[0] == 'on-table':
+                self.goal_on[parts[1]] = 'table'
+            elif parts[0] == 'clear':
+                self.goal_clear.add(parts[1])
+                
+        self.goal_has_support = {}
+        for b, sup in self.goal_on.items():
+            if sup != 'table':
+                self.goal_has_support[sup] = b
+        for b in self.goal_clear:
+            self.goal_has_support[b] = 'CLEAR'
+
+    def __call__(self, node):
+        state = node.state
+        
+        curr_on = {}
+        curr_held = None
+        curr_clear = set()
+        all_blocks = set()
+        
+        # 1. & 2. Extract current state and identify all blocks
+        for fact in state:
+            parts = fact[1:-1].split()
+            if parts[0] == 'on':
+                curr_on[parts[1]] = parts[2]
+                all_blocks.add(parts[1])
+                all_blocks.add(parts[2])
+            elif parts[0] == 'on-table':
+                curr_on[parts[1]] = 'table'
+                all_blocks.add(parts[1])
+            elif parts[0] == 'holding':
+                curr_held = parts[1]
+                all_blocks.add(parts[1])
+            elif parts[0] == 'clear':
+                curr_clear.add(parts[1])
+                all_blocks.add(parts[1])
+                
+        must_move = {b: False for b in all_blocks}
+        evaluated = set()
+        
+        # 3. Determine which blocks must move
+        if curr_held:
+            must_move[curr_held] = True
+            evaluated.add(curr_held)
+            
+        # Evaluate blocks currently on the table
+        for b in all_blocks:
+            if curr_on.get(b) == 'table':
+                if self.goal_on.get(b) is not None and self.goal_on.get(b) != 'table':
+                    must_move[b] = True
+                else:
+                    must_move[b] = False
+                evaluated.add(b)
+                
+        # Evaluate remaining blocks bottom-up
+        while len(evaluated) < len(all_blocks):
+            added = False
+            for b in all_blocks:
+                if b not in evaluated:
+                    sup = curr_on.get(b)
+                    if sup in evaluated:
+                        if must_move[sup]:
+                            must_move[b] = True
+                        elif self.goal_on.get(b) is not None and self.goal_on.get(b) != sup:
+                            must_move[b] = True
+                        elif sup in self.goal_has_support and self.goal_has_support[sup] != b:
+                            must_move[b] = True
+                        else:
+                            must_move[b] = False
+                        evaluated.add(b)
+                        added = True
+            if not added:
+                # Fallback to prevent infinite loops in malformed states
+                for b in all_blocks:
+                    if b not in evaluated:
+                        must_move[b] = True
+                        evaluated.add(b)
+                        
+        def is_above(top, bottom):
+            """Check if the 'top' block is placed anywhere above the 'bottom' block."""
+            curr = curr_on.get(top)
+            while curr is not None and curr != 'table':
+                if curr == bottom:
+                    return True
+                curr = curr_on.get(curr)
+            return False
+
+        # 4. Calculate the cost for each block that must move
+        cost = 0
+        for b in all_blocks:
+            if must_move[b]:
+                if b == curr_held:
+                    sup = self.goal_on.get(b)
+                    if sup is not None and sup != 'table':
+                        # If target is another block, it must be ready and clear to place directly
+                        if must_move.get(sup, False) or sup not in curr_clear:
+                            cost += 3
+                        else:
+                            cost += 1
+                    else:
+                        # Target is table or not strictly specified, can place directly
+                        cost += 1
+                else:
+                    cost += 2
+                    sup = self.goal_on.get(b)
+                    if sup is not None and sup != 'table':
+                        # Penalty if a block needs to be placed on a target that is currently under it
+                        if is_above(b, sup):
+                            cost += 2
+                            
+        return cost
+```

@@ -1,0 +1,156 @@
+import collections
+from heuristics.heuristic_base import Heuristic
+
+
+def get_parts(fact):
+    """Extract the components of a PDDL fact by removing parentheses and splitting the string."""
+    return fact[1:-1].split()
+
+
+class transportLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Transport domain.
+
+    # Summary
+    This heuristic estimates the number of actions required to deliver all unreached packages 
+    to their respective goal locations. It uses a weighted distance approach to avoid plateaus 
+    and provide a strict gradient for greedy best-first search.
+
+    # Assumptions
+    - Vehicles travel along roads between locations.
+    - Packages must be picked up, transported by a vehicle, and dropped at the goal location.
+    - Every movement of a vehicle towards a package or a goal should strictly decrease the heuristic.
+
+    # Heuristic Initialization
+    - Parses the goal state to identify the target locations for each package.
+    - Parses the initial state to identify all vehicles (using the `capacity` predicate).
+    - Extracts `road` connectivity from the static facts.
+    - Computes all-pairs shortest paths using Breadth-First Search (BFS) for efficient distance lookup.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Identify Current Locations: Check `node.state` to find the current location of all vehicles 
+       and packages, and identify which packages are currently inside vehicles.
+    2. Check Package Goals: For each package, determine if it has reached its goal location. 
+       If it has, its cost contribution is 0.
+    3. Compute Package Delivery Cost:
+       - If a package is on the ground at location `L`, it needs a vehicle to pick it up, drive to `G`, and drop it.
+         We assign a weighted cost: 4 (for pickup + drop) + 2 * dist(L, G).
+       - If a package is inside a vehicle at location `V_L`, it only needs to be driven to `G` and dropped.
+         We assign a weighted cost: 2 (for drop) + 2 * dist(V_L, G).
+    4. Compute Vehicle Approach Cost:
+       - To guide empty vehicles to packages on the ground, for each location that has at least one 
+         unreached package on the ground, we find the distance to the closest vehicle.
+       - We add 1 * min_vehicle_distance(L) to the total cost.
+       - The weighting (1 for vehicle approach, 2 for package transit) ensures that a vehicle moving 
+         towards its destination with a package decreases the heuristic by 2, while moving away from 
+         other left-behind packages only increases the penalty by 1. This creates a net negative change, 
+         perfectly guiding the search without getting stuck in local minima when vehicles are full.
+    """
+
+    def __init__(self, task):
+        """Initialize the heuristic by extracting goals, vehicles, and computing all-pairs shortest paths."""
+        self.goal_locations = {}
+        for goal in task.goals:
+            parts = get_parts(goal)
+            if parts[0] == "at":
+                self.goal_locations[parts[1]] = parts[2]
+                
+        # Identify vehicles from the initial state using the capacity predicate
+        self.vehicles = set()
+        for fact in task.initial_state:
+            parts = get_parts(fact)
+            if parts[0] == "capacity":
+                self.vehicles.add(parts[1])
+                
+        # Build the road graph from static facts
+        self.roads = collections.defaultdict(list)
+        self.locations = set()
+        for fact in task.static:
+            parts = get_parts(fact)
+            if parts[0] == "road":
+                l1, l2 = parts[1], parts[2]
+                self.roads[l1].append(l2)
+                self.locations.add(l1)
+                self.locations.add(l2)
+                
+        # Compute all-pairs shortest path distances using BFS
+        self.distances = {}
+        for start_loc in self.locations:
+            self.distances[start_loc] = {start_loc: 0}
+            queue = collections.deque([start_loc])
+            while queue:
+                curr = queue.popleft()
+                d = self.distances[start_loc][curr]
+                for nxt in self.roads[curr]:
+                    if nxt not in self.distances[start_loc]:
+                        self.distances[start_loc][nxt] = d + 1
+                        queue.append(nxt)
+
+    def __call__(self, node):
+        """Compute the estimated cost to deliver all remaining packages."""
+        state = node.state
+
+        vehicle_locations = {}
+        package_locations = {}
+        package_in_vehicle = {}
+
+        # Parse current state to locate vehicles and packages
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == "at":
+                obj, loc = parts[1], parts[2]
+                if obj in self.vehicles:
+                    vehicle_locations[obj] = loc
+                else:
+                    package_locations[obj] = loc
+            elif parts[0] == "in":
+                p, v = parts[1], parts[2]
+                package_in_vehicle[p] = v
+                
+        total_cost = 0
+        unreached_package_locations = set()
+
+        for p, goal_loc in self.goal_locations.items():
+            # If the package is already at its goal location, skip it
+            if package_locations.get(p) == goal_loc:
+                continue
+                
+            if p in package_locations:
+                # Package is at some location, not in a vehicle
+                loc = package_locations[p]
+                unreached_package_locations.add(loc)
+                total_cost += 4  # Weight for pick-up (2) and drop (2)
+                
+                d = self.distances.get(loc, {}).get(goal_loc, float('inf'))
+                if d == float('inf'): 
+                    return float('inf')  # Dead-end state
+                total_cost += 2 * d
+                
+            elif p in package_in_vehicle:
+                # Package is currently inside a vehicle
+                v = package_in_vehicle[p]
+                if v in vehicle_locations:
+                    v_loc = vehicle_locations[v]
+                    total_cost += 2  # Weight for drop (2)
+                    
+                    d = self.distances.get(v_loc, {}).get(goal_loc, float('inf'))
+                    if d == float('inf'): 
+                        return float('inf')  # Dead-end state
+                    total_cost += 2 * d
+                else:
+                    return float('inf')  # Vehicle location unknown
+            else:
+                return float('inf')  # Package location unknown
+                
+        # Add penalty for distance from vehicles to unreached package locations
+        for loc in unreached_package_locations:
+            if vehicle_locations:
+                min_v_dist = min((self.distances.get(v_loc, {}).get(loc, float('inf')) 
+                                  for v_loc in vehicle_locations.values()), default=float('inf'))
+                if min_v_dist == float('inf'): 
+                    return float('inf')  # Dead-end state
+                total_cost += min_v_dist
+            else:
+                return float('inf')  # No vehicles available to reach the location
+
+        return total_cost

@@ -1,0 +1,18 @@
+2026-11-22 11:13:13,911 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-22 11:13:13,911 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_okhinw_6\domain.pddl
+2026-11-22 11:13:13,911 INFO     using search: gbfs_early_goal_test
+2026-11-22 11:13:13,911 INFO     using heuristic: hFFHeuristic
+2026-11-22 11:13:13,911 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_okhinw_6\domain.pddl
+2026-11-22 11:13:13,911 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_okhinw_6\medium-p13.pddl
+2026-11-22 11:13:13,927 INFO     5 Predicates parsed
+2026-11-22 11:13:13,927 INFO     3 Actions parsed
+2026-11-22 11:13:13,927 INFO     68 Objects parsed
+2026-11-22 11:13:13,927 INFO     0 Constants parsed
+2026-11-22 11:13:13,927 INFO     Grounding start: transport-13
+2026-11-22 11:13:14,891 INFO     Relevance analysis removed 0 facts
+2026-11-22 11:13:14,907 INFO     Grounding end: transport-13
+2026-11-22 11:13:14,907 INFO     1344 Variables created
+2026-11-22 11:13:14,907 INFO     75208 Operators created
+2026-11-22 11:13:15,240 INFO     Search start: transport-13
+2026-11-22 11:13:15,303 INFO     Initial h value: 69.00
+2026-11-22 11:13:47,103 INFO     Found new best h: 67.00 after 1 expansions

@@ -1,0 +1,142 @@
+```python
+from collections import deque
+from heuristics.heuristic_base import Heuristic
+
+class transportLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Transport domain.
+    
+    # Summary
+    This heuristic estimates the minimum number of actions required to transport 
+    all packages to their respective goal locations, and for any vehicles to reach 
+    their goal locations.
+    
+    # Assumptions
+    - Each package needs to be picked up (1 action), transported across the road 
+      network (1 action per road segment), and dropped at its goal (1 action).
+    - If a package is already in a vehicle, it only needs to be transported and dropped.
+    - If a package is not at its goal and not in a vehicle, a vehicle must first drive 
+      to the package's location. We estimate this by finding the closest vehicle.
+    - Vehicle capacities are relaxed; we assume any vehicle can pick up any package.
+    - We assume the road graph is static and compute all-pairs shortest paths initially.
+    
+    # Heuristic Initialization
+    - Extract all goal locations for all objects (packages or vehicles).
+    - Extract all road connections from the static and initial state facts.
+    - Extract all vehicles by looking for `capacity` facts in the initial state.
+    - Compute the all-pairs shortest path distances between all locations using BFS.
+    
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to find the locations of all objects (`at` facts) 
+       and which packages are inside vehicles (`in` facts).
+    2. Initialize the estimated cost to 0.
+    3. Iterate over each goal condition (object and its target location):
+       a. If the object is inside a vehicle:
+          - Find the vehicle's current location.
+          - Add 1 (for the drop action) plus the shortest path distance from the 
+            vehicle's location to the goal location.
+       b. If the object is at a location (`at` fact):
+          - If the object is already at its goal location, add 0.
+          - If it is not at its goal location:
+            * If the object is a vehicle, add the shortest path distance to its goal.
+            * If the object is a package, add 2 (for pick-up and drop actions) plus 
+              the shortest path distance from its current location to its goal.
+            * Additionally, estimate the cost for a vehicle to reach the package by 
+              finding the minimum shortest path distance from any vehicle's current 
+              location to the package's location, and add this to the total cost.
+    4. Return the total estimated cost. If any required path is unreachable, 
+       float('inf') is added, effectively returning infinity for dead-end states.
+    """
+
+    def __init__(self, task):
+        # Extract goal locations
+        self.goal_locations = {}
+        for fact in task.goals:
+            parts = fact[1:-1].split()
+            if parts[0] == "at":
+                self.goal_locations[parts[1]] = parts[2]
+                
+        self.locations = set()
+        self.roads = {}
+        self.vehicles = set()
+        
+        # Extract static information: roads and vehicles
+        # Both task.static and task.initial_state are checked to ensure no missing facts.
+        for fact in list(task.static) + list(task.initial_state):
+            parts = fact[1:-1].split()
+            if parts[0] == "road":
+                l1, l2 = parts[1], parts[2]
+                if l1 not in self.roads:
+                    self.roads[l1] = []
+                self.roads[l1].append(l2)
+                self.locations.update([l1, l2])
+            elif parts[0] == "capacity":
+                self.vehicles.add(parts[1])
+            elif parts[0] == "at":
+                self.locations.add(parts[2])
+                
+        # Compute all-pairs shortest paths using BFS
+        self.distances = {}
+        for start_loc in self.locations:
+            dist = {start_loc: 0}
+            queue = deque([start_loc])
+            while queue:
+                curr = queue.popleft()
+                curr_dist = dist[curr]
+                for nxt in self.roads.get(curr, []):
+                    if nxt not in dist:
+                        dist[nxt] = curr_dist + 1
+                        queue.append(nxt)
+            self.distances[start_loc] = dist
+
+    def __call__(self, node):
+        state = node.state
+        current_at = {}
+        current_in = {}
+
+        # Parse the current state
+        for fact in state:
+            parts = fact[1:-1].split()
+            if parts[0] == "at":
+                current_at[parts[1]] = parts[2]
+            elif parts[0] == "in":
+                current_in[parts[1]] = parts[2]
+
+        total_cost = 0
+
+        # Evaluate the heuristic cost for each goal condition
+        for obj, goal_loc in self.goal_locations.items():
+            if obj in current_in:
+                # The object is currently being carried by a vehicle
+                v = current_in[obj]
+                v_loc = current_at.get(v)
+                if v_loc:
+                    dist = self.distances.get(v_loc, {}).get(goal_loc, float('inf'))
+                    # 1 action to drop + travel distance
+                    total_cost += 1 + dist
+                    
+            elif obj in current_at:
+                loc = current_at[obj]
+                if loc != goal_loc:
+                    if obj in self.vehicles:
+                        # Goal is for a vehicle to be at a specific location
+                        dist = self.distances.get(loc, {}).get(goal_loc, float('inf'))
+                        total_cost += dist
+                    else:
+                        # Goal is for a package currently on the ground
+                        dist = self.distances.get(loc, {}).get(goal_loc, float('inf'))
+                        # 2 actions to pick-up and drop + travel distance
+                        total_cost += 2 + dist
+                        
+                        # Add distance to closest vehicle needed to pick up the package
+                        v_dists = []
+                        for v in self.vehicles:
+                            v_loc = current_at.get(v)
+                            if v_loc:
+                                d = self.distances.get(v_loc, {}).get(loc, float('inf'))
+                                v_dists.append(d)
+                        if v_dists:
+                            total_cost += min(v_dists)
+
+        return total_cost
+```

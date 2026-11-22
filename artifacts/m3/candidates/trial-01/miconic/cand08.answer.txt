@@ -1,0 +1,125 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+class miconicLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the miconic domain.
+    
+    # Summary
+    This heuristic estimates the minimum number of actions required to serve all 
+    goal passengers. It considers the boarding and departing actions for each 
+    passenger, as well as the number of elevator movements needed to visit all 
+    the required floors.
+    
+    # Assumptions
+    - Passengers who are already served require no further actions.
+    - Passengers who are currently boarded require 1 action to depart, and the 
+      elevator must visit their destination floor.
+    - Passengers who are waiting (not boarded and not served) require 2 actions 
+      (one to board, one to depart), and the elevator must visit both their 
+      origin and destination floors.
+    - The elevator can move directly between any two floors in 1 action. The 
+      minimum number of movements is estimated based on the set of unique floors 
+      that must be visited.
+    - If the elevator's current floor is an "actionable" floor (i.e., the origin 
+      of a waiting passenger or the destination of a boarded passenger), it can 
+      save one movement because a passenger action can be taken immediately.
+
+    # Heuristic Initialization
+    - Extract the destination floor for each passenger from the static facts (`destin`).
+    - Identify the set of passengers that need to be served based on the goals (`served`).
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Parse the current state to find which passengers are `served`, which are 
+       `boarded`, what their `origin` floors are, and where the elevator is 
+       currently located (`lift-at`).
+    2. Initialize `total_cost = 0`. Create sets `actionable_floors` and 
+       `all_required_floors`.
+    3. Loop through all the goal passengers:
+       a. If the passenger is `served`, they contribute 0 to the cost.
+       b. If the passenger is `boarded`, add 1 to `total_cost` (for departing). 
+          Add their destination floor to `all_required_floors` and `actionable_floors`.
+       c. If the passenger is waiting, add 2 to `total_cost` (for boarding and 
+          departing). Add their origin and destination to `all_required_floors`, 
+          but only add their origin to `actionable_floors` (since they cannot be 
+          departed until they are picked up).
+    4. Calculate the elevator movement cost:
+       - If `all_required_floors` is not empty, the base movement cost is the 
+         number of unique floors in `all_required_floors`.
+       - If the elevator's current floor (`lift-at`) is in `actionable_floors`, 
+         subtract 1 from the movement cost because the elevator can immediately 
+         perform a useful action without moving first.
+       - Add this movement cost to `total_cost`.
+    5. Return the final `total_cost`.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        self.static = task.static
+
+        # Extract destinations from static facts
+        self.destinations = {}
+        for fact in self.static:
+            parts = fact[1:-1].split()
+            if parts[0] == "destin":
+                # Fact format: (destin ?person ?floor)
+                self.destinations[parts[1]] = parts[2]
+                
+        # Extract the set of passengers that must be served
+        self.goal_passengers = set()
+        for goal in self.goals:
+            parts = goal[1:-1].split()
+            if parts[0] == "served":
+                self.goal_passengers.add(parts[1])
+
+    def __call__(self, node):
+        state = node.state
+        
+        served = set()
+        boarded = set()
+        origins = {}
+        lift_at = None
+
+        # Parse current state
+        for fact in state:
+            parts = fact[1:-1].split()
+            if parts[0] == "served":
+                served.add(parts[1])
+            elif parts[0] == "boarded":
+                boarded.add(parts[1])
+            elif parts[0] == "origin":
+                origins[parts[1]] = parts[2]
+            elif parts[0] == "lift-at":
+                lift_at = parts[1]
+
+        total_cost = 0
+        actionable_floors = set()
+        all_required_floors = set()
+
+        for p in self.goal_passengers:
+            if p in served:
+                continue
+            elif p in boarded:
+                total_cost += 1
+                if p in self.destinations:
+                    all_required_floors.add(self.destinations[p])
+                    actionable_floors.add(self.destinations[p])
+            else:
+                total_cost += 2
+                if p in origins:
+                    all_required_floors.add(origins[p])
+                    actionable_floors.add(origins[p])
+                if p in self.destinations:
+                    # The destination of a waiting passenger is required, but it 
+                    # is NOT actionable until the passenger is actually boarded.
+                    all_required_floors.add(self.destinations[p])
+                    
+        # Add the cost of necessary elevator movements
+        if all_required_floors:
+            if lift_at in actionable_floors:
+                total_cost += len(all_required_floors) - 1
+            else:
+                total_cost += len(all_required_floors)
+
+        return total_cost
+```

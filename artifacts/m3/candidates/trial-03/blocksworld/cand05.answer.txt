@@ -1,0 +1,178 @@
+```python
+from heuristics.heuristic_base import Heuristic
+
+class blocksworldLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the blocksworld domain.
+    
+    # Summary
+    This heuristic estimates the minimum number of actions required to reach a goal state 
+    from the current state. It calculates this by identifying which blocks are currently 
+    in their correct final positions ("well-placed") and calculating the exact number 
+    of movement actions needed for the misplaced blocks.
+    
+    # Assumptions
+    - Any block that is not well-placed must be moved at least once. 
+    - Moving a block that is not currently held requires at least two actions (e.g., pick up + stack, or unstack + put down).
+    - A block may need additional actions (moving to the table temporarily) if it is currently located above its target support.
+    - A block is considered well-placed if its current support matches its goal support, and that support is itself well-placed. If it has no specific goal, it is well-placed if it is not blocking another block.
+    
+    # Heuristic Initialization
+    - The goal conditions are parsed to map each block to its explicit target support (`target_on`), or to sets for blocks that must be on the table (`target_on_table`), clear (`target_clear`), or held (`target_holding`).
+    - A reverse mapping (`target_on_rev`) is created to quickly check if any block needs a specific support block.
+    
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Check if the current state exactly satisfies all goals. If it does, return 0.
+    2. Iterate through the current state facts to map out the current structure of the blocks (which block is on which, which are on the table, and which is held).
+    3. Use a recursive function with memoization to determine the "well-placed" status of each block from the bottom up.
+    4. For each block, if it is not well-placed:
+       - If it is currently held by the robotic arm, calculate the cost to place it directly on its target (1 action) or on the table temporarily (3 actions).
+       - If it is not held, it generally costs 2 actions to move (e.g., pick up and place). 
+       - Add a penalty of 2 actions if a block's target support is currently located below it in the same tower, representing a deadlock that forces the block to be placed on the table first.
+    5. Sum the costs. If the calculated cost is 0 but the state is not exactly the goal state, return 1 to maintain the property that h=0 only for goal states.
+    """
+    
+    def __init__(self, task):
+        self.goals = task.goals
+        self.target_on = {}
+        self.target_on_table = set()
+        self.target_clear = set()
+        self.target_holding = None
+        
+        # Extract explicit goal states from the task specification
+        for goal in self.goals:
+            parts = goal[1:-1].split()
+            if parts[0] == "on":
+                self.target_on[parts[1]] = parts[2]
+            elif parts[0] == "on-table":
+                self.target_on_table.add(parts[1])
+            elif parts[0] == "clear":
+                self.target_clear.add(parts[1])
+            elif parts[0] == "holding":
+                self.target_holding = parts[1]
+                
+        # Fast lookup mapping target supports back to the block that goes on top of them
+        self.target_on_rev = {y: x for x, y in self.target_on.items()}
+
+    def __call__(self, node):
+        state = node.state
+        
+        # 1. Exact match with goal state
+        if self.goals.issubset(state):
+            return 0
+            
+        # 2. Extract state representation
+        current_on = {}
+        current_on_table = set()
+        current_clear = set()
+        holding = None
+        all_blocks = set()
+        
+        for fact in state:
+            parts = fact[1:-1].split()
+            if parts[0] == "on":
+                current_on[parts[1]] = parts[2]
+                all_blocks.add(parts[1])
+                all_blocks.add(parts[2])
+            elif parts[0] == "on-table":
+                current_on_table.add(parts[1])
+                all_blocks.add(parts[1])
+            elif parts[0] == "clear":
+                current_clear.add(parts[1])
+                all_blocks.add(parts[1])
+            elif parts[0] == "holding":
+                holding = parts[1]
+                all_blocks.add(parts[1])
+                
+        well_placed = {}
+        
+        # 3. Recursive logic to check if a block is well-placed
+        def check_well_placed(b):
+            if b in well_placed:
+                return well_placed[b]
+                
+            if b == holding:
+                if self.target_holding == b:
+                    well_placed[b] = True
+                else:
+                    well_placed[b] = False
+                return well_placed[b]
+                
+            # If the block should be held, but currently isn't, it's not well-placed
+            if b == self.target_holding:
+                well_placed[b] = False
+                return False
+
+            if b in current_on_table:
+                if b in self.target_on:
+                    well_placed[b] = False
+                else:
+                    well_placed[b] = True
+                    
+            elif b in current_on:
+                y = current_on[b]
+                if b in self.target_on_table:
+                    well_placed[b] = False
+                elif b in self.target_on:
+                    if self.target_on[b] == y:
+                        well_placed[b] = check_well_placed(y)
+                    else:
+                        well_placed[b] = False
+                else:
+                    # b has no explicit support goal
+                    # It is fine as long as the support is well-placed, doesn't need to be clear, 
+                    # and isn't needed by another block
+                    if check_well_placed(y) and y not in self.target_clear and y not in self.target_on_rev:
+                        well_placed[b] = True
+                    else:
+                        well_placed[b] = False
+            else:
+                well_placed[b] = False
+                
+            return well_placed[b]
+            
+        # Helper to check if a block is above its target support in the current state
+        def is_above(top, bottom):
+            curr = current_on.get(top)
+            while curr is not None:
+                if curr == bottom:
+                    return True
+                curr = current_on.get(curr)
+            return False
+
+        # 4. Action cost calculation for out-of-place blocks
+        total_cost = 0
+        for b in all_blocks:
+            if check_well_placed(b):
+                continue
+                
+            if b == holding:
+                if b == self.target_holding:
+                    pass
+                elif b in self.target_on_table:
+                    total_cost += 1
+                elif b in self.target_on:
+                    y = self.target_on[b]
+                    if check_well_placed(y) and y in current_clear:
+                        total_cost += 1
+                    else:
+                        total_cost += 3 # Must go table first, then later picked and stacked
+                else:
+                    total_cost += 1
+            else:
+                cost = 2 # General penalty (pick up + place somewhere)
+                if b in self.target_on:
+                    y = self.target_on[b]
+                    if is_above(b, y):
+                        cost += 2 # Cycle resolution: extra put-down to table and pick-up needed
+                elif b == self.target_holding:
+                    cost = 1 # Only needs to be picked up
+                    
+                total_cost += cost
+                
+        # 5. Ensuring heuristic is strictly 0 ONLY when the state is the goal state
+        if total_cost == 0:
+            return 1
+            
+        return total_cost
+```

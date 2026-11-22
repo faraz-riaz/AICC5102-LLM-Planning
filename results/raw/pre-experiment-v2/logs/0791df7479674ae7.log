@@ -1,0 +1,33 @@
+2026-11-22 10:58:19,634 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-22 10:58:19,634 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_0gfo9xx3\domain.pddl
+2026-11-22 10:58:19,640 INFO     using search: gbfs_early_goal_test
+2026-11-22 10:58:19,640 INFO     using heuristic: hMaxHeuristic
+2026-11-22 10:58:19,640 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_0gfo9xx3\domain.pddl
+2026-11-22 10:58:19,640 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_0gfo9xx3\easy-p04.pddl
+2026-11-22 10:58:19,640 INFO     5 Predicates parsed
+2026-11-22 10:58:19,640 INFO     4 Actions parsed
+2026-11-22 10:58:19,640 INFO     7 Objects parsed
+2026-11-22 10:58:19,640 INFO     0 Constants parsed
+2026-11-22 10:58:19,640 INFO     Grounding start: blocksworld-04
+2026-11-22 10:58:19,640 INFO     Relevance analysis removed 0 facts
+2026-11-22 10:58:19,640 INFO     Grounding end: blocksworld-04
+2026-11-22 10:58:19,640 INFO     71 Variables created
+2026-11-22 10:58:19,640 INFO     112 Operators created
+2026-11-22 10:58:19,640 INFO     Search start: blocksworld-04
+2026-11-22 10:58:19,640 INFO     Initial h value: 8.00
+2026-11-22 10:58:19,644 INFO     Found new best h: 7.00 after 2 expansions
+2026-11-22 10:58:19,644 INFO     Found new best h: 6.00 after 4 expansions
+2026-11-22 10:58:19,644 INFO     Found new best h: 5.00 after 7 expansions
+2026-11-22 10:58:19,646 INFO     Found new best h: 4.00 after 11 expansions
+2026-11-22 10:58:19,648 INFO     Found new best h: 3.00 after 16 expansions
+2026-11-22 10:58:19,650 INFO     Found new best h: 2.00 after 22 expansions
+2026-11-22 10:58:19,803 INFO     Found new best h: 1.00 after 379 expansions
+2026-11-22 10:58:19,803 INFO     Early goal reached via operator (stack b4 b1).
+2026-11-22 10:58:19,803 INFO     380 Nodes expanded
+2026-11-22 10:58:19,803 INFO     Max open list size: 1070
+2026-11-22 10:58:19,803 INFO     Search end: blocksworld-04
+2026-11-22 10:58:19,803 INFO     Search time: 0.17
+2026-11-22 10:58:19,803 INFO     Total time: 0.17
+2026-11-22 10:58:19,803 INFO     Plan length: 24
+2026-11-22 10:58:19,807 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-22 10:58:19,807 WARNING  warning: could not determine peak memory

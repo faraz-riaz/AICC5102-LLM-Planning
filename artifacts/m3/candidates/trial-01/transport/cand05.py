@@ -1,0 +1,151 @@
+from fnmatch import fnmatch
+from heuristics.heuristic_base import Heuristic
+
+def get_parts(fact):
+    """
+    Extract the components of a PDDL fact by removing parentheses and splitting the string.
+    Example: '(at p1 l8)' -> ['at', 'p1', 'l8']
+    """
+    return fact[1:-1].split()
+
+class TransportLLMHeuristic(Heuristic):
+    """
+    A domain-dependent heuristic for the Transport domain.
+
+    # Summary
+    This heuristic estimates the number of actions required to transport all packages to their 
+    respective goal locations. It computes the shortest path distances between locations and evaluates 
+    the minimum cost for each unachieved package based on its state (whether at a location or inside a vehicle).
+
+    # Assumptions
+    - Vehicle capacity constraints are relaxed. We assume any vehicle can pick up any package.
+    - If multiple packages share a vehicle, their delivery costs are evaluated independently and summed up. 
+      This is non-admissible but creates a strong gradient for a greedy best-first search.
+    - All-pairs shortest paths on the road network accurately represent the minimum driving distances.
+
+    # Heuristic Initialization
+    - Vehicles are identified by looking for `capacity` facts in the initial state and static facts.
+    - Package goal locations are extracted from the task's goals.
+    - The road network is extracted from `road` facts.
+    - A Breadth-First Search (BFS) is performed from each location to precompute all-pairs 
+      shortest path distances.
+
+    # Step-By-Step Thinking for Computing Heuristic
+    1. Identify the current locations of all vehicles and the status of all packages (either at a location or in a vehicle).
+    2. Iterate over each package that has a goal location:
+        a. If the package is already at its goal location, its estimated cost is 0.
+        b. If the package is currently at a location `L` (not the goal):
+            - Find the minimum driving distance from any vehicle to `L`.
+            - The cost to deliver this package is the distance for the closest vehicle to reach `L`, 
+              plus 1 action to `pick-up`, plus the driving distance from `L` to the goal, plus 1 action to `drop`.
+        c. If the package is currently inside a vehicle `V`:
+            - The cost to deliver this package is the driving distance from the vehicle's current location 
+              to the goal, plus 1 action to `drop`.
+    3. Sum the estimated costs for all unachieved packages.
+    """
+
+    def __init__(self, task):
+        self.goals = task.goals
+        self.static_facts = task.static
+
+        # 1. Identify all vehicles based on the `capacity` facts.
+        self.vehicles = set()
+        for fact in list(self.static_facts) + list(task.initial_state):
+            parts = get_parts(fact)
+            if parts[0] == "capacity":
+                self.vehicles.add(parts[1])
+
+        # 2. Extract goal destinations for each package.
+        self.goal_locations = {}
+        for goal in self.goals:
+            parts = get_parts(goal)
+            if parts[0] == "at":
+                self.goal_locations[parts[1]] = parts[2]
+
+        # 3. Extract the road network topology.
+        self.adj = {}
+        for fact in list(self.static_facts) + list(task.initial_state):
+            parts = get_parts(fact)
+            if parts[0] == "road":
+                l1, l2 = parts[1], parts[2]
+                if l1 not in self.adj:
+                    self.adj[l1] = set()
+                if l2 not in self.adj:
+                    self.adj[l2] = set()
+                self.adj[l1].add(l2)
+
+        # 4. Precompute all-pairs shortest paths using BFS.
+        self.distances = {}
+        locations = list(self.adj.keys())
+        for start in locations:
+            self.distances[start] = {start: 0}
+            queue = [start]
+            while queue:
+                curr = queue.pop(0)
+                dist = self.distances[start][curr]
+                for neighbor in self.adj.get(curr, []):
+                    if neighbor not in self.distances[start]:
+                        self.distances[start][neighbor] = dist + 1
+                        queue.append(neighbor)
+
+    def __call__(self, node):
+        state = node.state
+
+        vehicle_locations = {}
+        package_locations = {}
+        package_in_vehicle = {}
+
+        # Parse current state facts to locate vehicles and goal packages.
+        for fact in state:
+            parts = get_parts(fact)
+            if parts[0] == "at":
+                obj, loc = parts[1], parts[2]
+                if obj in self.vehicles:
+                    vehicle_locations[obj] = loc
+                elif obj in self.goal_locations:
+                    package_locations[obj] = loc
+            elif parts[0] == "in":
+                obj, veh = parts[1], parts[2]
+                if obj in self.goal_locations:
+                    package_in_vehicle[obj] = veh
+
+        cost = 0
+
+        # Calculate minimal action estimate for each package.
+        for p, g in self.goal_locations.items():
+            if p in package_locations:
+                p_loc = package_locations[p]
+                
+                # If package is already properly at its destination, no action is required.
+                if p_loc == g:
+                    continue
+
+                # Get distance from current location to destination
+                dist_to_goal = self.distances.get(p_loc, {}).get(g, 100000)
+
+                # Determine the nearest vehicle that can come for a pick-up
+                min_v_dist = 100000
+                for v_loc in vehicle_locations.values():
+                    v_dist = self.distances.get(v_loc, {}).get(p_loc, 100000)
+                    if v_dist < min_v_dist:
+                        min_v_dist = v_dist
+
+                # Actions estimated: move nearest vehicle + pick-up (1) + drive to goal + drop (1)
+                cost += min_v_dist + dist_to_goal + 2
+
+            elif p in package_in_vehicle:
+                veh = package_in_vehicle[p]
+                v_loc = vehicle_locations.get(veh)
+                
+                if v_loc:
+                    dist_to_goal = self.distances.get(v_loc, {}).get(g, 100000)
+                    # Actions estimated: drive vehicle to goal + drop (1)
+                    cost += dist_to_goal + 1
+                else:
+                    # Fallback for unreachable states
+                    cost += 100000
+            else:
+                # Package location not known (transient/inconsistent state)
+                cost += 100000
+
+        return cost
