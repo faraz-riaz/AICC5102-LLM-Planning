@@ -3,7 +3,7 @@
 Inputs (all already in the repository, nothing is re-run):
   results/derived/pre-experiment-v2/m3/m3_trial_runs.csv     the 9 frozen trial heuristics,
         1,170 test runs (Faraz, convert_runner_records.py --batches m3-)
-  results/derived/pre-experiment-v2/m2-official/search_runs.csv   baselines: archived
+  results/derived/pre-experiment-v2/w8-official/search_runs.csv   baselines: archived
         DeepSeek-R1 and hmax with the same algorithms (pass --baseline to use a re-run)
   results/raw/faraz_optimal_refs.csv                           proven optimal costs L*
   results/raw/m3/state_references.csv + .../m3/state_estimates.csv   R6 (h vs h*)
@@ -43,7 +43,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DERIVED = ROOT / "results" / "derived" / "pre-experiment-v2"
 M3 = DERIVED / "m3"
 TRIAL_RUNS = M3 / "m3_trial_runs.csv"
-BASELINE = DERIVED / "m2-official" / "search_runs.csv"
+BASELINE = DERIVED / "w8-official" / "search_runs.csv"
 REFS = ROOT / "results" / "raw" / "faraz_optimal_refs.csv"
 STATE_REFS = ROOT / "results" / "raw" / "m3" / "state_references.csv"
 ESTIMATES = M3 / "state_estimates.csv"

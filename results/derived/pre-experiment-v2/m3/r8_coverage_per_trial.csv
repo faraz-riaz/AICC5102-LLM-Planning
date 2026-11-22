@@ -1,6 +1,6 @@
 algorithm,heuristic,domain,solved,tested
 astar,archived,blocksworld,19,30
-astar,archived,miconic,30,30
+astar,archived,miconic,28,30
 astar,archived,transport,16,30
 astar,trial-01,blocksworld,23,30
 astar,trial-01,miconic,12,30
@@ -12,7 +12,7 @@ astar,trial-03,blocksworld,24,30
 astar,trial-03,miconic,30,30
 astar,trial-03,transport,20,30
 gbfs,archived,blocksworld,20,30
-gbfs,archived,miconic,29,30
+gbfs,archived,miconic,27,30
 gbfs,archived,transport,15,30
 gbfs,trial-01,blocksworld,23,30
 gbfs,trial-01,miconic,24,30
@@ -25,7 +25,7 @@ gbfs,trial-03,miconic,29,30
 gbfs,trial-03,transport,20,30
 ida_star,archived,blocksworld,6,10
 ida_star,archived,miconic,10,10
-ida_star,archived,transport,8,10
+ida_star,archived,transport,7,10
 ida_star,trial-01,blocksworld,10,10
 ida_star,trial-01,miconic,10,10
 ida_star,trial-01,transport,10,10
@@ -36,8 +36,8 @@ ida_star,trial-03,blocksworld,10,10
 ida_star,trial-03,miconic,10,10
 ida_star,trial-03,transport,3,10
 weighted_astar-w1.5,archived,blocksworld,20,30
-weighted_astar-w1.5,archived,miconic,30,30
-weighted_astar-w1.5,archived,transport,20,30
+weighted_astar-w1.5,archived,miconic,28,30
+weighted_astar-w1.5,archived,transport,19,30
 weighted_astar-w1.5,trial-01,blocksworld,23,30
 weighted_astar-w1.5,trial-01,miconic,25,30
 weighted_astar-w1.5,trial-01,transport,20,30
@@ -48,8 +48,8 @@ weighted_astar-w1.5,trial-03,blocksworld,24,30
 weighted_astar-w1.5,trial-03,miconic,30,30
 weighted_astar-w1.5,trial-03,transport,20,30
 weighted_astar-w2,archived,blocksworld,20,30
-weighted_astar-w2,archived,miconic,30,30
-weighted_astar-w2,archived,transport,19,30
+weighted_astar-w2,archived,miconic,29,30
+weighted_astar-w2,archived,transport,18,30
 weighted_astar-w2,trial-01,blocksworld,23,30
 weighted_astar-w2,trial-01,miconic,26,30
 weighted_astar-w2,trial-01,transport,20,30
