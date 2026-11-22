@@ -1,0 +1,10 @@
+domain,heuristic,tested,solved,timeout,memory_limit
+blocksworld,hff,30,8,22,0
+blocksworld,hmax,30,5,25,0
+blocksworld,llm-r1,30,20,8,2
+miconic,hff,30,20,10,0
+miconic,hmax,30,9,21,0
+miconic,llm-r1,30,29,0,1
+transport,hff,30,10,20,0
+transport,hmax,30,5,25,0
+transport,llm-r1,30,15,15,0

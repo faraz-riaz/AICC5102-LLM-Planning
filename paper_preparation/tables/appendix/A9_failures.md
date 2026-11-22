@@ -1,0 +1,51 @@
+# A9_failures
+
+Success 363; timeout 404; memory_limit 13. No exhausted searches, invalid plans or planner errors. Missing statistics do not prove grounding failure.
+
+| heuristic_id | method | difficulty | status | runs | missing_expansions |
+|---|---|---|---|---|---|
+| deepseek-r1 | astar | easy | success | 30 | 0 |
+| deepseek-r1 | astar | hard | memory_limit | 2 | 0 |
+| deepseek-r1 | astar | hard | success | 10 | 0 |
+| deepseek-r1 | astar | hard | timeout | 18 | 9 |
+| deepseek-r1 | astar | medium | success | 25 | 0 |
+| deepseek-r1 | astar | medium | timeout | 5 | 1 |
+| deepseek-r1 | gbfs | easy | success | 30 | 0 |
+| deepseek-r1 | gbfs | hard | memory_limit | 3 | 2 |
+| deepseek-r1 | gbfs | hard | success | 9 | 0 |
+| deepseek-r1 | gbfs | hard | timeout | 18 | 18 |
+| deepseek-r1 | gbfs | medium | success | 25 | 0 |
+| deepseek-r1 | gbfs | medium | timeout | 5 | 4 |
+| deepseek-r1 | ida_star | easy | success | 24 | 0 |
+| deepseek-r1 | ida_star | easy | timeout | 6 | 0 |
+| deepseek-r1 | weighted_astar-w1.5 | easy | success | 30 | 0 |
+| deepseek-r1 | weighted_astar-w1.5 | hard | memory_limit | 3 | 0 |
+| deepseek-r1 | weighted_astar-w1.5 | hard | success | 10 | 0 |
+| deepseek-r1 | weighted_astar-w1.5 | hard | timeout | 17 | 10 |
+| deepseek-r1 | weighted_astar-w1.5 | medium | success | 30 | 0 |
+| deepseek-r1 | weighted_astar-w2 | easy | success | 30 | 0 |
+| deepseek-r1 | weighted_astar-w2 | hard | memory_limit | 3 | 0 |
+| deepseek-r1 | weighted_astar-w2 | hard | success | 10 | 0 |
+| deepseek-r1 | weighted_astar-w2 | hard | timeout | 17 | 10 |
+| deepseek-r1 | weighted_astar-w2 | medium | success | 29 | 0 |
+| deepseek-r1 | weighted_astar-w2 | medium | timeout | 1 | 0 |
+| hmax | astar | easy | success | 14 | 0 |
+| hmax | astar | easy | timeout | 16 | 0 |
+| hmax | astar | hard | memory_limit | 1 | 1 |
+| hmax | astar | hard | timeout | 29 | 10 |
+| hmax | astar | medium | timeout | 30 | 0 |
+| hmax | gbfs | easy | success | 19 | 0 |
+| hmax | gbfs | easy | timeout | 11 | 11 |
+| hmax | gbfs | hard | timeout | 30 | 30 |
+| hmax | gbfs | medium | timeout | 30 | 30 |
+| hmax | ida_star | easy | success | 7 | 0 |
+| hmax | ida_star | easy | timeout | 23 | 0 |
+| hmax | weighted_astar-w1.5 | easy | success | 15 | 0 |
+| hmax | weighted_astar-w1.5 | easy | timeout | 15 | 0 |
+| hmax | weighted_astar-w1.5 | hard | timeout | 30 | 11 |
+| hmax | weighted_astar-w1.5 | medium | timeout | 30 | 0 |
+| hmax | weighted_astar-w2 | easy | success | 16 | 0 |
+| hmax | weighted_astar-w2 | easy | timeout | 14 | 0 |
+| hmax | weighted_astar-w2 | hard | memory_limit | 1 | 1 |
+| hmax | weighted_astar-w2 | hard | timeout | 29 | 9 |
+| hmax | weighted_astar-w2 | medium | timeout | 30 | 0 |
