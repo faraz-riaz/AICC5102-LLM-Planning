@@ -114,7 +114,7 @@ Exact quality and state-level error are available only for the 17 easy tasks, te
 
 ## 7. Conclusion
 
-The reduced-budget reproduction agrees with the original finding that archived LLM guidance improves coverage over hFF. Keeping that guidance fixed while changing search reveals a sharper distinction between finding plans and finding optimal plans: Weighted A* improves coverage, A* remains suboptimal on some reference-known tasks, and IDA* exhibits substantial quality and repeated-work costs. On sampled states with proven costs, every heuristic set overestimates in some domain, and the overestimation frequency of independently generated sets ranges from 0% to 99% within one domain, depending on which candidate the coverage-first selector picks. Average coverage is robust across generation trials, but individual trials can differ by up to 23 solved tasks with A*. Practical evaluation should therefore report coverage, matched effort, proven-reference quality and heuristic accuracy together, across more than one generated heuristic set.
+The reduced-budget reproduction agrees with the original finding that archived LLM guidance improves coverage over hFF. Keeping that guidance fixed while changing search reveals a sharper distinction between finding plans and finding optimal plans: Weighted A* improves coverage, A* remains suboptimal on some reference-known tasks, and IDA* exhibits substantial quality and repeated-work costs. On sampled states with proven costs, every heuristic set overestimates in some domain, and the overestimation frequency of independently generated sets ranges from 0% to 99% within one domain, depending on which candidate the coverage-first selector picks. Average coverage is robust across generation trials except under A*, where individual trials differ by up to 23 solved tasks. Practical evaluation should therefore report coverage, matched effort, proven-reference quality and heuristic accuracy together, across more than one generated heuristic set.
 
 @page
 
@@ -194,7 +194,7 @@ For hmax, the proof-eligible optimality checks comprise 13 A* and seven IDA* out
 
 ## Appendix F. Reproduction and frozen-heuristic provenance
 
-The reported reproduction uses the shared GBFS runner and summarizer, with task-scoped hash seeds on the same machine and eight workers as the search matrix. Two earlier result sets are kept for traceability but excluded from all comparisons: the same experiments run with three workers (GBFS 64/38/19 for R1/hFF/hmax; A* 65, Weighted A* 70 and 69), whose differences come from runs near the time limit under different parallel load, and a first reproduction on another machine with run-scoped seeds (53/25/14).
+The reported reproduction uses the shared GBFS runner and summarizer, with task-scoped hash seeds on the same machine and eight workers as the search matrix. Two earlier result sets are kept for traceability but excluded from all comparisons: the same experiments run with three workers (GBFS 64/38/19 for R1/hFF/hmax; A* 65, Weighted A* 70 and 69), whose differences likely come from runs near the time limit runs near the time limit under different parallel load, and a first reproduction on another machine with run-scoped seeds (53/25/14).
 
 The archived set was generated with DeepSeek-R1 and selected using training tasks. The selected files are blocksworld9_10.py, miconic11_10.py and transport7_10.py. Their complete SHA-256 values are:
 
