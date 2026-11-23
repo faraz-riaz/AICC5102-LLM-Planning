@@ -1,6 +1,6 @@
 # Research paper draft
 
-Open **AICC5102_Final_Paper_Draft.docx** for the written research paper. The PDF preview is rendered from that DOCX. **PENDING_CONTENT_CHECKLIST.md** lists each actual yellow Word highlight; **DRAFT_VALIDATION.md** records page counts, layout review, evidence checks and remaining submission steps.
+Open **AICC5102_Final_Paper_Draft.docx** for the written research paper. **PENDING_CONTENT_CHECKLIST.md** lists each actual yellow Word highlight; **DRAFT_VALIDATION.md** records page counts, layout review, evidence checks and remaining submission steps.
 
 The editable prose source is **manuscript.md**. Its `@pending` directives pair with metadata in **build_docx.py**; they become real dark-text Word runs with yellow highlighting and bold `TO BE DONE`. Table directives read the prepared CSVs (and, for Table 8, results/derived/heuristic_reliability), and image directives embed existing PNGs without redrawing them, including the heuristic-reliability figures from results/figures/heuristic_reliability. Only three author-supplied items remain highlighted. Populated tables are numbered in order of appearance, independently of preparation file IDs.
 
