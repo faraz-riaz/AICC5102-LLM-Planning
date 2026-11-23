@@ -246,7 +246,7 @@ tools/                            verify_all.py, benchmark selection/verificatio
 docs/                             protocol, reproducibility notes, logs and integration status
 ```
 
-Who did what: [`docs/TEAM_RESPONSIBILITIES.md`](docs/TEAM_RESPONSIBILITIES.md). Detailed status and every number's source: [`docs/INTEGRATION_STATUS.md`](docs/INTEGRATION_STATUS.md).
+Who did what: [`docs/TEAM_RESPONSIBILITIES.md`](docs/TEAM_RESPONSIBILITIES.md). Integration history (earlier three-worker numbers; final rerun in §7): [`docs/INTEGRATION_STATUS.md`](docs/INTEGRATION_STATUS.md).
 
 The manifest is the single source of truth. Do not enumerate benchmark files independently in experiment code.
 

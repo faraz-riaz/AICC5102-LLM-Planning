@@ -6,16 +6,16 @@
 \begin{longtable}{>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}}
 \hline
 heuristic id & method & batch id & tested & time limit s & memory mib \\ \hline\endhead
-deepseek-r1 & astar & m2-official-astar-llm & 90 & 60 & 4096 \\
-deepseek-r1 & gbfs & m2-paired-gbfs-llm & 90 & 60 & 4096 \\
-deepseek-r1 & ida\_\allowbreak{}star & m2-official-ida-llm & 30 & 60 & 4096 \\
-deepseek-r1 & weighted\_\allowbreak{}astar-w1.5 & m2-official-wa15-llm & 90 & 60 & 4096 \\
-deepseek-r1 & weighted\_\allowbreak{}astar-w2 & m2-official-wa20-llm & 90 & 60 & 4096 \\
-hmax & astar & m2-official-astar-hmax & 90 & 60 & 4096 \\
-hmax & gbfs & m2-paired-gbfs-hmax & 90 & 60 & 4096 \\
-hmax & ida\_\allowbreak{}star & m2-official-ida-hmax & 30 & 60 & 4096 \\
-hmax & weighted\_\allowbreak{}astar-w1.5 & m2-official-wa15-hmax & 90 & 60 & 4096 \\
-hmax & weighted\_\allowbreak{}astar-w2 & m2-official-wa20-hmax & 90 & 60 & 4096 \\
+deepseek-r1 & astar & w8-m2-astar-llm & 90 & 60 & 4096 \\
+deepseek-r1 & gbfs & w8-gbfs-llm & 90 & 60 & 4096 \\
+deepseek-r1 & ida\_\allowbreak{}star & w8-m2-ida-llm & 30 & 60 & 4096 \\
+deepseek-r1 & weighted\_\allowbreak{}astar-w1.5 & w8-m2-wa15-llm & 90 & 60 & 4096 \\
+deepseek-r1 & weighted\_\allowbreak{}astar-w2 & w8-m2-wa20-llm & 90 & 60 & 4096 \\
+hmax & astar & w8-m2-astar-hmax & 90 & 60 & 4096 \\
+hmax & gbfs & w8-gbfs-hmax & 90 & 60 & 4096 \\
+hmax & ida\_\allowbreak{}star & w8-m2-ida-hmax & 30 & 60 & 4096 \\
+hmax & weighted\_\allowbreak{}astar-w1.5 & w8-m2-wa15-hmax & 90 & 60 & 4096 \\
+hmax & weighted\_\allowbreak{}astar-w2 & w8-m2-wa20-hmax & 90 & 60 & 4096 \\
 \hline
 \end{longtable}
 \endgroup
@@ -37,4 +37,4 @@ hmax & weighted\_\allowbreak{}astar-w2 & machine-f922a64c5235 \\
 \hline
 \end{longtable}
 \endgroup
-% 10 configurations; 600 official + 180 paired GBFS; task hash seeds and workers=3 verified from sidecars.
+% 10 configurations; 600 search + 180 GBFS runs (R1, hmax); task hash seeds and workers=8 verified from sidecars.

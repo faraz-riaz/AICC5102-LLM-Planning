@@ -1,11 +1,11 @@
 {
   "docx_filename": "AICC5102_Final_Paper_Draft.docx",
-  "main_word_count_approx": 3085,
-  "paragraphs": 130,
+  "main_word_count_approx": 3312,
+  "paragraphs": 120,
   "tables": [
     {
       "key": "reproduction",
-      "caption": "Table 1. GBFS coverage in the published evaluation [1] and current same-machine regeneration. Paper columns test 90 tasks/domain; ours test 30. Published hmax coverage is not reported. R1 denotes the archived DeepSeek-R1 set.",
+      "caption": "Table 1. GBFS coverage in the published evaluation [1] and in our final runs (60 s, 4096 MiB, 8 workers). Paper columns test 90 tasks/domain; ours test 30. Published hmax coverage is not reported. R1 denotes the archived DeepSeek-R1 set.",
       "source": "tables/main/T1_reproduction.csv",
       "rows": 3,
       "columns": 6,
@@ -13,7 +13,7 @@
     },
     {
       "key": "setup",
-      "caption": "Table 2. Current experimental contract. Actual run/batch records supersede historical provisional setup prose.",
+      "caption": "Table 2. Experimental contract of all reported runs. Actual run/batch records supersede historical provisional setup prose.",
       "source": "tables/appendix/T3_setup.csv",
       "rows": 9,
       "columns": 2,
@@ -58,6 +58,14 @@
       "rows": 10,
       "columns": 5,
       "width_in": 5.5
+    },
+    {
+      "key": "trials",
+      "caption": "Table 8. Coverage of the three independently generated and selected heuristic sets (Gemini 3.1 Pro) under the same contract, with mean ± sample SD (ddof = 1) across trials and the archived DeepSeek-R1 set for reference. IDA* tests the 30 easy tasks; other methods test 90.",
+      "source": "results/derived/heuristic_reliability/trial_stability_summary.csv",
+      "rows": 5,
+      "columns": 7,
+      "width_in": 5.5
     }
   ],
   "embedded_figures": [
@@ -70,11 +78,19 @@
       ]
     },
     {
-      "caption": "Figure 2. Exact gaps use validated plans and proven unit-action optima, all on easy tasks. Left: the identical 17 R1 tasks for every method; black bars show means and labels show optimal/eligible counts. Right: hmax optimal proportions on each method’s own solved, reference-known set. Those sets differ, so the proportions are not a paired ranking.",
+      "caption": "Figure 2. Exact gaps use validated plans and proven unit-action optima, all on easy tasks. Left: the identical 17 R1 tasks for every method; black bars show means and labels show optimal/eligible counts. Right: hmax optimal proportions on each method's own solved, reference-known set. Those sets differ, so the proportions are not a paired ranking.",
       "source": "paper_preparation/figures/main/F2_plan_quality.png",
       "pixel_size": [
         1095,
         445
+      ]
+    },
+    {
+      "caption": "Figure 3. Sampled-state reliability on 305 states with proven h*(s) from the 17 reference tasks. (a) Share of states with h(s) > h*(s) per domain and heuristic set. (b) Distribution of the signed error h(s) − h*(s) on a symmetric-log axis; values above zero are overestimates. Trial 3 in Transport uses large penalty constants, which explains its error magnitude.",
+      "source": "results/figures/heuristic_reliability/overestimation.png",
+      "pixel_size": [
+        1444,
+        541
       ]
     },
     {
@@ -86,15 +102,39 @@
       ]
     },
     {
-      "caption": "Figure 5. Initial-state estimates on 17 easy tasks with proven optimum L*. Dashed lines denote equality and ratio one. Archived R1 overestimates 15/17 states, with median ratio 1.18 and maximum 2.10; hmax overestimates 0/17. Ranked curves sort tasks independently within each heuristic. These are initial states, not the pending reachable-state sample.",
+      "caption": "Figure 5. Initial-state estimates on 17 easy tasks with proven optimum L*. Dashed lines denote equality and ratio one. Archived R1 overestimates 15/17 states, with median ratio 1.18 and maximum 2.10; hmax overestimates 0/17. Ranked curves sort tasks independently within each heuristic.",
       "source": "paper_preparation/figures/appendix/F4_initial_state_accuracy.png",
       "pixel_size": [
         1095,
         445
       ]
+    },
+    {
+      "caption": "Figure 6. Task mean positive sampled-state error against exact plan gap on the 17 proven-reference tasks, per algorithm, for the archived set and the three trials (symmetric-log axes; n = task outcomes). The IDA* association is dominated by Trial 3's penalty heuristic.",
+      "source": "results/figures/heuristic_reliability/error_vs_gap.png",
+      "pixel_size": [
+        1433,
+        501
+      ]
+    },
+    {
+      "caption": "Figure 7. Coverage of the three independent trials (dots), their mean ± sample SD (bars) and the archived set (diamonds), per algorithm. n is the number of tasks per trial.",
+      "source": "results/figures/heuristic_reliability/trial_stability.png",
+      "pixel_size": [
+        1123,
+        483
+      ]
+    },
+    {
+      "caption": "Figure 8. Coverage by difficulty tier (30 tasks per tier) for the archived set, the three trials and hmax. IDA* is omitted because it was evaluated on easy tasks only.",
+      "source": "results/figures/heuristic_reliability/coverage_by_difficulty.png",
+      "pixel_size": [
+        1423,
+        461
+      ]
     }
   ],
-  "pending_count": 16,
+  "pending_count": 3,
   "pending": [
     {
       "id": "authors",
@@ -106,130 +146,13 @@
       "page_group": 1
     },
     {
-      "id": "abstract",
-      "section": "Abstract",
-      "priority": "CRITICAL",
-      "source": "Verified R6/R8/R9 summaries",
-      "affected": "Abstract",
-      "text": "Add the final sampled-state reliability and independent-trial finding, with its denominator, after those experiments are verified.",
-      "page_group": 1
-    },
-    {
-      "id": "generation",
-      "section": "3.3 Methodology",
-      "priority": "CRITICAL",
-      "source": "results/raw/sampled_states/heuristic_manifest.csv (proposed); generation and selection logs",
-      "affected": "Independent-generation protocol",
-      "text": "Document the actual model/version, prompts, candidate counts, sampling settings, repair budget, training-only selection scores, independent trial IDs and frozen file hashes for three newly generated sets; supply generation and selection logs before describing this protocol as executed.",
-      "page_group": 2
-    },
-    {
-      "id": "sampling",
-      "section": "5.3 Initial-state and sampled-state reliability",
-      "priority": "CRITICAL",
-      "source": "results/raw/sampled_states/sampled_states.jsonl (proposed); executed sampling protocol",
-      "affected": "R6 methods",
-      "text": "Specify and freeze a heuristic-independent reachable-state sampling rule, seed, source tasks, depths and inventory hash. Report sampled, finite-proven, unknown and proven-dead-end counts by task/domain before comparing estimates.",
-      "page_group": 5
-    },
-    {
-      "id": "errors",
-      "section": "5.3 Sampled-state results",
-      "priority": "CRITICAL",
-      "source": "results/raw/sampled_states/sampled_state_optimal_costs.csv; results/derived/heuristic_reliability/sampled_state_estimates.csv and task_errors.csv (proposed)",
-      "affected": "R6 numerical results",
-      "text": "Insert sampled-state overestimation frequency, signed/absolute/positive error summaries and eligible counts for archived and new heuristics on identical states. Label task-macro and pooled-state rates separately; exclude unknown references and report h* = 0 separately for relative errors.",
-      "page_group": 5
-    },
-    {
-      "id": "composite",
-      "section": "5.3 Figure 3 caption",
-      "priority": "CRITICAL",
-      "source": "Real R6 errors and R8 trials_agg.csv; figures/main/F3_M3_reliability_robustness.png (proposed)",
-      "affected": "Figure 3",
-      "text": "Insert a real two-panel figure: error distributions or overestimation rates from finite-proven sampled states, and individual three-trial coverage points with mean ± sample SD against the archived baseline. Label state/task/trial denominators, algorithms and resource scope; interpret measured variation only after provenance review.",
-      "page_group": 5
-    },
-    {
-      "id": "scaling",
-      "section": "5.3 Difficulty scaling",
-      "priority": "CRITICAL",
-      "source": "results/raw/run_records/batches/m3-*.json; m3/trial_runs.csv (proposed)",
-      "affected": "R7 new-trial scaling",
-      "text": "Add per-domain/tier coverage and matched effort for the three newly generated sets from admitted trial runs. Compare against the archived curves under identical tasks, budgets and hash seeds; report failure counts and any machine differences.",
-      "page_group": 6
-    },
-    {
-      "id": "trials",
-      "section": "5.3 Independent generation",
-      "priority": "CRITICAL",
-      "source": "m3/trial_runs.csv and trials_agg.csv (proposed); generation provenance",
-      "affected": "R8 mean and sample SD",
-      "text": "Insert each independent trial’s solved/tested counts and coverage mean ± sample SD across exactly three selected sets, along with common-solved effort and its n. Compare against the archived baseline using matched algorithms/tasks; identify failed generation or selection attempts and preserve the actual provenance.",
-      "page_group": 6
-    },
-    {
-      "id": "association",
-      "section": "5.3 Heuristic error and plan quality",
-      "priority": "CRITICAL",
-      "source": "m3/task_errors.csv and joined_analysis.csv (proposed); proven task references",
-      "affected": "R9 interpretation",
-      "text": "Join task mean positive sampled-state error to exact plan gaps by domain/problem/set/trial/algorithm. Report eligible outcomes, unique tasks and exclusions; insert the error–gap plot and a scoped interpretation, or explain why the available sample/variation is insufficient. Do not infer causation or treat states as independent plans.",
-      "page_group": 6
-    },
-    {
-      "id": "limitations",
-      "section": "6 Limitations",
-      "priority": "CRITICAL",
-      "source": "Actual sampling, solver feasibility and generation/selection reports",
-      "affected": "Final limitations",
-      "text": "After the reliability study, state its actual sampling/reference failure rates, generation/selection budget and three-trial uncertainty limitations; assess any provenance, test-leakage or hardware comparability constraints revealed by those data.",
-      "page_group": 6
-    },
-    {
-      "id": "conclusion",
-      "section": "7 Conclusion",
-      "priority": "CRITICAL",
-      "source": "Verified R6/R8/R9 findings after integration",
-      "affected": "Conclusion and abstract",
-      "text": "Integrate the final sampled-state frequency, generation stability and error–quality findings into the conclusion and abstract; revise the scope of the practical recommendation if those findings are negative or inconclusive.",
-      "page_group": 6
-    },
-    {
-      "id": "trialtable",
-      "section": "Appendix G",
-      "priority": "CRITICAL",
-      "source": "Actual three-trial runs and frozen manifests; T4_independent_trials_PENDING.csv is currently empty",
-      "affected": "Table 8 (pending)",
-      "text": "Populate per-trial algorithm × heuristic-set rows with attempted/solved counts, coverage, matched effort, eligible exact-gap n and mean gaps. Include all three actual trials, then mean ± sample SD; attach model/settings, frozen hashes and training-only selection evidence. Do not render the header-only schema as results.",
-      "page_group": 13
-    },
-    {
-      "id": "errorfigure",
-      "section": "Appendix G",
-      "priority": "CRITICAL",
-      "source": "m3/joined_analysis.csv; figures/appendix/F6_M3_error_vs_quality.png (proposed)",
-      "affected": "Figure 6 (pending)",
-      "text": "Plot task mean positive error against 100(L − L*)/L* on valid, proven-reference outcomes; retain algorithm, set and trial identity. Show unique-task and outcome n, exclusions and domain mix. Supply the actual joined data and a descriptive interpretation or an explicit insufficient-data finding.",
-      "page_group": 13
-    },
-    {
-      "id": "appendixprotocol",
-      "section": "Appendix G",
-      "priority": "CRITICAL",
-      "source": "Executed sampling inventory, references, generation and selection logs",
-      "affected": "Protocol and feasibility supplement",
-      "text": "Insert the executed state-sampling/reference protocol, inventory hash, per-task feasibility/exclusion counts, trial generation/selection logs, and failed-generation handling. Distinguish exact-reference timeouts from proven dead ends and preserve invalid heuristic-output counts.",
-      "page_group": 13
-    },
-    {
       "id": "contributions",
       "section": "Appendix H",
       "priority": "CRITICAL",
       "source": "Author-confirmed contribution and course declarations",
       "affected": "Contributions",
-      "text": "Confirm the final per-person contribution statement, including completed reliability/generation work once evidenced, review responsibilities, institutional author details, student IDs and course section. Obtain author agreement before submission; do not infer completion from assigned responsibilities.",
-      "page_group": 13
+      "text": "Confirm the per-person contribution statement above, institutional author details, student IDs and course section. Obtain author agreement before submission.",
+      "page_group": 8
     },
     {
       "id": "aidisclosure",
@@ -237,8 +160,8 @@
       "priority": "CRITICAL",
       "source": "Actual per-person AI-use records and original assignment brief",
       "affected": "AI-use statement",
-      "text": "Complete the course-required per-person AI-use disclosure from actual tool/model use in code, experiments, analysis and writing, and confirm its wording against the original assignment brief. Do not claim that AI tools were unused.",
-      "page_group": 13
+      "text": "Each author confirms or completes their own AI-use statement (tools, and use in code, experiments, analysis and writing) against the original assignment brief.",
+      "page_group": 8
     }
   ],
   "equations": 2,

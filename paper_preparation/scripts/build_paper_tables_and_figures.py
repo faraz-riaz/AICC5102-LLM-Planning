@@ -104,15 +104,15 @@ def save(fig, name, placement):
 
 def verify_raw(runs, baseline):
     """No grounding: compare converted records, sidecars, schema and saved plan hashes."""
-    rebuilt = pd.read_csv(io.StringIO(pd.DataFrame(convert(RAW, ["m2-official-", "m2-paired-gbfs-"])).to_csv(index=False)))
+    rebuilt = pd.read_csv(io.StringIO(pd.DataFrame(convert(RAW, ["w8-m2-", "w8-gbfs-"])).to_csv(index=False)))
     pd.testing.assert_frame_equal(runs.sort_index(axis=1), rebuilt.sort_index(axis=1),
                                   check_dtype=False, check_exact=False, rtol=1e-10, atol=1e-10)
     batches = [json.loads(p.read_text(encoding="utf-8")) for p in sorted((RAW / "batches").glob("*.json"))
-               if p.name.startswith(("m1-r1r2-", "m2-official-", "m2-paired-gbfs-"))]
+               if p.name.startswith(("w8-m2-", "w8-gbfs-"))]
     seeds, ids = {}, []
     for b in batches:
         assert b["hash_seed_scope"] == "task"
-        assert b["command"][b["command"].index("--workers")+1] == "3"
+        assert b["command"][b["command"].index("--workers")+1] == "8"
         ids.extend(b["run_ids"])
         seeds.update(b["python_hash_seeds"])
     assert len(ids) == len(set(ids)) == 870
@@ -243,22 +243,30 @@ def main():
     # Existing quality_table takes medians of GBFS's entirely absent search-wall
     # column. Preserve those nulls while silencing only its known NumPy warning.
     warnings.filterwarnings("ignore", message="Mean of empty slice", category=RuntimeWarning)
-    runs = pd.read_csv(DATA / "history/three_workers/search_comparison/search_runs.csv")
-    baseline = pd.read_csv(DATA / "history/three_workers/reproduction/baseline_runs.csv")
+    # Final 8-worker results (docs/INTEGRATION_STATUS.md §7). search_runs.csv also holds the
+    # GBFS + hFF reproduction runs; hFF is used for reproduction only, not the search comparison.
+    all_runs = pd.read_csv(DATA / "search_comparison/search_runs.csv")
+    baseline = pd.read_csv(DATA / "reproduction/baseline_runs.csv")
     refs = pd.read_csv(ROOT / "results/raw/optimal_costs.csv")
-    report = verify_raw(runs, baseline)
+    report = verify_raw(all_runs, baseline) or {}
+    runs = all_runs[all_runs.heuristic_id != "hff"].reset_index(drop=True)
     df = attach_references(runs, refs)
     all90 = df[df.method != "ida_star"]
     easy = df[df.difficulty == "easy"]
-    assert len(runs) == 780 and (runs.status == "success").sum() == 363
+    assert len(all_runs) == 870 and len(runs) == 780
+    solved_total = int((runs.status == "success").sum())
     assert len(refs) == 90 and refs.optimality_proven.sum() == 17
     assert refs[refs.optimality_proven].difficulty.eq("easy").all()
     assert not (df.gap_pct.dropna() < 0).any()
     paired = paired_vs_astar(df)
-    pd.testing.assert_frame_equal(paired, pd.read_csv(DATA / "history/three_workers/search_comparison/paired/paired_vs_astar.csv"), check_dtype=False)
+    committed_pairs = pd.read_csv(DATA / "search_comparison/paired/paired_vs_astar.csv")
+    committed_pairs = committed_pairs[committed_pairs.heuristic != "hff"].reset_index(drop=True)
+    pd.testing.assert_frame_equal(paired, committed_pairs, check_dtype=False)
     q = quality_table(df)
-    for subset, old in [(all90, "history/three_workers/search_analysis_all_tasks"), (easy, "history/three_workers/search_analysis_easy_tasks")]:
-        pd.testing.assert_frame_equal(quality_table(subset), pd.read_csv(DATA / old / "quality.csv"), check_dtype=False)
+    for subset, folder in [(all90, "search_analysis_all_tasks"), (easy, "search_analysis_easy_tasks")]:
+        committed = pd.read_csv(DATA / folder / "quality.csv")
+        committed = committed[committed.heuristic != "hff"].reset_index(drop=True)
+        pd.testing.assert_frame_equal(quality_table(subset), committed, check_dtype=False)
 
     # Table 1: published hFF/R1 cells independently checked in final paper Table 2.
     published = {"blocksworld": (66, 24), "miconic": (90, 74), "transport": (59, 29)}
@@ -268,8 +276,9 @@ def main():
         counts = sub.groupby("heuristic").solved.sum()
         reproduction.append({"Domain": domain.title(), "Paper R1/90": llm, "Paper FF/90": hff,
                              "Ours R1/30": counts["llm-r1"], "Ours FF/30": counts["hff"], "Ours max/30": counts["hmax"]})
+    totals = baseline.groupby("heuristic").solved.sum()
     table("T1_reproduction", pd.DataFrame(reproduction), "main",
-          "Same-machine regeneration: 270 GBFS runs; R1/FF/max = 64/38/19. Paper: 1800 s, 8192 MiB, PyPy; ours: 60 s, 4096 MiB, CPython. Different task counts. Published hmax not reported. Amina's historical 53/25/14 remains a separate, document-only result.")
+          f"Final 8-worker runs: 270 GBFS runs; R1/FF/max = {totals['llm-r1']}/{totals['hff']}/{totals['hmax']}. Paper: 1800 s, 8192 MiB, PyPy; ours: 60 s, 4096 MiB, CPython. Different task counts. Published hmax not reported. Earlier 3-worker results (64/38/19) and Amina's first reproduction (53/25/14) are kept as history.")
     comparison = []
     for h in COLORS:
         for method in METHODS:
@@ -286,16 +295,16 @@ def main():
         ("Split", "99 training tasks/domain; select on training only; freeze before testing"),
         ("Heuristics", "Archived selected DeepSeek-R1; hmax; hFF for reproduction only"),
         ("Search", "GBFS, A*, WA* weights 1.5 and 2; IDA* easy30 only; w=1 correctness check"),
-        ("Budget", "60 s wall; 4096 MiB process-tree committed memory; 3 workers"),
+        ("Budget", "60 s wall; 4096 MiB process-tree committed memory; 8 workers"),
         ("Seeds", "Task-scoped hash seeds, base 5102; historical M1 used run-scoped seeds"),
-        ("Trials", "One deterministic run/configuration; 3 new independent generation trials PENDING"),
+        ("Trials", "One deterministic run/configuration; 3 independent generation trials (Gemini 3.1 Pro), same contract"),
         ("References", "17/90 proven, all easy: BW 2, Miconic 10, Transport 5"),
         ("Machine", "Windows 11, CPython 3.12.12; machine-f922a64c5235; 24 logical CPUs")]
     table("T3_setup", pd.DataFrame(setup, columns=["Item", "Contract"]), "appendix", "Summarize in main text to save space; actual sidecars override historical provisional config prose.")
     table("T4_independent_trials_PENDING", pd.DataFrame(columns=["model_version", "heuristic_set_id", "trial_id", "selection_protocol", "algorithm", "weight", "scope", "solved", "tested", "median_wall_s", "median_expansions", "gap_n", "gap_mean_pct", "status"]),
           "appendix", "SCHEMA ONLY: no trial observations. Three independent trials and sample SD (ddof=1), plus matched archived reference, required before filling. Full provenance schema in RELIABILITY_INTEGRATION_SPEC.md.")
     table("A1_coverage_domain_difficulty", df.groupby(["heuristic_id", "method", "domain", "difficulty"]).agg(tested=("run_id", "size"), solved=("status", lambda s: s.eq("success").sum())).reset_index(), note="Each domain/tier denominator is 10; IDA* easy only.")
-    table("A2_configurations", df.groupby(["heuristic_id", "method", "batch_id"]).agg(tested=("run_id", "size"), time_limit_s=("time_limit_s", "first"), memory_mib=("memory_limit_mib", "first"), machine=("machine_id", "first")).reset_index(), note="10 configurations; 600 official + 180 paired GBFS; task hash seeds and workers=3 verified from sidecars.")
+    table("A2_configurations", df.groupby(["heuristic_id", "method", "batch_id"]).agg(tested=("run_id", "size"), time_limit_s=("time_limit_s", "first"), memory_mib=("memory_limit_mib", "first"), machine=("machine_id", "first")).reset_index(), note="10 configurations; 600 search + 180 GBFS runs (R1, hmax); task hash seeds and workers=8 verified from sidecars.")
     table("A3_exact_references", refs[["domain", "problem_id", "difficulty", "reference_status", "optimal_cost", "optimality_proven", "cross_check", "ucs_status"]], note="All 90 outcomes retained; unknown and not_requested never supply a gap denominator.")
     table("A4_quality", q[["heuristic", "method", "attempted", "solved_valid", "gap_n", "optimal_n", "gap_mean_pct", "gap_median_pct", "gap_max_pct", "solved_without_proven_ref"]], note="Per-configuration eligible sets differ; compare LLM all five on the same 17 easy tasks. All gaps in percent.")
     table("A5_paired_vs_astar", paired, note="Both-solved pairs; method/A* ratios. IDA* matches easy tasks only. All90 baseline comparisons exclude IDA* from their intersection.")
@@ -307,7 +316,7 @@ def main():
     guarantees = df.groupby(["heuristic_id", "method", "guarantee"]).agg(tested=("run_id", "size"), eligible=("gap_pct", "count"), violations=("violation", "sum")).reset_index()
     assert guarantees.violations.sum() == 0
     table("A8_guarantees", guarantees, note="Guarantees conditional on admissibility, implementation and finite proof-eligible outcomes. Zero observed violations is not proof for arbitrary heuristics.")
-    table("A9_failures", df.groupby(["heuristic_id", "method", "difficulty", "status"]).agg(runs=("run_id", "size"), missing_expansions=("nodes_expanded", lambda s: s.isna().sum())).reset_index(), note="Success 363; timeout 404; memory_limit 13. No exhausted searches, invalid plans or planner errors. Missing statistics do not prove grounding failure.")
+    table("A9_failures", df.groupby(["heuristic_id", "method", "difficulty", "status"]).agg(runs=("run_id", "size"), missing_expansions=("nodes_expanded", lambda s: s.isna().sum())).reset_index(), note=f"Status counts: {runs.status.value_counts().to_dict()}. No exhausted searches, invalid plans or planner errors. Missing statistics do not prove grounding failure.")
     effort = df[df.status == "success"].groupby(["heuristic_id", "method", "difficulty"]).agg(solved=("run_id", "size"), wall_n=("wall_time_s", "count"), wall_median_s=("wall_time_s", "median"), wall_q25_s=("wall_time_s", lambda s:s.quantile(.25)), wall_q75_s=("wall_time_s", lambda s:s.quantile(.75)), expansions_median=("nodes_expanded", "median"), peak_memory_median_mib=("peak_memory_mib", "median"), peak_memory_max_mib=("peak_memory_mib", "max")).reset_index()
     table("A10_solved_effort", effort, note="Solved-only distributions; pair with A1/A9 coverage. Quartiles describe task heterogeneity, not random-trial uncertainty. Wall time includes setup; GBFS search CPU time is not compared with worker search wall time.")
     init = df[df.ref_proven & df.initial_h.notna()][["domain", "problem_id", "heuristic_id", "initial_h", "L_star"]].drop_duplicates()
@@ -320,15 +329,15 @@ def main():
         common, _ = common_solved_table(subset)
         table("A12_common_" + scope, common, note="Intersection of every included algorithm separately per heuristic; eligible exact-reference count reported.")
     reproduction_detail = baseline.groupby(["domain", "heuristic"]).agg(tested=("run_id", "size"), solved=("solved", "sum"), timeout=("status", lambda s:s.eq("timeout").sum()), memory_limit=("status", lambda s:s.eq("memory_limit").sum())).reset_index()
-    table("A13_reproduction_details", reproduction_detail, note="270 same-machine rows, including 180 GBFS rows already in M2; do not sum these as independent experiments. Historical Amina raw results unavailable.")
+    table("A13_reproduction_details", reproduction_detail, note="270 final 8-worker GBFS rows, including the 180 R1/hmax GBFS rows of the search comparison; do not sum these as independent experiments.")
     figures(df, init)
     report.update({"m2_status_counts": runs.status.value_counts().to_dict(),
                    "reference_count": 17, "reference_scope": "easy only",
                    "llm_initial_overestimates": int(init[init.heuristic_id == "deepseek-r1"].overestimates.sum()),
                    "guarantee_violations": 0, "negative_gaps": 0,
-                   "official_missing_expansion_stats": int(df[df.batch_id.str.startswith("m2-official-")].nodes_expanded.isna().sum()),
-                   "historical_m1_raw_available": False, "m3_available": False})
-    sources = [DATA / "history/three_workers/search_comparison/search_runs.csv", DATA / "history/three_workers/reproduction/baseline_runs.csv", ROOT / "results/raw/optimal_costs.csv", ROOT / "benchmarks/manifest.csv", ROOT / "artifacts/upstream/deepseek-r1/provenance.json"]
+                   "official_missing_expansion_stats": int(df[df.batch_id.str.startswith("w8-m2-")].nodes_expanded.isna().sum()),
+                   "workers": 8, "m3_available": True})
+    sources = [DATA / "search_comparison/search_runs.csv", DATA / "reproduction/baseline_runs.csv", ROOT / "results/raw/optimal_costs.csv", ROOT / "benchmarks/manifest.csv", ROOT / "artifacts/upstream/deepseek-r1/provenance.json"]
     report["source_sha256"] = {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     (OUT / "VALIDATION.json").write_text(json.dumps(report, indent=2)+"\n", encoding="utf-8")
     snippets = sorted((OUT / "tables").glob("*/*.tex"))

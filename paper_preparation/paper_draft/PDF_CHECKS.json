@@ -1,9 +1,9 @@
 {
   "render_engine": "LibreOffice Writer, headless PDF export",
-  "pdf_pages": 14,
+  "pdf_pages": 15,
   "main_pages": 6,
   "references_start_page": 7,
-  "pending_count": 16,
+  "pending_count": 3,
   "letter_page_geometry": "passed",
   "nonblank_pages": "passed",
   "body_text_bounds": "passed",
@@ -14,9 +14,9 @@
       "page": 4,
       "bbox_pt": [
         117.05000305175781,
-        168.95001220703125,
+        167.95001220703125,
         502.25,
-        318.45001220703125
+        317.45001220703125
       ],
       "pixels": [
         1095,
@@ -27,9 +27,9 @@
       "page": 4,
       "bbox_pt": [
         117.05000305175781,
-        417.45001220703125,
+        416.45001220703125,
         502.25,
-        574.0
+        573.0
       ],
       "pixels": [
         1095,
@@ -37,12 +37,25 @@
       ]
     },
     {
+      "page": 5,
+      "bbox_pt": [
+        117.05000305175781,
+        378.95001220703125,
+        502.25,
+        523.25
+      ],
+      "pixels": [
+        1444,
+        541
+      ]
+    },
+    {
       "page": 11,
       "bbox_pt": [
         117.05000305175781,
-        268.45001220703125,
+        272.45001220703125,
         502.25,
-        449.6000061035156
+        453.6000061035156
       ],
       "pixels": [
         1095,
@@ -61,62 +74,101 @@
         1095,
         445
       ]
+    },
+    {
+      "page": 14,
+      "bbox_pt": [
+        117.05000305175781,
+        233.95001220703125,
+        502.25,
+        368.6000061035156
+      ],
+      "pixels": [
+        1433,
+        501
+      ]
+    },
+    {
+      "page": 14,
+      "bbox_pt": [
+        117.05000305175781,
+        408.5999755859375,
+        502.25,
+        574.2999877929688
+      ],
+      "pixels": [
+        1123,
+        483
+      ]
+    },
+    {
+      "page": 15,
+      "bbox_pt": [
+        117.05000305175781,
+        71.94999694824219,
+        502.25,
+        196.75
+      ],
+      "pixels": [
+        1423,
+        461
+      ]
     }
   ],
   "pages": [
     {
       "page": 1,
       "opening": "Coverage, Optimality and Reliability of",
-      "word_count_excluding_raster_text": 538,
-      "pending_count": 2,
+      "word_count_excluding_raster_text": 587,
+      "pending_count": 1,
       "image_count": 0
     },
     {
       "page": 2,
       "opening": "3. Methodology",
-      "word_count_excluding_raster_text": 589,
-      "pending_count": 1,
+      "word_count_excluding_raster_text": 664,
+      "pending_count": 0,
       "image_count": 0
     },
     {
       "page": 3,
       "opening": "4. Experimental Setup",
-      "word_count_excluding_raster_text": 597,
+      "word_count_excluding_raster_text": 592,
       "pending_count": 0,
       "image_count": 0
     },
     {
       "page": 4,
       "opening": "5.2 Search Algorithm Comparison",
-      "word_count_excluding_raster_text": 358,
+      "word_count_excluding_raster_text": 418,
       "pending_count": 0,
       "image_count": 2
     },
     {
       "page": 5,
-      "opening": "5.2 Search Algorithm Comparison (continued)",
-      "word_count_excluding_raster_text": 546,
-      "pending_count": 3,
-      "image_count": 0
+      "opening": "behavior under g + h: if heuristic differences dominate g, path cost has limited influence on",
+      "word_count_excluding_raster_text": 601,
+      "pending_count": 0,
+      "image_count": 1
     },
     {
       "page": 6,
-      "opening": "5.3 Heuristic Reliability and Robustness (continued)",
-      "word_count_excluding_raster_text": 565,
-      "pending_count": 5,
+      "opening": "29–30 of 30 easy tasks, but hard-tier coverage ranges from 4/30 (Trial 1, A*) to 13–14/30 (Trial",
+      "word_count_excluding_raster_text": 476,
+      "pending_count": 0,
       "image_count": 0
     },
     {
       "page": 7,
       "opening": "References",
-      "word_count_excluding_raster_text": 253,
+      "word_count_excluding_raster_text": 252,
       "pending_count": 0,
       "image_count": 0
     },
     {
       "page": 8,
       "opening": "Appendix A. Evidence, configuration and validation",
-      "word_count_excluding_raster_text": 358,
+      "word_count_excluding_raster_text": 306,
       "pending_count": 0,
       "image_count": 0
     },
@@ -137,31 +189,38 @@
     {
       "page": 11,
       "opening": "Appendix D. Paired effort and initial-state accuracy",
-      "word_count_excluding_raster_text": 230,
+      "word_count_excluding_raster_text": 218,
       "pending_count": 0,
       "image_count": 1
     },
     {
       "page": 12,
       "opening": "Figure 5. Initial-state estimates on 17 easy tasks with proven optimum L*. Dashed lines denote",
-      "word_count_excluding_raster_text": 57,
+      "word_count_excluding_raster_text": 48,
       "pending_count": 0,
       "image_count": 1
     },
     {
       "page": 13,
       "opening": "Appendix E. Failures and guarantee audit",
-      "word_count_excluding_raster_text": 426,
+      "word_count_excluding_raster_text": 367,
       "pending_count": 0,
       "image_count": 0
     },
     {
       "page": 14,
-      "opening": "Appendix G. Pending reliability and independent-trial supplement",
-      "word_count_excluding_raster_text": 447,
-      "pending_count": 5,
-      "image_count": 0
+      "opening": "Appendix G. Reliability and independent-trial supplement",
+      "word_count_excluding_raster_text": 190,
+      "pending_count": 0,
+      "image_count": 2
+    },
+    {
+      "page": 15,
+      "opening": "Figure 8. Coverage by difficulty tier (30 tasks per tier) for the archived set, the three trials and",
+      "word_count_excluding_raster_text": 443,
+      "pending_count": 2,
+      "image_count": 1
     }
   ],
-  "preview_sha256": "7bd2b2b9fd03044795e90b22bf8ec95a2f6e2ae6e16941082a0a65e5e8d61a24"
+  "preview_sha256": "5bd3b6071993ed0cbef86d75c82349efa3562a5f17d138445129b9325413ab40"
 }

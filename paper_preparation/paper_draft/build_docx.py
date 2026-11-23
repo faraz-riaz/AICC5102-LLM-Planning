@@ -25,19 +25,6 @@ OUT = HERE / 'AICC5102_Final_Paper_Draft.docx'
 # Each identifier occurs exactly once in the source manuscript and checklist.
 PENDING = {
  'authors':('Title/authors','CRITICAL','Verified author/course declarations','Author block'),
- 'abstract':('Abstract','CRITICAL','Verified R6/R8/R9 summaries','Abstract'),
- 'generation':('3.3 Methodology','CRITICAL','results/raw/sampled_states/heuristic_manifest.csv (proposed); generation and selection logs','Independent-generation protocol'),
- 'sampling':('5.3 Initial-state and sampled-state reliability','CRITICAL','results/raw/sampled_states/sampled_states.jsonl (proposed); executed sampling protocol','R6 methods'),
- 'errors':('5.3 Sampled-state results','CRITICAL','results/raw/sampled_states/sampled_state_optimal_costs.csv; results/derived/heuristic_reliability/sampled_state_estimates.csv and task_errors.csv (proposed)','R6 numerical results'),
- 'composite':('5.3 Figure 3 caption','CRITICAL','Real R6 errors and R8 trials_agg.csv; figures/main/F3_M3_reliability_robustness.png (proposed)','Figure 3'),
- 'scaling':('5.3 Difficulty scaling','CRITICAL','results/raw/run_records/batches/m3-*.json; m3/trial_runs.csv (proposed)','R7 new-trial scaling'),
- 'trials':('5.3 Independent generation','CRITICAL','m3/trial_runs.csv and trials_agg.csv (proposed); generation provenance','R8 mean and sample SD'),
- 'association':('5.3 Heuristic error and plan quality','CRITICAL','m3/task_errors.csv and joined_analysis.csv (proposed); proven task references','R9 interpretation'),
- 'limitations':('6 Limitations','CRITICAL','Actual sampling, solver feasibility and generation/selection reports','Final limitations'),
- 'conclusion':('7 Conclusion','CRITICAL','Verified R6/R8/R9 findings after integration','Conclusion and abstract'),
- 'trialtable':('Appendix G','CRITICAL','Actual three-trial runs and frozen manifests; T4_independent_trials_PENDING.csv is currently empty','Table 8 (pending)'),
- 'errorfigure':('Appendix G','CRITICAL','m3/joined_analysis.csv; figures/appendix/F6_M3_error_vs_quality.png (proposed)','Figure 6 (pending)'),
- 'appendixprotocol':('Appendix G','CRITICAL','Executed sampling inventory, references, generation and selection logs','Protocol and feasibility supplement'),
  'contributions':('Appendix H','CRITICAL','Author-confirmed contribution and course declarations','Contributions'),
  'aidisclosure':('Appendix H','CRITICAL','Actual per-person AI-use records and original assignment brief','AI-use statement'),
 }
@@ -57,7 +44,7 @@ DN = {'blocksworld':'Blocksworld','miconic':'Miconic','transport':'Transport'}
 def tables():
     specs = {}
     repro = read_csv('T1_reproduction','main')
-    specs['reproduction'] = ('Table 1. GBFS coverage in the published evaluation [1] and current same-machine regeneration. Paper columns test 90 tasks/domain; ours test 30. Published hmax coverage is not reported. R1 denotes the archived DeepSeek-R1 set.',
+    specs['reproduction'] = ('Table 1. GBFS coverage in the published evaluation [1] and in our final runs (60 s, 4096 MiB, 8 workers). Paper columns test 90 tasks/domain; ours test 30. Published hmax coverage is not reported. R1 denotes the archived DeepSeek-R1 set.',
       ['Domain','Paper\nR1 /90','Paper\nhFF /90','Ours\nR1 /30','Ours\nhFF /30','Ours\nhmax /30'],
       [[x[c] for c in x] for x in repro], [1.15,.87,.87,.87,.87,.87], 'tables/main/T1_reproduction.csv')
     summary = read_csv('A4_quality')
@@ -71,8 +58,8 @@ def tables():
       ['h','Method','Solved / tested','Mean gap %','Gap n','Optimal / n'],rows,[.5,1.0,1.0,1.0,.7,1.3], 'tables/main/T2_search_summary.csv; tables/appendix/A4_quality.csv')
     setup = read_csv('T3_setup')
     rows = [[x['Item'],x['Contract']] for x in setup if x['Item']!='Trials']
-    rows.append(['Repetitions','One run per frozen configuration; generation trials are pending (Appendix G).'])
-    specs['setup']=('Table 2. Current experimental contract. Actual run/batch records supersede historical provisional setup prose.', ['Item','Contract'],rows,[1.0,4.5],'tables/appendix/T3_setup.csv')
+    rows.append(['Repetitions','One run per frozen configuration; three independent heuristic-generation trials (Gemini 3.1 Pro), same contract (Appendix G).'])
+    specs['setup']=('Table 2. Experimental contract of all reported runs. Actual run/batch records supersede historical provisional setup prose.', ['Item','Contract'],rows,[1.0,4.5],'tables/appendix/T3_setup.csv')
     cover = read_csv('A1_coverage_domain_difficulty')
     lookup = {(x['heuristic_id'],x['method'],x['domain'],x['difficulty']):x['solved'] for x in cover}
     rows=[]
@@ -100,6 +87,12 @@ def tables():
             rows.append([HN[h],MN[m],*map(str,[counts.get((h,m,s),0) for s in ['success','timeout','memory_limit']])])
     specs['failures']=('Table 7. Outcomes in the 780-run matched matrix. Success means a returned plan recorded as valid. There are no invalid-plan, error or exhaustive-unsolved outcomes. Per-arm denominators are 90, except IDA* (30).',
       ['h','Method','Valid','Timeout','Memory limit'],rows,[.5,1.1,.9,1.3,1.7], 'tables/appendix/A9_failures.csv')
+    with (ROOT / 'results/derived/heuristic_reliability/trial_stability_summary.csv').open(encoding='utf-8', newline='') as f:
+        stability=[r for r in csv.DictReader(f) if r['scope']=='all']
+    specs['trials']=('Table 8. Coverage of the three independently generated and selected heuristic sets (Gemini 3.1 Pro) under the same contract, with mean ± sample SD (ddof = 1) across trials and the archived DeepSeek-R1 set for reference. IDA* tests the 30 easy tasks; other methods test 90.',
+      ['Method','Tested','Trial 1','Trial 2','Trial 3','Mean ± SD','Archived'],
+      [[MN[r['algorithm']],r['tested_per_trial'],r['trial_01'],r['trial_02'],r['trial_03'],f"{float(r['mean']):.1f} ± {float(r['sd_ddof1']):.1f}",r['archived']] for r in stability],
+      [1.05,.65,.65,.65,.65,1.1,.75], 'results/derived/heuristic_reliability/trial_stability_summary.csv')
     return specs
 
 
@@ -324,8 +317,8 @@ def build():
     assert set(PENDING)=={r['id'] for r in pending}
     doc.save(OUT)
     reopened=Document(OUT)
-    assert len(reopened.inline_shapes)==4
-    assert len(reopened.tables)==7
+    assert len(reopened.inline_shapes)==len(used_figures)==8
+    assert len(reopened.tables)==len(used_tables)==8
     for t in reopened.tables:
         assert sum(c.width for c in t.columns)<=Inches(5.501)
     highlighted=[p for p in reopened.paragraphs if p.text.startswith('TO BE DONE')]
@@ -337,8 +330,8 @@ def build():
     assert sum(r.font.highlight_color==WD_COLOR_INDEX.YELLOW for p in reopened.paragraphs for r in p.runs)==2*len(PENDING)
     with zipfile.ZipFile(OUT) as z:
         assert z.testzip() is None
-        assert len([n for n in z.namelist() if n.startswith('word/media/')])==4
-    checklist=['# Pending content checklist','',f'{len(pending)} yellow-highlighted locations. All are CRITICAL to completing the stated paper scope or submission declarations. Proposed source paths below do not imply existing data.','']
+        assert len([n for n in z.namelist() if n.startswith('word/media/')])==len(used_figures)
+    checklist=['# Pending content checklist','',f'{len(pending)} yellow-highlighted locations. All need information only the authors can give (names, IDs, section, confirmed contributions and per-person AI use).','']
     for index,r in enumerate(pending,1):
         checklist.extend([f"## {index}. {r['section']} — {r['id']}",'',f"- Priority: {r['priority']}",f"- Missing content / required result: {r['text']}",f"- Expected source/output: `{r['source']}`",f"- Figure/table/content affected: {r['affected']}",''])
     (HERE/'PENDING_CONTENT_CHECKLIST.md').write_text('\n'.join(checklist),encoding='utf-8')

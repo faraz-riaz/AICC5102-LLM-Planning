@@ -1,27 +1,26 @@
 {
   "raw_records_checked": 870,
-  "m2_reconverted_rows": 780,
+  "m2_reconverted_rows": 870,
   "m1_summary_rows_checked": 270,
   "logs_present": 870,
-  "successful_saved_plans_checked": 401,
+  "successful_saved_plans_checked": 387,
   "task_seed_consistent": true,
   "plan_check_scope": "saved length/hash and recorded validation; no new grounding or replay",
   "m2_status_counts": {
-    "timeout": 404,
-    "success": 363,
-    "memory_limit": 13
+    "timeout": 430,
+    "success": 350
   },
   "reference_count": 17,
   "reference_scope": "easy only",
   "llm_initial_overestimates": 15,
   "guarantee_violations": 0,
   "negative_gaps": 0,
-  "official_missing_expansion_stats": 62,
-  "historical_m1_raw_available": false,
-  "m3_available": false,
+  "official_missing_expansion_stats": 78,
+  "workers": 8,
+  "m3_available": true,
   "source_sha256": {
-    "results/derived/history/three_workers/search_comparison/search_runs.csv": "dd1db63c372169ee2fb3f819ee6c1499560f454c2eacf2df414cb83709437203",
-    "results/derived/history/three_workers/reproduction/baseline_runs.csv": "f89b19f06b90ffa963bdb9a587989d8b08c480bc52afeefd3442a3d6368a9cd8",
+    "results/derived/search_comparison/search_runs.csv": "8082936e8a57665ac12eb798182547e0738154e40d8b709290dfec21695365a6",
+    "results/derived/reproduction/baseline_runs.csv": "8d75d062c6216c559472637d180679b253211899680e36897b7546e4d9d9e4c5",
     "results/raw/optimal_costs.csv": "3d85c5076ee4cc244a409e1a2ab12ebb1bd7bd0ac07fad04a36461e05b2656fe",
     "benchmarks/manifest.csv": "f7c95a9dce9c5777847d92581f2051f5d34532e902069a3c12f08cefebdfcc23",
     "artifacts/upstream/deepseek-r1/provenance.json": "45c499797b4c3c164a04e47c7f5ae15ca39a1aa26fc4cd06af267f87309030d3"

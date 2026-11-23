@@ -1,5 +1,7 @@
 # M1/M2 final integration status
 
+> **Historical document.** Sections 1–6 were written on 2026-11-10 and use the earlier three-worker runs. The final reported numbers are the 8-worker rerun in §7, `README.md` and `results/derived/`; `tools/verify_all.py` checks them.
+
 Date: 2026-11-10. Prepared in the search workstream (Faraz, M2). Integration
 branch `integration/m1-m2`; every number below comes from files listed in this
 document. Status labels: **DONE AND VERIFIED**, **DONE BUT NOT INTEGRATED**,
