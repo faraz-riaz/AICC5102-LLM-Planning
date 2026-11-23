@@ -1,0 +1,10 @@
+ERROR:root:IDA* search failed
+Traceback (most recent call last):
+  File "C:\Users\HMC-ADMIN\Desktop\AI_Project-r2\src\pyperplan\search\ida_star.py", line 166, in ida_star_search_result
+    task.get_successor_states(node.state), key=_successor_key
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HMC-ADMIN\Desktop\AI_Project-r2\src\pyperplan\task.py", line 112, in get_successor_states
+  File "C:\Users\HMC-ADMIN\Desktop\AI_Project-r2\src\pyperplan\task.py", line 48, in apply
+MemoryError
+
+{"worker_ok": true, "initial_h": 1000054.0, "setup_time_s": 0.08016659994609654, "status": "error", "failure_detail": "MemoryError: ", "nodes_generated": 285438, "nodes_expanded": 130045, "nodes_reopened": null, "stale_nodes_skipped": null, "dead_ends_pruned": 0, "cycles_pruned": 155371, "iterations": 1, "final_bound": 1000054.0, "search_time_s": 37.30044749996159, "plan_cost": null, "plan_length": null, "plan_valid": null, "validation_detail": "no plan returned", "replay_cost": null, "plan_sha256": null, "plan": null, "self_peak_rss_mib": null, "python_hash_seed": "1148911474"}

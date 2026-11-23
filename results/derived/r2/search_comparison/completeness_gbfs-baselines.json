@@ -1,0 +1,19 @@
+{
+  "batch_prefixes": [
+    "r2-gbfs-"
+  ],
+  "scheduled_combinations": 270,
+  "records_found": 270,
+  "unique_combinations_found": 270,
+  "missing": 0,
+  "duplicates": 0,
+  "unexpected": 0,
+  "successful_plans_replayed_valid": 118,
+  "status_counts": {
+    "success": 118,
+    "timeout": 152
+  },
+  "tasks_with_inconsistent_hash_seed": 0,
+  "issues_by_check": {},
+  "passed": true
+}

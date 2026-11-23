@@ -1,0 +1,34 @@
+2026-11-23 09:20:49,477 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:20:49,477 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_ex5tk6vr\domain.pddl
+2026-11-23 09:20:49,478 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:20:49,478 INFO     using heuristic: hMaxHeuristic
+2026-11-23 09:20:49,478 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_ex5tk6vr\domain.pddl
+2026-11-23 09:20:49,478 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_ex5tk6vr\easy-p22.pddl
+2026-11-23 09:20:49,478 INFO     5 Predicates parsed
+2026-11-23 09:20:49,478 INFO     4 Actions parsed
+2026-11-23 09:20:49,478 INFO     22 Objects parsed
+2026-11-23 09:20:49,478 INFO     0 Constants parsed
+2026-11-23 09:20:49,478 INFO     Grounding start: blocksworld-22
+2026-11-23 09:20:49,490 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:20:49,490 INFO     Grounding end: blocksworld-22
+2026-11-23 09:20:49,490 INFO     551 Variables created
+2026-11-23 09:20:49,490 INFO     1012 Operators created
+2026-11-23 09:20:49,492 INFO     Search start: blocksworld-22
+2026-11-23 09:20:49,494 INFO     Initial h value: 19.00
+2026-11-23 09:20:49,498 INFO     Found new best h: 18.00 after 2 expansions
+2026-11-23 09:20:49,506 INFO     Found new best h: 17.00 after 5 expansions
+2026-11-23 09:20:49,520 INFO     Found new best h: 16.00 after 9 expansions
+2026-11-23 09:20:49,544 INFO     Found new best h: 15.00 after 14 expansions
+2026-11-23 09:20:49,578 INFO     Found new best h: 14.00 after 20 expansions
+2026-11-23 09:20:49,625 INFO     Found new best h: 13.00 after 27 expansions
+2026-11-23 09:20:49,686 INFO     Found new best h: 12.00 after 35 expansions
+2026-11-23 09:20:49,760 INFO     Found new best h: 11.00 after 44 expansions
+2026-11-23 09:20:49,852 INFO     Found new best h: 10.00 after 54 expansions
+2026-11-23 09:20:49,973 INFO     Found new best h: 9.00 after 65 expansions
+2026-11-23 09:20:50,144 INFO     Found new best h: 8.00 after 77 expansions
+2026-11-23 09:20:50,323 INFO     Found new best h: 7.00 after 90 expansions
+2026-11-23 09:20:50,540 INFO     Found new best h: 6.00 after 104 expansions
+2026-11-23 09:20:50,753 INFO     Found new best h: 5.00 after 119 expansions
+2026-11-23 09:20:57,161 INFO     Found new best h: 4.00 after 489 expansions
+2026-11-23 09:21:06,973 INFO     Found new best h: 3.00 after 975 expansions
+2026-11-23 09:21:20,620 INFO     Found new best h: 2.00 after 1578 expansions

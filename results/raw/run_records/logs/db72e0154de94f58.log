@@ -1,0 +1,70 @@
+2026-11-23 09:45:29,635 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:45:29,635 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_g_03caas\domain.pddl
+2026-11-23 09:45:29,648 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:45:29,648 INFO     using heuristic: transportLLMHeuristic
+2026-11-23 09:45:29,648 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_g_03caas\domain.pddl
+2026-11-23 09:45:29,648 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_g_03caas\hard-p04.pddl
+2026-11-23 09:45:29,674 INFO     5 Predicates parsed
+2026-11-23 09:45:29,674 INFO     3 Actions parsed
+2026-11-23 09:45:29,674 INFO     136 Objects parsed
+2026-11-23 09:45:29,674 INFO     0 Constants parsed
+2026-11-23 09:45:29,674 INFO     Grounding start: transport-04
+2026-11-23 09:46:08,172 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:46:08,587 INFO     Grounding end: transport-04
+2026-11-23 09:46:08,587 INFO     5418 Variables created
+2026-11-23 09:46:08,587 INFO     1364096 Operators created
+2026-11-23 09:46:08,589 INFO     Search start: transport-04
+2026-11-23 09:46:08,589 INFO     Initial h value: 151.00
+2026-11-23 09:46:09,922 INFO     Found new best h: 149.00 after 1 expansions
+2026-11-23 09:46:11,458 INFO     Found new best h: 147.00 after 2 expansions
+2026-11-23 09:46:15,198 INFO     Found new best h: 145.00 after 3 expansions
+2026-11-23 09:46:15,469 INFO     Found new best h: 143.00 after 4 expansions
+2026-11-23 09:46:15,752 INFO     Found new best h: 141.00 after 5 expansions
+2026-11-23 09:46:16,002 INFO     Found new best h: 140.00 after 6 expansions
+2026-11-23 09:46:16,266 INFO     Found new best h: 139.00 after 7 expansions
+2026-11-23 09:46:16,584 INFO     Found new best h: 138.00 after 8 expansions
+2026-11-23 09:46:16,900 INFO     Found new best h: 137.00 after 9 expansions
+2026-11-23 09:46:17,214 INFO     Found new best h: 136.00 after 10 expansions
+2026-11-23 09:46:17,539 INFO     Found new best h: 135.00 after 11 expansions
+2026-11-23 09:46:17,860 INFO     Found new best h: 134.00 after 12 expansions
+2026-11-23 09:46:18,185 INFO     Found new best h: 133.00 after 13 expansions
+2026-11-23 09:46:18,507 INFO     Found new best h: 132.00 after 14 expansions
+2026-11-23 09:46:18,834 INFO     Found new best h: 131.00 after 15 expansions
+2026-11-23 09:46:19,154 INFO     Found new best h: 130.00 after 16 expansions
+2026-11-23 09:46:19,457 INFO     Found new best h: 129.00 after 17 expansions
+2026-11-23 09:46:19,721 INFO     Found new best h: 128.00 after 18 expansions
+2026-11-23 09:46:20,004 INFO     Found new best h: 127.00 after 19 expansions
+2026-11-23 09:46:20,275 INFO     Found new best h: 126.00 after 20 expansions
+2026-11-23 09:46:20,597 INFO     Found new best h: 125.00 after 21 expansions
+2026-11-23 09:46:20,911 INFO     Found new best h: 124.00 after 22 expansions
+2026-11-23 09:46:21,139 INFO     Found new best h: 123.00 after 23 expansions
+2026-11-23 09:46:21,367 INFO     Found new best h: 122.00 after 24 expansions
+2026-11-23 09:46:21,593 INFO     Found new best h: 121.00 after 25 expansions
+2026-11-23 09:46:21,813 INFO     Found new best h: 120.00 after 26 expansions
+2026-11-23 09:46:22,038 INFO     Found new best h: 119.00 after 27 expansions
+2026-11-23 09:46:22,263 INFO     Found new best h: 118.00 after 28 expansions
+2026-11-23 09:46:22,491 INFO     Found new best h: 117.00 after 29 expansions
+2026-11-23 09:46:22,746 INFO     Found new best h: 116.00 after 30 expansions
+2026-11-23 09:46:22,990 INFO     Found new best h: 115.00 after 31 expansions
+2026-11-23 09:46:23,237 INFO     Found new best h: 114.00 after 32 expansions
+2026-11-23 09:46:23,467 INFO     Found new best h: 113.00 after 33 expansions
+2026-11-23 09:46:23,731 INFO     Found new best h: 112.00 after 34 expansions
+2026-11-23 09:46:23,999 INFO     Found new best h: 111.00 after 35 expansions
+2026-11-23 09:46:24,263 INFO     Found new best h: 110.00 after 36 expansions
+2026-11-23 09:46:24,522 INFO     Found new best h: 109.00 after 37 expansions
+2026-11-23 09:46:24,832 INFO     Found new best h: 108.00 after 38 expansions
+2026-11-23 09:46:25,153 INFO     Found new best h: 107.00 after 39 expansions
+2026-11-23 09:46:25,474 INFO     Found new best h: 106.00 after 40 expansions
+2026-11-23 09:46:25,781 INFO     Found new best h: 105.00 after 41 expansions
+2026-11-23 09:46:26,036 INFO     Found new best h: 104.00 after 42 expansions
+2026-11-23 09:46:26,297 INFO     Found new best h: 103.00 after 43 expansions
+2026-11-23 09:46:26,568 INFO     Found new best h: 102.00 after 44 expansions
+2026-11-23 09:46:26,885 INFO     Found new best h: 101.00 after 45 expansions
+2026-11-23 09:46:27,208 INFO     Found new best h: 100.00 after 46 expansions
+2026-11-23 09:46:27,520 INFO     Found new best h: 99.00 after 47 expansions
+2026-11-23 09:46:27,815 INFO     Found new best h: 98.00 after 48 expansions
+2026-11-23 09:46:28,112 INFO     Found new best h: 97.00 after 49 expansions
+2026-11-23 09:46:28,432 INFO     Found new best h: 96.00 after 50 expansions
+2026-11-23 09:46:28,733 INFO     Found new best h: 94.00 after 51 expansions
+2026-11-23 09:46:29,062 INFO     Found new best h: 93.00 after 52 expansions
+2026-11-23 09:46:29,343 INFO     Found new best h: 92.00 after 53 expansions

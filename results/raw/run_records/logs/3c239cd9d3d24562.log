@@ -1,0 +1,53 @@
+2026-11-23 09:48:48,770 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:48:48,770 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_xz_7jg0c\domain.pddl
+2026-11-23 09:48:48,785 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:48:48,785 INFO     using heuristic: miconicLLMHeuristic
+2026-11-23 09:48:48,785 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_xz_7jg0c\domain.pddl
+2026-11-23 09:48:48,788 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_xz_7jg0c\easy-p23.pddl
+2026-11-23 09:48:48,791 INFO     6 Predicates parsed
+2026-11-23 09:48:48,791 INFO     4 Actions parsed
+2026-11-23 09:48:48,791 INFO     24 Objects parsed
+2026-11-23 09:48:48,791 INFO     0 Constants parsed
+2026-11-23 09:48:48,791 INFO     Grounding start: miconic-23
+2026-11-23 09:48:48,793 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:48:48,793 INFO     Grounding end: miconic-23
+2026-11-23 09:48:48,793 INFO     160 Variables created
+2026-11-23 09:48:48,793 INFO     376 Operators created
+2026-11-23 09:48:48,793 INFO     Search start: miconic-23
+2026-11-23 09:48:48,793 INFO     Initial h value: 50.00
+2026-11-23 09:48:48,793 INFO     Found new best h: 46.00 after 1 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 45.00 after 2 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 44.00 after 3 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 42.00 after 4 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 41.00 after 5 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 40.00 after 6 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 36.00 after 7 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 35.00 after 8 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 34.00 after 9 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 32.00 after 10 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 31.00 after 11 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 30.00 after 12 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 27.00 after 13 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 26.00 after 14 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 25.00 after 15 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 24.00 after 16 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 21.00 after 17 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 20.00 after 18 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 17.00 after 19 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 16.00 after 20 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 13.00 after 21 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 12.00 after 22 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 9.00 after 23 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 8.00 after 24 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 5.00 after 25 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 4.00 after 26 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 1.00 after 27 expansions
+2026-11-23 09:48:48,793 INFO     Early goal reached via operator (depart f6 p5).
+2026-11-23 09:48:48,793 INFO     28 Nodes expanded
+2026-11-23 09:48:48,793 INFO     Max open list size: 387
+2026-11-23 09:48:48,793 INFO     Search end: miconic-23
+2026-11-23 09:48:48,793 INFO     Search time: 0.00
+2026-11-23 09:48:48,793 INFO     Total time: 0.00
+2026-11-23 09:48:48,793 INFO     Plan length: 28
+2026-11-23 09:48:48,807 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-23 09:48:48,807 WARNING  warning: could not determine peak memory

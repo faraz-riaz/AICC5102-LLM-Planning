@@ -1,0 +1,21 @@
+2026-11-23 09:34:44,785 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:34:44,785 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_q52ni2m8\domain.pddl
+2026-11-23 09:34:44,789 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:34:44,789 INFO     using heuristic: hFFHeuristic
+2026-11-23 09:34:44,789 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_q52ni2m8\domain.pddl
+2026-11-23 09:34:44,791 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_q52ni2m8\hard-p26.pddl
+2026-11-23 09:34:44,880 INFO     6 Predicates parsed
+2026-11-23 09:34:44,880 INFO     4 Actions parsed
+2026-11-23 09:34:44,880 INFO     605 Objects parsed
+2026-11-23 09:34:44,880 INFO     0 Constants parsed
+2026-11-23 09:34:44,881 INFO     Grounding start: miconic-26
+2026-11-23 09:34:48,880 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:34:48,911 INFO     Grounding end: miconic-26
+2026-11-23 09:34:48,911 INFO     77530 Variables created
+2026-11-23 09:34:48,911 INFO     109145 Operators created
+2026-11-23 09:34:50,003 INFO     Search start: miconic-26
+2026-11-23 09:34:50,066 INFO     Initial h value: 1028.00
+2026-11-23 09:35:00,777 INFO     Found new best h: 1027.00 after 1 expansions
+2026-11-23 09:35:10,265 INFO     Found new best h: 1026.00 after 2 expansions
+2026-11-23 09:35:29,520 INFO     Found new best h: 1025.00 after 4 expansions
+2026-11-23 09:35:39,259 INFO     Found new best h: 1024.00 after 5 expansions

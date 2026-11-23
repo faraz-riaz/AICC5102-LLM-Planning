@@ -1,0 +1,28 @@
+2026-11-23 09:23:49,995 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:23:49,995 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_cut1u86m\domain.pddl
+2026-11-23 09:23:50,001 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:23:50,001 INFO     using heuristic: hMaxHeuristic
+2026-11-23 09:23:50,001 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_cut1u86m\domain.pddl
+2026-11-23 09:23:50,001 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_cut1u86m\easy-p14.pddl
+2026-11-23 09:23:50,003 INFO     6 Predicates parsed
+2026-11-23 09:23:50,003 INFO     4 Actions parsed
+2026-11-23 09:23:50,003 INFO     16 Objects parsed
+2026-11-23 09:23:50,003 INFO     0 Constants parsed
+2026-11-23 09:23:50,003 INFO     Grounding start: miconic-14
+2026-11-23 09:23:50,007 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:23:50,007 INFO     Grounding end: miconic-14
+2026-11-23 09:23:50,007 INFO     76 Variables created
+2026-11-23 09:23:50,007 INFO     170 Operators created
+2026-11-23 09:23:50,007 INFO     Search start: miconic-14
+2026-11-23 09:23:50,007 INFO     Initial h value: 3.00
+2026-11-23 09:23:50,098 INFO     Found new best h: 2.00 after 252 expansions
+2026-11-23 09:23:50,163 INFO     Found new best h: 1.00 after 453 expansions
+2026-11-23 09:23:50,163 INFO     Early goal reached via operator (depart f11 p4).
+2026-11-23 09:23:50,163 INFO     455 Nodes expanded
+2026-11-23 09:23:50,163 INFO     Max open list size: 1181
+2026-11-23 09:23:50,163 INFO     Search end: miconic-14
+2026-11-23 09:23:50,163 INFO     Search time: 0.16
+2026-11-23 09:23:50,163 INFO     Total time: 0.16
+2026-11-23 09:23:50,163 INFO     Plan length: 18
+2026-11-23 09:23:50,168 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-23 09:23:50,168 WARNING  warning: could not determine peak memory

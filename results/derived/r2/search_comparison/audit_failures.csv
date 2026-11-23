@@ -1,0 +1,483 @@
+run_id,domain,problem_id,difficulty,method,heuristic_id,status,failure_detail,nodes_expanded,wall_time_s,peak_memory_mib,dead_ends_pruned
+0080667712094728,transport,medium-p16,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,10.0,59.194,141.3,0.0
+00b5b4d9b8cb4e24,transport,medium-p16,medium,astar,hmax,timeout,cooperative time limit reached,10.0,59.158,140.7,0.0
+00e576e09f55451b,transport,hard-p17,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.018,3227.0,
+015990315c434a5b,miconic,medium-p24,medium,astar,hmax,timeout,cooperative time limit reached,7618.0,59.13,163.1,0.0
+01ba677216ce4ffe,blocksworld,easy-p11,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,40456.0,59.227,232.5,0.0
+01e413ddc292415c,blocksworld,easy-p08,easy,astar,hmax,timeout,cooperative time limit reached,82900.0,59.275,252.4,0.0
+0200154cd4ca4494,blocksworld,easy-p28,easy,gbfs,hff,timeout,process tree killed at the time limit,,60.012,61.9,
+0241c05ca0cb46c3,blocksworld,easy-p11,easy,astar,hmax,timeout,cooperative time limit reached,44367.0,59.215,229.6,0.0
+0286263d04ab4e6a,transport,easy-p08,easy,astar,hmax,timeout,cooperative time limit reached,87494.0,59.192,215.0,0.0
+028e20f46c9f4b3d,miconic,hard-p01,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,3333.0,59.124,66.4,0.0
+0381182d6def418d,blocksworld,medium-p23,medium,astar,hmax,timeout,cooperative time limit reached,120.0,59.117,62.5,0.0
+03efdccc2fde4232,miconic,hard-p26,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.011,2605.4,
+048731dcf3b146ae,blocksworld,medium-p17,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,107.0,59.12,49.7,0.0
+05148662f5fd4866,transport,medium-p09,medium,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.009,1406.6,
+052f8368c785494a,transport,hard-p29,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.016,3609.0,
+05b7faf15c2d414d,blocksworld,medium-p21,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,77.0,59.147,58.3,0.0
+05e5719ce823401b,blocksworld,easy-p19,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,17503.0,59.136,105.5,0.0
+096ecb4205474d44,blocksworld,easy-p28,easy,ida_star,deepseek-r1,timeout,cooperative time limit reached,165528.0,59.077,21.9,0.0
+09d7e476e2e04b1a,blocksworld,medium-p05,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,663.0,59.105,38.8,0.0
+0b3210286dd14cf4,miconic,medium-p17,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,3773.0,59.123,129.5,0.0
+0c5da410c65947c6,blocksworld,easy-p28,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.012,91.4,
+0c83864b5f0c48ae,miconic,hard-p08,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,144.0,59.115,93.2,0.0
+0cf11af6684d4e58,miconic,hard-p02,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.008,85.6,
+0d1435169f1a4756,miconic,medium-p25,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,4489.0,59.135,153.7,0.0
+0d23dadcc524433c,blocksworld,hard-p02,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.015,108.7,
+0d955332f9674485,transport,hard-p06,hard,astar,hmax,timeout,process tree killed at the time limit,,60.003,2569.2,
+0dbdc943eade4d9d,blocksworld,hard-p08,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,7.0,59.534,193.4,0.0
+0f2c92714137499e,blocksworld,hard-p26,hard,weighted_astar-w2,deepseek-r1,timeout,cooperative time limit reached,473.0,59.759,1986.8,0.0
+0f6f0de5687b4f91,blocksworld,medium-p25,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.007,71.3,
+0fded90afd224e39,transport,easy-p21,easy,ida_star,hmax,timeout,cooperative time limit reached,621.0,59.071,18.4,0.0
+11d82b9f82e44cde,transport,hard-p17,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.01,3356.2,
+1272425266a44986,transport,easy-p19,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,3417.0,59.093,63.0,0.0
+1288d54acaf74cbe,blocksworld,hard-p11,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.013,246.6,
+12b10c47fa6b4a44,blocksworld,easy-p22,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,15082.0,59.13,90.8,0.0
+13f0691eb1ba4f7d,miconic,medium-p13,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,7976.0,59.13,156.2,0.0
+13ffbdc426244561,transport,medium-p16,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,10.0,59.152,141.0,0.0
+145fb333c3dc4179,transport,hard-p04,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.015,1883.2,
+1537463b40ea4f1e,transport,easy-p20,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,3573.0,59.093,63.0,0.0
+156678c5c86b488e,blocksworld,medium-p17,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.008,50.3,
+156a929a8fa54c67,transport,easy-p17,easy,ida_star,hmax,timeout,cooperative time limit reached,1781.0,59.077,16.4,0.0
+15d3ce2052234238,blocksworld,hard-p30,hard,astar,deepseek-r1,timeout,cooperative time limit reached,394.0,59.697,1707.7,0.0
+15e554ced6a542b6,blocksworld,easy-p19,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,16098.0,59.145,105.1,0.0
+167891e2d08d446d,blocksworld,easy-p22,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.014,130.3,
+16cded8322a84e17,miconic,medium-p02,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.013,171.6,
+16d94c09b0264016,blocksworld,easy-p28,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,9094.0,59.11,76.3,0.0
+16e7c357063c4e58,transport,hard-p06,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,60.005,2568.7,
+1953027249264d8e,blocksworld,medium-p24,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,69.0,59.118,68.1,0.0
+19f4061edb2c4747,blocksworld,hard-p18,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.019,2086.4,
+1a3bbfe7dc434f0f,blocksworld,hard-p08,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,7.0,59.382,194.2,0.0
+1a791795fd744900,blocksworld,medium-p06,medium,astar,hmax,timeout,cooperative time limit reached,1038.0,59.089,38.1,0.0
+1bba6481eaf34743,blocksworld,hard-p11,hard,weighted_astar-w2,deepseek-r1,timeout,cooperative time limit reached,1002.0,59.844,2322.5,0.0
+1bdad0bd5c0b4db3,miconic,medium-p09,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,22069.0,59.129,201.0,0.0
+1c0ae7bd433c4d81,miconic,medium-p24,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.017,142.6,
+1cbe746d3fde4401,transport,hard-p17,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,60.005,3303.2,
+1cce10e7216c4268,miconic,hard-p13,hard,astar,hmax,timeout,cooperative time limit reached,145.0,59.126,103.5,0.0
+1ccfcb68bc6947a1,transport,hard-p15,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,60.055,3162.3,
+1d17a09dff0b45a8,miconic,medium-p10,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,7430.0,59.128,184.7,0.0
+1e73c2ff63184469,blocksworld,hard-p29,hard,astar,hmax,timeout,process tree killed at the time limit,,60.005,716.1,
+1f06508dfaea428d,transport,hard-p15,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.02,3163.0,
+1f8744441ca340be,blocksworld,medium-p25,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,62.0,59.124,71.1,0.0
+200d5a356a6d4d39,blocksworld,hard-p11,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,5.0,59.711,246.8,0.0
+202a0ccca7e04ec4,blocksworld,easy-p08,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,72329.0,59.28,257.0,0.0
+20bd6dbb7078446a,blocksworld,medium-p06,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.011,48.4,
+218afb2080254916,blocksworld,hard-p15,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.019,328.8,
+236b5e5569c7420b,transport,hard-p18,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,60.0,3369.7,
+237b0c374b8f4a80,transport,hard-p21,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,59.999,3374.6,
+238ead69d72448bc,blocksworld,hard-p29,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.008,716.0,
+23926be6f75144c4,transport,easy-p17,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,4528.0,59.099,73.7,0.0
+24b0563e4da542fb,transport,hard-p18,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,60.005,3389.1,
+24e51d84de9946ab,transport,hard-p17,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,60.006,3619.6,
+253101a2c27a4213,transport,hard-p15,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.022,3186.9,
+25869d39624b4afa,transport,medium-p20,medium,astar,hmax,timeout,cooperative time limit reached,3.0,59.201,197.8,0.0
+264096df90d34a27,transport,medium-p04,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.0,46.6,
+2644ea87cb3c4820,blocksworld,medium-p05,medium,astar,hmax,timeout,cooperative time limit reached,1583.0,59.095,40.2,0.0
+2657692848c74c53,transport,easy-p07,easy,astar,hmax,timeout,cooperative time limit reached,77864.0,59.189,205.6,0.0
+275636ead8074668,miconic,hard-p16,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.008,133.8,
+2a8a9673ab4047e1,blocksworld,hard-p30,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,60.016,749.3,
+2aa0ad4f404f4f0a,transport,medium-p16,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.012,141.2,
+2abbdfe5af4c4c35,miconic,hard-p12,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,263.0,59.135,98.5,0.0
+2b41d8e7e91443b8,blocksworld,easy-p13,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,36062.0,59.185,188.7,0.0
+2bb362bb86724049,transport,medium-p09,medium,weighted_astar-w2,deepseek-r1,timeout,cooperative time limit reached,14269.0,59.622,1301.8,0.0
+2be962fd44804d66,blocksworld,medium-p16,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,94.0,59.128,47.7,0.0
+2d63773b45c047ed,blocksworld,hard-p18,hard,astar,hmax,timeout,cooperative time limit reached,3.0,59.378,397.2,0.0
+2db7cc6e06704bdf,transport,medium-p26,medium,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.02,1998.2,
+2e21da934328496b,transport,hard-p29,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,60.014,3608.3,
+2f3ed3b0b4654a07,blocksworld,medium-p24,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.017,67.6,
+2f62ccc185d042bb,transport,easy-p17,easy,astar,hmax,timeout,cooperative time limit reached,4686.0,59.103,76.2,0.0
+2f9516d30fc640e8,miconic,easy-p27,easy,astar,hmax,timeout,cooperative time limit reached,268325.0,59.174,270.2,0.0
+2ff6a8a53adb403d,blocksworld,hard-p08,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.008,193.3,
+302ae2fe109a45d1,transport,hard-p15,hard,astar,hmax,timeout,process tree killed at the time limit,,60.001,3180.6,
+3066dc1a512845ab,miconic,hard-p25,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.012,185.4,
+306afc9f1274447c,miconic,easy-p25,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,304577.0,59.175,295.3,0.0
+3099aa3629ec4ba2,transport,medium-p01,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,354.0,59.09,42.1,0.0
+31071c08d742400c,transport,easy-p20,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,3482.0,59.096,62.3,0.0
+311600e068844975,transport,hard-p29,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.012,3608.8,
+3125c69d919f4bf1,transport,hard-p16,hard,astar,hmax,timeout,process tree killed at the time limit,,60.011,3407.1,
+3142a4311a0e4927,blocksworld,hard-p14,hard,weighted_astar-w1.5,deepseek-r1,timeout,cooperative time limit reached,843.0,59.788,1991.1,0.0
+319a62fb314740c2,transport,hard-p11,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.003,3199.0,
+31b83616b6a4483c,transport,medium-p02,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,195.0,59.085,40.5,0.0
+323d221d715341b9,blocksworld,hard-p03,hard,astar,hmax,timeout,cooperative time limit reached,17.0,59.217,119.6,0.0
+3283d7ece3a346da,transport,hard-p21,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.016,3612.0,
+332d413dc64c4db9,blocksworld,hard-p03,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.01,121.0,
+333fd890249245e1,blocksworld,easy-p28,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,3996.0,59.11,99.9,0.0
+334c30278dc34f93,blocksworld,hard-p11,hard,astar,deepseek-r1,timeout,cooperative time limit reached,953.0,59.827,2172.2,0.0
+336bf1fdaefc456c,miconic,medium-p11,medium,astar,hmax,timeout,cooperative time limit reached,11777.0,59.12,174.4,0.0
+34697efce4284b1f,miconic,easy-p11,easy,ida_star,hmax,timeout,cooperative time limit reached,251818.0,59.076,14.0,0.0
+34c548c9efa34848,miconic,hard-p07,hard,astar,hmax,timeout,cooperative time limit reached,249.0,59.133,93.8,0.0
+35779e16cf0a49e6,transport,hard-p06,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.003,2569.6,
+3672c1ff35cc4199,miconic,medium-p17,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,3774.0,59.11,129.5,0.0
+36a6127bf7014fbb,blocksworld,hard-p02,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.009,107.4,
+36df37293fa14062,blocksworld,hard-p14,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.013,308.8,
+374c4181483642c1,blocksworld,hard-p03,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,60.004,4067.0,
+37667f1ad1be4397,transport,easy-p13,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.008,69.4,
+3925a77d4e4d407a,blocksworld,easy-p29,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,6502.0,59.103,95.4,0.0
+3985facd144b4666,blocksworld,medium-p05,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.017,44.3,
+39b6ae5bdee24b9d,miconic,hard-p13,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.002,102.5,
+3b8f0587265b45db,transport,easy-p19,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,3447.0,59.099,62.9,0.0
+3c1d1e66c089471f,blocksworld,hard-p29,hard,weighted_astar-w2,deepseek-r1,timeout,cooperative time limit reached,387.0,59.822,1875.3,0.0
+3c703349e1634f46,transport,medium-p20,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,3.0,59.203,198.5,0.0
+3d18e01858d44b45,transport,medium-p09,medium,astar,hmax,timeout,cooperative time limit reached,86.0,59.108,69.1,0.0
+3e04d80520de488d,blocksworld,medium-p24,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.014,67.9,
+3e4fd64ec35d4cb8,blocksworld,hard-p26,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.019,625.8,
+3e96dd7a4e3c4d19,transport,medium-p20,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,2.0,59.186,197.5,0.0
+3efe67735f8c42a2,blocksworld,medium-p14,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.008,45.3,
+3facfd78532b40bf,transport,hard-p04,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.011,1783.3,
+400e77e49a074cb9,blocksworld,hard-p30,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,60.005,749.0,
+4036e5d9802c44f5,blocksworld,medium-p14,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.013,47.0,
+40388135c1564113,blocksworld,hard-p26,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.007,622.4,
+407a59aa6476437b,miconic,hard-p26,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.008,191.5,
+4154847be5634eee,blocksworld,hard-p29,hard,astar,deepseek-r1,timeout,cooperative time limit reached,386.0,59.75,1871.3,0.0
+41bd3038e88346c9,transport,medium-p16,medium,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.009,644.5,
+41ef29dba83b44b1,blocksworld,hard-p30,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.009,748.9,
+4294f751d23d439f,transport,hard-p21,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.01,3275.9,
+42fdbe9ed36f4228,blocksworld,medium-p21,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,107.0,59.116,58.4,0.0
+436d389ba94141ab,transport,hard-p18,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.012,3324.0,
+4443a9578760440d,blocksworld,easy-p22,easy,ida_star,deepseek-r1,timeout,cooperative time limit reached,226979.0,59.085,17.5,0.0
+459fa9c5bb8b4d72,transport,hard-p15,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,60.003,3162.4,
+461481e61948400b,transport,hard-p29,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.011,3608.8,
+47881febad734ed3,transport,medium-p09,medium,astar,deepseek-r1,timeout,cooperative time limit reached,12063.0,59.743,1405.5,0.0
+48f5b2bfb8dd4e3f,blocksworld,hard-p08,hard,astar,hmax,timeout,cooperative time limit reached,8.0,59.349,194.4,0.0
+498066de9ee64c72,transport,hard-p12,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.005,3186.4,
+4a207d41031147f9,transport,hard-p17,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.02,3254.8,
+4b2e06b026ec4836,transport,hard-p18,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.003,3369.9,
+4b3a8631727b4147,transport,hard-p11,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,60.009,3140.1,
+4ba2ecfd610f4812,blocksworld,hard-p02,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.021,4097.0,
+4bd201a1f3d14615,miconic,hard-p01,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.005,56.1,
+4be4767746da4223,blocksworld,hard-p02,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,15.0,59.185,107.3,0.0
+4ce3418db0c74ba5,miconic,hard-p02,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,299.0,59.113,85.4,0.0
+4d0a7cc11da54da4,miconic,hard-p13,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.01,103.8,
+4d6f2a10bd4b4ad6,transport,hard-p29,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,59.997,3609.1,
+4d7e17f00dff4b0c,transport,medium-p04,medium,astar,hmax,timeout,cooperative time limit reached,33.0,59.105,47.0,0.0
+4dab801c156a4f49,transport,medium-p26,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,1.0,59.337,333.9,0.0
+4e70f7ccb5404aa1,miconic,hard-p16,hard,astar,hmax,timeout,cooperative time limit reached,287.0,59.133,134.3,0.0
+4ee07c43c7e44129,miconic,hard-p08,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.014,99.3,
+4f4e29d1fb4149bc,transport,medium-p01,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.014,39.8,
+4fd4339d836b4b00,blocksworld,easy-p22,easy,ida_star,hmax,timeout,cooperative time limit reached,11688.0,59.081,15.2,0.0
+51c73b24923a47f2,blocksworld,medium-p24,medium,astar,hmax,timeout,cooperative time limit reached,72.0,59.129,68.4,0.0
+53c1eb07ca46490c,blocksworld,hard-p14,hard,weighted_astar-w2,deepseek-r1,timeout,cooperative time limit reached,846.0,59.723,1999.7,0.0
+550e6f3f343a4789,transport,hard-p15,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.012,3187.5,
+559eaa77d61d4d93,miconic,easy-p23,easy,ida_star,hmax,timeout,cooperative time limit reached,38364.0,59.067,14.0,0.0
+55b9948dda414a13,miconic,hard-p25,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,211.0,59.201,193.0,0.0
+575674ae1c48451b,blocksworld,easy-p04,easy,ida_star,hmax,timeout,cooperative time limit reached,131327.0,59.082,14.2,0.0
+57e767f91c7a4057,blocksworld,hard-p18,hard,weighted_astar-w1.5,deepseek-r1,timeout,cooperative time limit reached,654.0,59.772,2144.4,0.0
+5843d954b5b24ba3,transport,hard-p12,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.011,3075.7,
+5884d645a69c4a36,blocksworld,easy-p08,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,81404.0,59.276,252.1,0.0
+59097db2d2af417c,transport,medium-p09,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,82.0,59.139,68.6,0.0
+599371f577154eb6,miconic,easy-p27,easy,ida_star,hmax,timeout,cooperative time limit reached,26835.0,59.067,14.1,0.0
+5a14f8174d4540c0,miconic,easy-p14,easy,ida_star,hmax,timeout,cooperative time limit reached,140430.0,59.076,14.1,0.0
+5b6b5b65b0374d2e,transport,medium-p01,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,312.0,59.091,40.4,0.0
+5bf89b1dcab24bb4,transport,hard-p11,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,60.003,3216.6,
+5cbbd034090d4a28,miconic,hard-p02,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.021,73.9,
+5cdb32a3d3e54d46,transport,hard-p06,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.014,2568.6,
+5d8c9f0769724f7f,miconic,hard-p26,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,183.0,59.194,197.0,0.0
+5e12dc5d5a054a87,blocksworld,medium-p17,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,164.0,59.122,50.2,0.0
+5e2d8b4cd9a94e63,miconic,hard-p25,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,224.0,59.173,193.4,0.0
+5e614202c4f44dd6,transport,hard-p04,hard,weighted_astar-w1.5,deepseek-r1,timeout,cooperative time limit reached,39.0,59.845,1784.8,0.0
+5e9b699db3304e24,blocksworld,hard-p30,hard,astar,hmax,timeout,process tree killed at the time limit,,60.004,748.9,
+60f6e7d6792c44f9,blocksworld,hard-p18,hard,weighted_astar-w2,deepseek-r1,timeout,cooperative time limit reached,643.0,59.762,2080.8,0.0
+6139d3149fea4c0a,transport,easy-p21,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,2015.0,59.094,56.6,0.0
+614c3a7d29084bb2,miconic,hard-p13,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,144.0,59.131,103.1,0.0
+6162f5d323fc4ccb,transport,easy-p06,easy,ida_star,hmax,timeout,cooperative time limit reached,42352.0,59.07,14.1,0.0
+6278be0faf3b4ae5,blocksworld,medium-p12,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.016,43.9,
+651a31d0340f4ee5,blocksworld,hard-p11,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,5.0,59.229,247.1,0.0
+658d74f70bd74b50,miconic,medium-p25,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,4482.0,59.14,151.9,0.0
+65f7242fd75b464d,miconic,medium-p09,medium,astar,hmax,timeout,cooperative time limit reached,21749.0,59.127,198.1,0.0
+6618ba027ed14319,miconic,hard-p13,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,144.0,59.128,103.0,0.0
+6648be55593140d1,blocksworld,hard-p14,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,3.0,59.383,308.4,0.0
+67b821ec70cd418b,blocksworld,easy-p29,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.006,87.5,
+6819f0fe304c494c,transport,hard-p21,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.002,3612.9,
+688914d2a6314d1c,transport,hard-p16,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.021,3276.8,
+68970b5999a44849,transport,medium-p04,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,29.0,59.106,46.8,0.0
+68c0edd789394134,miconic,medium-p10,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.016,183.6,
+6a1ace32afb14602,blocksworld,easy-p29,easy,astar,hmax,timeout,cooperative time limit reached,6558.0,59.105,94.7,0.0
+6a5b20ba57e74ed3,blocksworld,hard-p11,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.016,248.0,
+6ac009a330214c73,blocksworld,medium-p23,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,109.0,59.111,62.7,0.0
+6c06c3c6cad849fd,transport,hard-p29,hard,astar,hmax,timeout,process tree killed at the time limit,,60.005,3609.1,
+6c19a9eae0734ef8,blocksworld,hard-p26,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,1.0,59.625,622.8,0.0
+6caf795dd7354fcc,blocksworld,medium-p05,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,1599.0,59.098,40.1,0.0
+6dbc010fd5ce4114,transport,hard-p16,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,59.998,3277.6,
+6dc1bd846a3045e5,transport,easy-p08,easy,ida_star,hmax,timeout,cooperative time limit reached,22681.0,59.073,14.2,0.0
+6dd64013afe44b2f,transport,easy-p20,easy,ida_star,hmax,timeout,cooperative time limit reached,1061.0,59.074,17.5,0.0
+713818a22e7e40fe,blocksworld,hard-p15,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.022,1860.3,
+718740c5bf0b498b,transport,medium-p26,medium,weighted_astar-w1.5,deepseek-r1,timeout,cooperative time limit reached,969.0,59.781,1831.0,0.0
+72129e3c259c4b57,blocksworld,medium-p23,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,76.0,59.122,64.9,0.0
+721b70c4b5674fb9,transport,hard-p11,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.016,3087.0,
+722262d6ef8442f8,miconic,hard-p07,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.022,95.4,
+73a9a491fbab4643,transport,hard-p17,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,60.015,3228.7,
+73dc9a7b380f4acf,transport,hard-p21,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,60.012,3612.5,
+75deb9da04d44ab5,miconic,easy-p27,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,272528.0,59.189,275.1,0.0
+765a02f4b3814edf,transport,medium-p02,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.018,37.9,
+76f382e19a0a49bf,blocksworld,medium-p21,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.011,58.3,
+770097f01faf45ea,miconic,hard-p02,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,625.0,59.112,88.2,0.0
+7738a0fb449d4621,transport,medium-p02,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,182.0,59.093,40.1,0.0
+79ceab4f958b4098,transport,hard-p11,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.015,3040.1,
+7a0fc99b76f1477a,miconic,easy-p25,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,311580.0,59.176,295.9,0.0
+7a5ad7b1e06e43ad,blocksworld,hard-p29,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.009,1878.4,
+7a78c2da3e024e69,blocksworld,hard-p15,hard,weighted_astar-w1.5,deepseek-r1,timeout,cooperative time limit reached,784.0,59.65,1827.7,0.0
+7aa040dfed904158,blocksworld,medium-p16,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,117.0,59.101,47.6,0.0
+7b66a572e5614d82,blocksworld,hard-p03,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,16.0,59.174,119.6,0.0
+7c19eacd335c44c4,transport,hard-p06,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.01,2570.5,
+7c3ed03f41ed43b5,miconic,medium-p11,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,11781.0,59.12,174.8,0.0
+7c5199a5b1b54509,miconic,hard-p25,hard,astar,deepseek-r1,timeout,cooperative time limit reached,1264.0,59.964,2609.3,0.0
+7d39109287464931,blocksworld,medium-p21,medium,astar,hmax,timeout,cooperative time limit reached,113.0,59.175,58.8,0.0
+7dd95e2dbc2b4d86,transport,easy-p13,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,12830.0,59.111,79.4,0.0
+7f897424c5514ab1,blocksworld,hard-p11,hard,astar,hmax,timeout,cooperative time limit reached,5.0,59.307,246.9,0.0
+808976d590e54eaf,blocksworld,medium-p25,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.011,70.8,
+81a9b7f6e9d844aa,blocksworld,easy-p18,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,20607.0,59.144,114.0,0.0
+82310685583a4b79,transport,medium-p01,medium,astar,hmax,timeout,cooperative time limit reached,365.0,59.097,42.8,0.0
+82a38e2637054964,blocksworld,easy-p13,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,33401.0,59.204,186.6,0.0
+8365c89e40aa4295,transport,hard-p29,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.014,3608.1,
+8424ff9a9f5a4caa,transport,medium-p26,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.014,333.8,
+845da55b64c2421e,transport,medium-p26,medium,astar,hmax,timeout,cooperative time limit reached,1.0,59.251,333.6,0.0
+8564db04e6694e2d,blocksworld,medium-p16,medium,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.002,3171.1,
+85891938006641f9,transport,easy-p21,easy,ida_star,deepseek-r1,timeout,cooperative time limit reached,80923.0,59.061,20.4,0.0
+85fa08fe1aed4121,transport,hard-p16,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.005,3407.6,
+8699fca51c0f480e,blocksworld,hard-p26,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.012,1930.6,
+86d94f0729384e01,transport,hard-p21,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.016,3302.3,
+8718d32e550544b0,blocksworld,hard-p02,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.004,4096.8,
+871d0a34ca254f9c,blocksworld,hard-p14,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.019,308.4,
+872c6438de3c4dff,blocksworld,easy-p08,easy,ida_star,hmax,timeout,cooperative time limit reached,60046.0,59.08,14.1,0.0
+8763dfb53dc14b46,transport,hard-p06,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.013,2569.1,
+87efa4bf415341cc,transport,easy-p17,easy,ida_star,deepseek-r1,timeout,cooperative time limit reached,128120.0,59.073,16.9,0.0
+8879a42d2fbb4614,transport,easy-p07,easy,ida_star,hmax,timeout,cooperative time limit reached,18241.0,59.074,14.0,0.0
+89f80cbb5f444770,blocksworld,medium-p12,medium,astar,hmax,timeout,cooperative time limit reached,471.0,59.103,44.5,0.0
+8a5140a7c37f4993,transport,hard-p16,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.013,3294.8,
+8b35859dde7a47bd,transport,hard-p21,hard,astar,hmax,timeout,process tree killed at the time limit,,60.005,3613.1,
+8c3a128235bb4556,miconic,medium-p11,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,11788.0,59.132,175.5,0.0
+8c7444ac7bc3439a,transport,medium-p26,medium,weighted_astar-w2,deepseek-r1,timeout,cooperative time limit reached,947.0,59.779,1797.5,0.0
+8d4d39662562433a,miconic,medium-p11,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.007,167.1,
+8d7737b007a34d23,miconic,medium-p19,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,6129.0,59.13,115.1,0.0
+8dbc735064f54706,blocksworld,hard-p03,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.009,3773.7,
+8ed1a16880e6465e,transport,medium-p09,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.015,69.0,
+8f077b0622224e17,blocksworld,hard-p30,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.009,753.6,
+8fc2d0ed4c474efc,miconic,hard-p24,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,106.0,59.198,183.7,0.0
+8fd3047fec8c48e7,transport,hard-p12,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.01,3126.1,
+90b756acdf7b4707,transport,easy-p13,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,12426.0,59.118,79.4,0.0
+9169a93e98a24d75,blocksworld,hard-p26,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,60.015,622.2,
+91ca02650b244970,transport,medium-p07,medium,astar,hmax,timeout,cooperative time limit reached,9.0,59.139,67.4,0.0
+92f8747fbc0640ce,blocksworld,medium-p14,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,175.0,59.127,44.1,0.0
+9307323dd94c4d40,blocksworld,medium-p25,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,56.0,59.143,71.3,0.0
+936b492bb2fb47f3,miconic,easy-p27,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.014,167.1,
+93942bed947744b1,blocksworld,hard-p15,hard,astar,deepseek-r1,timeout,cooperative time limit reached,739.0,59.654,1692.3,0.0
+94c73d5bedba430d,blocksworld,medium-p06,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.011,41.1,
+95c1e787b9894707,transport,medium-p09,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,86.0,59.127,69.0,0.0
+95d41152f9ef4c56,miconic,hard-p26,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.009,2707.5,
+95e68734180f402e,miconic,medium-p17,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.021,126.8,
+96eb4e61d3804708,transport,medium-p26,medium,astar,deepseek-r1,timeout,cooperative time limit reached,727.0,59.779,1777.7,0.0
+974980418ebb419a,blocksworld,hard-p29,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,1.0,60.001,716.4,0.0
+9905913f04244d9a,blocksworld,hard-p02,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.009,4097.0,
+99586f19efa04244,miconic,hard-p16,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,287.0,59.137,132.8,0.0
+99670857707d4f54,blocksworld,hard-p11,hard,weighted_astar-w1.5,deepseek-r1,timeout,cooperative time limit reached,1006.0,59.839,2335.0,0.0
+9b6af27bc40b48b0,transport,hard-p12,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,60.011,3037.5,
+9b8fda5e71de4be6,transport,medium-p04,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,31.0,59.103,46.7,0.0
+9bde8ed048f64f71,blocksworld,medium-p14,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,197.0,59.091,46.6,0.0
+9dcbe77772c3418d,blocksworld,hard-p11,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.01,2331.6,
+9e510cb557e546d0,blocksworld,easy-p18,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,16111.0,59.14,115.6,0.0
+9e764ca8efce4853,miconic,medium-p16,medium,astar,hmax,timeout,cooperative time limit reached,5713.0,59.12,137.1,0.0
+9f25d9cf229e4670,miconic,medium-p13,medium,astar,hmax,timeout,cooperative time limit reached,8003.0,59.122,156.0,0.0
+a00ae88ad105444e,miconic,hard-p25,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.014,183.0,
+a05347fd97a44d0e,transport,easy-p19,easy,ida_star,hmax,timeout,cooperative time limit reached,1282.0,59.078,17.4,0.0
+a0a225f729ba4cdc,blocksworld,hard-p03,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.005,3951.7,
+a0c951b0b5ab46d2,transport,hard-p15,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.003,3303.0,
+a0f4d8b7a3724fd5,transport,hard-p12,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,59.996,3312.4,
+a1dbd0be23a745d6,transport,easy-p21,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,1991.0,59.09,56.4,0.0
+a1efa3eae5dd4de0,transport,medium-p29,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,1.0,59.312,405.9,0.0
+a2001606534f461d,transport,easy-p13,easy,ida_star,hmax,timeout,cooperative time limit reached,3041.0,59.075,15.4,0.0
+a222a43bb13e43fc,blocksworld,hard-p03,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,16.0,59.18,120.0,0.0
+a290373f7c9f4f29,transport,hard-p29,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.01,3608.9,
+a2907c4e65654571,blocksworld,hard-p29,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,60.001,716.4,
+a2a6f5d52fc34236,transport,easy-p19,easy,astar,hmax,timeout,cooperative time limit reached,3520.0,59.101,63.4,0.0
+a2ea876825c143aa,blocksworld,hard-p18,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.011,398.2,
+a362e8869e684386,miconic,hard-p24,hard,astar,hmax,timeout,cooperative time limit reached,103.0,59.173,183.3,0.0
+a44d2c8b39394053,transport,easy-p19,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.019,57.8,
+a523eb04f1614b27,transport,medium-p16,medium,astar,deepseek-r1,timeout,cooperative time limit reached,3516.0,59.366,659.9,0.0
+a5a569832c824acf,transport,hard-p17,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.006,3287.7,
+a5a58213e5754b71,transport,hard-p06,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,60.009,2569.1,
+a5ee8bdc60d04122,blocksworld,medium-p12,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,457.0,59.088,43.7,0.0
+a6209bc7653d45bd,transport,hard-p16,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.018,3277.0,
+a69aa1147e8f42f8,blocksworld,hard-p08,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.016,3077.9,
+a84be75fa7c14967,blocksworld,medium-p16,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.009,48.4,
+a8f9a39284604317,miconic,medium-p02,medium,astar,hmax,timeout,cooperative time limit reached,35665.0,59.145,197.9,0.0
+a8fe4f6749e04bda,blocksworld,hard-p08,hard,astar,deepseek-r1,timeout,cooperative time limit reached,1136.0,59.991,2894.8,0.0
+a9abd86403d54ea5,transport,easy-p17,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.023,68.8,
+a9ce3645a8634983,transport,hard-p11,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,60.008,2879.6,
+aa6fd4d4e324450d,miconic,medium-p02,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,36015.0,59.148,198.4,0.0
+aacdc861c1b94c8a,transport,hard-p04,hard,astar,deepseek-r1,timeout,cooperative time limit reached,34.0,59.856,1784.2,0.0
+ab495fcfbfc74e5e,transport,easy-p21,easy,astar,hmax,timeout,cooperative time limit reached,2153.0,59.098,59.6,0.0
+ab81fb6c0ed84c86,blocksworld,easy-p18,easy,ida_star,hmax,timeout,cooperative time limit reached,15682.0,59.082,15.2,0.0
+ac0e904e2dd6492a,transport,hard-p12,hard,astar,hmax,timeout,process tree killed at the time limit,,60.005,3265.5,
+ac3ef37934474c70,blocksworld,hard-p15,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,3.0,59.258,328.0,0.0
+ac68e79f91444b3a,miconic,hard-p26,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.011,191.1,
+adc687ec5fbd4ece,miconic,medium-p02,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,34597.0,59.147,195.5,0.0
+adcd808e465045ca,miconic,hard-p26,hard,astar,hmax,timeout,cooperative time limit reached,206.0,59.154,200.8,0.0
+ae7978ce965c4d45,blocksworld,hard-p18,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,2.0,59.975,396.8,0.0
+ae81293d16c444d6,miconic,hard-p02,hard,astar,hmax,timeout,cooperative time limit reached,883.0,59.112,89.4,0.0
+ae98ac71de634e4a,blocksworld,hard-p29,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.021,719.1,
+afb62ab47e4549c8,transport,hard-p21,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,60.012,3286.7,
+aff1a739bbc64371,miconic,hard-p12,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.008,100.6,
+b078112c11b343d9,blocksworld,medium-p14,medium,astar,hmax,timeout,cooperative time limit reached,204.0,59.125,46.9,0.0
+b08c1d9b66454dfc,miconic,hard-p08,hard,astar,hmax,timeout,cooperative time limit reached,145.0,59.122,93.9,0.0
+b16a19f013c14f30,miconic,hard-p26,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,60.012,2565.0,
+b17daca74e344cad,miconic,hard-p01,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.014,64.3,
+b1d955ebdf744c35,miconic,medium-p19,medium,astar,hmax,timeout,cooperative time limit reached,6144.0,59.12,116.8,0.0
+b2470b0480024313,blocksworld,hard-p15,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,3.0,59.841,328.5,0.0
+b2e743ebe0524af6,transport,medium-p29,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,1.0,59.591,406.2,0.0
+b3791f6c647c457a,transport,medium-p04,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.016,46.0,
+b421344bc5ec46da,transport,medium-p13,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,3.0,59.205,118.3,0.0
+b4a6ab4b61434567,blocksworld,hard-p14,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,3.0,59.999,308.8,0.0
+b536b9648d944595,blocksworld,hard-p29,hard,weighted_astar-w1.5,deepseek-r1,timeout,cooperative time limit reached,391.0,59.799,1892.1,0.0
+b66927eace644419,miconic,easy-p17,easy,ida_star,hmax,timeout,cooperative time limit reached,81926.0,59.077,14.1,0.0
+b6cab07a0211473d,blocksworld,hard-p03,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.012,120.9,
+b6ecf20966514fdd,blocksworld,medium-p25,medium,astar,hmax,timeout,cooperative time limit reached,63.0,59.19,71.2,0.0
+b6f434d5c0604529,transport,hard-p18,hard,astar,hmax,timeout,process tree killed at the time limit,,60.012,3369.2,
+b725a6766da34936,blocksworld,hard-p02,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,14.0,59.181,108.0,0.0
+b7a4c92d957a453d,miconic,medium-p13,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.005,153.2,
+b809674c304f40ec,blocksworld,medium-p21,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.021,58.2,
+b83c1123880c4c60,miconic,hard-p16,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.005,134.0,
+b902554e86414f9d,transport,medium-p07,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.019,66.3,
+ba3a07a430634b9a,blocksworld,medium-p23,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.015,61.9,
+ba5f521a1c8942dc,blocksworld,medium-p16,medium,astar,hmax,timeout,cooperative time limit reached,130.0,59.109,49.5,0.0
+bab555338b0d467a,transport,easy-p21,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.007,54.4,
+bab874eb534440a3,transport,medium-p29,medium,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.012,1902.8,
+bad2c95e51214437,miconic,medium-p25,medium,astar,hmax,timeout,cooperative time limit reached,4494.0,59.124,155.1,0.0
+bb6cbaf748f9498a,transport,hard-p17,hard,astar,hmax,timeout,process tree killed at the time limit,,60.002,3618.3,
+bc031fb6d5fa496f,miconic,hard-p24,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.011,177.2,
+bcc90ae482054765,blocksworld,hard-p26,hard,astar,deepseek-r1,timeout,cooperative time limit reached,454.0,59.736,1907.1,0.0
+bd8e141e4e204638,blocksworld,easy-p29,easy,ida_star,hmax,timeout,cooperative time limit reached,5381.0,59.083,16.4,0.0
+bdff337f0cec483a,blocksworld,hard-p02,hard,astar,hmax,timeout,cooperative time limit reached,15.0,59.193,107.6,0.0
+be73a139dac24c58,transport,hard-p11,hard,astar,hmax,timeout,process tree killed at the time limit,,60.016,3266.5,
+be85199dc4d74eb6,blocksworld,easy-p29,easy,ida_star,deepseek-r1,timeout,cooperative time limit reached,171315.0,59.078,22.4,0.0
+bfb2985b5ea64430,blocksworld,easy-p18,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.013,107.9,
+bfb5a7c1f03a4040,transport,easy-p13,easy,astar,hmax,timeout,cooperative time limit reached,13735.0,59.117,83.4,0.0
+c0010fca79c741a3,miconic,hard-p24,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.012,2951.5,
+c0303f770a4e4b8d,miconic,medium-p17,medium,astar,hmax,timeout,cooperative time limit reached,3778.0,59.113,130.2,0.0
+c0530758ef814bff,transport,medium-p29,medium,astar,hmax,timeout,cooperative time limit reached,1.0,59.396,406.0,0.0
+c16a3a8ef8bf4847,miconic,medium-p24,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,7542.0,59.137,162.6,0.0
+c1e2626ba9bc4d26,transport,medium-p02,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.008,39.9,
+c22d63dae636411a,miconic,hard-p07,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,249.0,59.133,93.4,0.0
+c32c146f1c614576,miconic,medium-p16,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,5708.0,59.134,134.1,0.0
+c37386a0f9bd474f,transport,hard-p04,hard,weighted_astar-w2,deepseek-r1,timeout,cooperative time limit reached,35.0,59.879,1784.3,0.0
+c37ee8a5a3064bef,transport,hard-p16,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,60.013,3353.0,
+c4adafddc95a4603,miconic,medium-p13,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,7755.0,59.118,149.2,0.0
+c4c8f305ad544eee,miconic,hard-p26,hard,weighted_astar-w1.5,deepseek-r1,timeout,cooperative time limit reached,1212.0,59.933,2629.9,0.0
+c50e8724e2944fcf,blocksworld,easy-p18,easy,astar,hmax,timeout,cooperative time limit reached,21425.0,59.143,116.9,0.0
+c52f3e3c9bd74a2b,transport,hard-p18,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,59.992,3370.6,
+c545ce4093ef4b59,blocksworld,medium-p05,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.016,41.9,
+c5f9a40b877240c7,blocksworld,hard-p15,hard,astar,hmax,timeout,cooperative time limit reached,3.0,59.425,328.4,0.0
+c6900174dbdb4fd1,blocksworld,hard-p14,hard,astar,hmax,timeout,cooperative time limit reached,3.0,60.006,308.4,0.0
+c69fe2502edf43fa,miconic,hard-p25,hard,astar,hmax,timeout,cooperative time limit reached,236.0,59.162,193.8,0.0
+c74b61c5794540b4,transport,medium-p09,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.018,67.5,
+c7ca1dc836b64afd,blocksworld,hard-p18,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,3.0,59.785,397.8,0.0
+c8fdb991ed8f4453,transport,medium-p01,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.007,37.7,
+c92cc240107e4128,transport,hard-p11,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.008,3142.1,
+c9ac586c27e34151,transport,medium-p13,medium,astar,hmax,timeout,cooperative time limit reached,3.0,59.137,117.9,0.0
+ca1cfb33e7414b2d,blocksworld,easy-p19,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.013,98.7,
+ca4ef83dcb1f4e91,blocksworld,easy-p19,easy,ida_star,hmax,timeout,cooperative time limit reached,13278.0,59.08,15.2,0.0
+ca78d9b1fe894f24,blocksworld,hard-p18,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.012,397.1,
+cc07d2ffe3664a48,miconic,hard-p16,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,287.0,59.152,133.0,0.0
+cc3a274c3083499e,blocksworld,easy-p19,easy,astar,hmax,timeout,cooperative time limit reached,18028.0,59.137,103.8,0.0
+cdd8ccf0d09a4c71,transport,easy-p20,easy,astar,hmax,timeout,cooperative time limit reached,3837.0,59.103,65.0,0.0
+cdda4587a1d343a1,miconic,hard-p08,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.01,94.7,
+cdf8ed17a1184281,blocksworld,hard-p30,hard,weighted_astar-w1.5,deepseek-r1,timeout,cooperative time limit reached,396.0,59.782,1716.1,0.0
+ce21b4e435c148bf,transport,hard-p04,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.022,1882.5,
+ce22961b9c4e4a17,transport,hard-p18,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.017,3324.0,
+ce5a0e12d1754080,blocksworld,medium-p23,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.008,65.2,
+cee56c0b01784803,miconic,medium-p24,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,7018.0,59.137,157.4,0.0
+cefa099e240e40fc,blocksworld,easy-p11,easy,ida_star,hmax,timeout,cooperative time limit reached,33922.0,59.081,14.1,0.0
+cf274ad397894cc6,transport,hard-p12,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,60.015,3099.0,
+d122b0a8710f4b45,transport,medium-p07,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,8.0,59.138,66.8,0.0
+d18768b0d50f4c1e,transport,hard-p12,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,60.008,3189.3,
+d2ff4ce3fd024465,miconic,hard-p24,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.016,176.8,
+d3ca06b01af6413d,miconic,easy-p27,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,273421.0,59.18,272.3,0.0
+d40a4e4c5c414166,transport,medium-p13,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.006,117.1,
+d42aa49cfdb4477b,transport,medium-p20,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.02,197.5,
+d4debd1181c64ff1,blocksworld,easy-p22,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,4825.0,59.145,142.8,0.0
+d566dd603bec4b3e,transport,medium-p07,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,8.0,59.117,66.4,0.0
+d5b792cd6f1d4ed0,blocksworld,hard-p14,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.01,2029.9,
+d7b184c078e54629,blocksworld,hard-p15,hard,weighted_astar-w2,deepseek-r1,timeout,cooperative time limit reached,784.0,59.659,1827.9,0.0
+d9183b85ffa740ec,blocksworld,hard-p08,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.012,193.7,
+d9a48b714f6c4fb4,transport,easy-p19,easy,ida_star,deepseek-r1,timeout,cooperative time limit reached,150269.0,59.074,18.3,0.0
+d9c7b74b3f2e4f76,blocksworld,easy-p19,easy,ida_star,deepseek-r1,timeout,cooperative time limit reached,304384.0,59.084,16.7,0.0
+db031279b5c84b91,blocksworld,medium-p12,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,347.0,59.108,43.1,0.0
+db2a4bc8fc2d4d4c,blocksworld,hard-p26,hard,weighted_astar-w1.5,deepseek-r1,timeout,cooperative time limit reached,476.0,59.773,1999.6,0.0
+db8805fddbff40d7,blocksworld,easy-p29,easy,gbfs,hff,timeout,process tree killed at the time limit,,60.019,85.0,
+dbe4d789e75b4289,transport,medium-p29,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.013,406.3,
+dc1ae2fa6f604312,blocksworld,medium-p17,medium,astar,hmax,timeout,cooperative time limit reached,188.0,59.116,51.1,0.0
+dd51732e92d54657,miconic,medium-p16,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,5687.0,59.117,133.1,0.0
+dd5472bb7cd2485a,blocksworld,easy-p28,easy,ida_star,hmax,timeout,cooperative time limit reached,7225.0,59.072,16.4,0.0
+ddd926418e9b40af,blocksworld,hard-p15,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.02,329.0,
+dea39ec0babf4ae8,transport,medium-p20,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.01,197.5,
+deec5d9b08e84dc6,blocksworld,easy-p11,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,43242.0,59.221,225.7,0.0
+df48481bc7ba4998,blocksworld,hard-p02,hard,weighted_astar-w2,deepseek-r1,memory_limit,memory cap reached,1901.0,59.612,4097.0,0.0
+df5eb44bc32b491d,miconic,medium-p16,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.023,132.4,
+df604357169149e3,blocksworld,medium-p24,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,63.0,59.108,68.1,0.0
+dfc37e1dbfbf4cc6,transport,medium-p26,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,1.0,59.298,333.8,0.0
+dfd13eed20dd4817,blocksworld,medium-p06,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,1065.0,59.093,38.0,0.0
+dff9acef8bd54241,blocksworld,medium-p17,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.012,49.8,
+e250680ce92142a1,transport,medium-p29,medium,astar,deepseek-r1,timeout,cooperative time limit reached,461.0,59.657,1465.0,0.0
+e2858bb3966b4ef7,transport,hard-p06,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,60.018,2569.4,
+e352219e19a341e0,miconic,hard-p01,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,3551.0,59.097,66.3,0.0
+e3615b8b5f0049be,miconic,medium-p25,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.013,136.1,
+e451644e10a941bf,transport,hard-p18,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.016,3325.1,
+e4a56d26894b42c8,blocksworld,hard-p30,hard,weighted_astar-w2,deepseek-r1,timeout,cooperative time limit reached,396.0,59.697,1715.4,0.0
+e5096ced5b434c67,miconic,medium-p19,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.019,114.3,
+e54a86d53e2244ba,transport,hard-p18,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.009,3369.5,
+e62b5a733ea14206,transport,easy-p07,easy,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,74647.0,59.168,199.8,0.0
+e6551c4c4bea4cd2,transport,medium-p07,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.014,66.7,
+e66b979bb71a4de8,transport,hard-p04,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,60.013,1882.6,
+e6da9e0e85174cfd,miconic,medium-p09,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,22999.0,59.121,204.5,0.0
+e70241cdd4234333,transport,hard-p12,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.014,3223.7,
+e801bb84b5844c7e,blocksworld,easy-p28,easy,astar,hmax,timeout,cooperative time limit reached,9283.0,59.112,74.5,0.0
+e8c95a45d68f42df,miconic,easy-p25,easy,astar,hmax,timeout,cooperative time limit reached,293776.0,59.175,287.9,0.0
+ea0271444eff4d17,blocksworld,hard-p08,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.015,3130.4,
+ea13bff9aaa14532,transport,hard-p04,hard,astar,hmax,timeout,process tree killed at the time limit,,60.003,1882.9,
+ea21145cbcc24c0b,transport,hard-p15,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.009,3162.8,
+ea4928dbebbd46cc,transport,hard-p04,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,59.996,1883.3,
+eab8db786d7f448e,transport,hard-p11,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.015,3139.6,
+eae780e9b1e14732,blocksworld,medium-p12,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.005,45.4,
+eb0459c0a9d940df,miconic,hard-p26,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,183.0,59.167,197.5,0.0
+eb2ca21d52d04246,transport,medium-p13,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.008,118.0,
+eb565e1d2fe740a9,transport,easy-p17,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,4454.0,59.105,73.8,0.0
+eb63d2dda11942e4,blocksworld,easy-p22,easy,astar,hmax,timeout,cooperative time limit reached,16020.0,59.127,91.9,0.0
+ebd1ce1d79c4459d,miconic,medium-p10,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,7429.0,59.126,184.5,0.0
+ebd42272c9ee4ff9,blocksworld,medium-p06,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,900.0,59.107,37.6,0.0
+ec4ab93f85b94afe,miconic,medium-p10,medium,astar,hmax,timeout,cooperative time limit reached,7289.0,59.114,180.8,0.0
+ee9330747a4f49e6,transport,medium-p16,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.014,140.7,
+ef87b86d96b64369,miconic,hard-p08,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,145.0,59.113,94.2,0.0
+ef92d2ffe3314443,blocksworld,hard-p26,hard,astar,hmax,timeout,cooperative time limit reached,1.0,59.884,621.9,0.0
+ef9366bf87664f07,blocksworld,hard-p18,hard,astar,deepseek-r1,timeout,cooperative time limit reached,619.0,59.697,1944.2,0.0
+efb7e111e50a4941,miconic,medium-p09,medium,gbfs,hmax,timeout,process tree killed at the time limit,,60.007,157.3,
+efef83c2294b4571,transport,medium-p26,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.009,334.9,
+f0755392203c4ae7,miconic,hard-p12,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,264.0,59.13,99.8,0.0
+f07a4a1ce0b94518,blocksworld,easy-p22,easy,gbfs,hff,timeout,process tree killed at the time limit,,60.004,80.9,
+f0ab3da6e85647e1,miconic,hard-p12,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.02,99.9,
+f117605c911d4b98,miconic,hard-p01,hard,astar,hmax,timeout,cooperative time limit reached,4029.0,59.097,67.3,0.0
+f2222481f28340a6,blocksworld,hard-p14,hard,astar,deepseek-r1,timeout,cooperative time limit reached,809.0,59.713,1892.1,0.0
+f38d324dbd724fca,blocksworld,easy-p13,easy,astar,hmax,timeout,cooperative time limit reached,36502.0,59.185,188.1,0.0
+f39c7deb179b45ea,miconic,hard-p25,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.018,2863.0,
+f4185cc81b054211,miconic,easy-p25,easy,ida_star,hmax,timeout,cooperative time limit reached,31676.0,59.072,13.8,0.0
+f473663efbfa46fe,miconic,hard-p24,hard,weighted_astar-w2,hmax,timeout,cooperative time limit reached,93.0,59.194,181.6,0.0
+f50c509f37ed408f,transport,medium-p20,medium,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.018,1374.9,
+f54d89285e764229,transport,hard-p21,hard,weighted_astar-w1.5,deepseek-r1,timeout,process tree killed at the time limit,,60.0,3322.1,
+f61a4aa7b44b4fdf,transport,hard-p17,hard,gbfs,hff,timeout,process tree killed at the time limit,,60.015,3228.4,
+f70c200cb7a14041,transport,hard-p29,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,60.017,3391.1,
+f7428a0a611844a1,blocksworld,hard-p08,hard,weighted_astar-w2,deepseek-r1,timeout,process tree killed at the time limit,,59.997,3099.7,
+f78e39192f7949cd,blocksworld,medium-p16,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.017,50.9,
+f7cfc1d3a68846b5,miconic,medium-p19,medium,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,6129.0,59.121,115.1,0.0
+f896ded4cb6643c0,blocksworld,hard-p03,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.008,4096.8,
+f914ee83e6894f20,transport,hard-p16,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.008,3351.0,
+f966901d4466445d,transport,medium-p02,medium,astar,hmax,timeout,cooperative time limit reached,222.0,59.097,41.0,0.0
+f99404003f7941cd,blocksworld,hard-p30,hard,gbfs,deepseek-r1,timeout,process tree killed at the time limit,,60.016,1711.7,
+f9de89507ba54503,miconic,hard-p12,hard,astar,hmax,timeout,cooperative time limit reached,264.0,59.122,99.9,0.0
+f9e357d50ce34cf1,blocksworld,easy-p13,easy,ida_star,hmax,timeout,cooperative time limit reached,25808.0,59.082,14.1,0.0
+fa1b6deecc154099,miconic,hard-p07,hard,weighted_astar-w1.5,hmax,timeout,cooperative time limit reached,249.0,59.129,93.9,0.0
+fa46d3536ac04936,transport,medium-p13,medium,weighted_astar-w2,hmax,timeout,cooperative time limit reached,3.0,59.13,117.8,0.0
+fa9410d0e1544b23,transport,medium-p29,medium,gbfs,hff,timeout,process tree killed at the time limit,,60.01,406.7,
+faeb8098c98a4eb0,transport,hard-p16,hard,weighted_astar-w1.5,hmax,timeout,process tree killed at the time limit,,60.008,3406.5,
+fd01fd18c6504c02,blocksworld,easy-p29,easy,weighted_astar-w2,hmax,timeout,cooperative time limit reached,2757.0,59.102,92.9,0.0
+fe76ff8b715243c9,miconic,hard-p07,hard,gbfs,hmax,timeout,process tree killed at the time limit,,60.02,102.0,
+fe7a051ed5d8493c,transport,hard-p06,hard,astar,deepseek-r1,timeout,process tree killed at the time limit,,60.014,2569.0,
+fedfcd354faf4960,transport,easy-p20,easy,gbfs,hmax,timeout,process tree killed at the time limit,,60.022,58.1,
+fef58a0b944441c9,transport,hard-p15,hard,weighted_astar-w2,hmax,timeout,process tree killed at the time limit,,60.01,3162.5,

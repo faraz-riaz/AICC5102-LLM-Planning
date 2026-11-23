@@ -1,0 +1,10 @@
+heuristic,method,gap_n,0 (optimal),"(0,5]","(5,10]","(10,25]","(25,50]",>50
+deepseek-r1,astar,17,12,1,2,2,0,0
+deepseek-r1,gbfs,17,11,1,3,2,0,0
+deepseek-r1,weighted_astar-w1.5,17,12,1,2,2,0,0
+deepseek-r1,weighted_astar-w2,17,12,1,2,2,0,0
+hff,gbfs,17,7,2,4,1,2,1
+hmax,astar,13,13,0,0,0,0,0
+hmax,gbfs,16,7,1,4,4,0,0
+hmax,weighted_astar-w1.5,14,14,0,0,0,0,0
+hmax,weighted_astar-w2,15,13,0,1,1,0,0

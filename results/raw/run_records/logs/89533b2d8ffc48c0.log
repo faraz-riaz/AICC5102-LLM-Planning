@@ -1,0 +1,28 @@
+2026-11-23 09:34:55,722 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:34:55,722 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_x24cxpoj\domain.pddl
+2026-11-23 09:34:55,728 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:34:55,728 INFO     using heuristic: hFFHeuristic
+2026-11-23 09:34:55,728 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_x24cxpoj\domain.pddl
+2026-11-23 09:34:55,730 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_x24cxpoj\easy-p01.pddl
+2026-11-23 09:34:55,732 INFO     5 Predicates parsed
+2026-11-23 09:34:55,732 INFO     3 Actions parsed
+2026-11-23 09:34:55,732 INFO     12 Objects parsed
+2026-11-23 09:34:55,732 INFO     0 Constants parsed
+2026-11-23 09:34:55,732 INFO     Grounding start: transport-01
+2026-11-23 09:34:55,732 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:34:55,732 INFO     Grounding end: transport-01
+2026-11-23 09:34:55,732 INFO     32 Variables created
+2026-11-23 09:34:55,732 INFO     90 Operators created
+2026-11-23 09:34:55,732 INFO     Search start: transport-01
+2026-11-23 09:34:55,732 INFO     Initial h value: 3.00
+2026-11-23 09:34:55,732 INFO     Found new best h: 2.00 after 1 expansions
+2026-11-23 09:34:55,734 INFO     Found new best h: 1.00 after 2 expansions
+2026-11-23 09:34:55,734 INFO     Early goal reached via operator (drop v1 l3 p1 c0 c1).
+2026-11-23 09:34:55,734 INFO     3 Nodes expanded
+2026-11-23 09:34:55,734 INFO     Max open list size: 8
+2026-11-23 09:34:55,734 INFO     Search end: transport-01
+2026-11-23 09:34:55,734 INFO     Search time: 0.00
+2026-11-23 09:34:55,734 INFO     Total time: 0.00
+2026-11-23 09:34:55,734 INFO     Plan length: 3
+2026-11-23 09:34:55,738 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-23 09:34:55,738 WARNING  warning: could not determine peak memory

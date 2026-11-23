@@ -1,0 +1,7 @@
+ERROR:root:A* search failed
+Traceback (most recent call last):
+  File "C:\Users\HMC-ADMIN\Desktop\AI_Project-r2\src\pyperplan\search\a_star.py", line 375, in astar_search_result
+    heapq.heappush(
+MemoryError
+
+{"worker_ok": true, "initial_h": 191.0, "setup_time_s": 0.43005820002872497, "status": "error", "failure_detail": "MemoryError: ", "nodes_generated": 1064050, "nodes_expanded": 12560, "nodes_reopened": 0, "stale_nodes_skipped": 0, "dead_ends_pruned": 0, "cycles_pruned": null, "iterations": null, "final_bound": null, "search_time_s": 38.43439239996951, "plan_cost": null, "plan_length": null, "plan_valid": null, "validation_detail": "no plan returned", "replay_cost": null, "plan_sha256": null, "plan": null, "self_peak_rss_mib": null, "python_hash_seed": "3851591026"}

@@ -1,0 +1,29 @@
+2026-11-23 09:26:32,319 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:26:32,319 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_fnjq8p1p\domain.pddl
+2026-11-23 09:26:32,323 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:26:32,323 INFO     using heuristic: hMaxHeuristic
+2026-11-23 09:26:32,323 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_fnjq8p1p\domain.pddl
+2026-11-23 09:26:32,325 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_fnjq8p1p\easy-p08.pddl
+2026-11-23 09:26:32,337 INFO     5 Predicates parsed
+2026-11-23 09:26:32,337 INFO     3 Actions parsed
+2026-11-23 09:26:32,337 INFO     17 Objects parsed
+2026-11-23 09:26:32,337 INFO     0 Constants parsed
+2026-11-23 09:26:32,337 INFO     Grounding start: transport-08
+2026-11-23 09:26:32,341 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:26:32,341 INFO     Grounding end: transport-08
+2026-11-23 09:26:32,341 INFO     70 Variables created
+2026-11-23 09:26:32,341 INFO     396 Operators created
+2026-11-23 09:26:32,341 INFO     Search start: transport-08
+2026-11-23 09:26:32,341 INFO     Initial h value: 4.00
+2026-11-23 09:26:32,347 INFO     Found new best h: 3.00 after 2 expansions
+2026-11-23 09:26:34,062 INFO     Found new best h: 2.00 after 772 expansions
+2026-11-23 09:26:35,159 INFO     Found new best h: 1.00 after 1304 expansions
+2026-11-23 09:26:35,167 INFO     Early goal reached via operator (drop v3 l3 p1 c1 c2).
+2026-11-23 09:26:35,167 INFO     1313 Nodes expanded
+2026-11-23 09:26:35,167 INFO     Max open list size: 8683
+2026-11-23 09:26:35,171 INFO     Search end: transport-08
+2026-11-23 09:26:35,171 INFO     Search time: 2.83
+2026-11-23 09:26:35,171 INFO     Total time: 2.83
+2026-11-23 09:26:35,171 INFO     Plan length: 17
+2026-11-23 09:26:35,178 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-23 09:26:35,178 WARNING  warning: could not determine peak memory

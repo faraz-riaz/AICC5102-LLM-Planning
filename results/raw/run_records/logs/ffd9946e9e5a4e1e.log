@@ -1,0 +1,59 @@
+2026-11-23 09:16:14,954 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:16:14,954 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_92d11f99\domain.pddl
+2026-11-23 09:16:14,970 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:16:14,970 INFO     using heuristic: blocksworld9Heuristic
+2026-11-23 09:16:14,970 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_92d11f99\domain.pddl
+2026-11-23 09:16:14,970 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_92d11f99\easy-p11.pddl
+2026-11-23 09:16:14,970 INFO     5 Predicates parsed
+2026-11-23 09:16:14,980 INFO     4 Actions parsed
+2026-11-23 09:16:14,980 INFO     13 Objects parsed
+2026-11-23 09:16:14,980 INFO     0 Constants parsed
+2026-11-23 09:16:14,980 INFO     Grounding start: blocksworld-11
+2026-11-23 09:16:14,980 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:16:14,982 INFO     Grounding end: blocksworld-11
+2026-11-23 09:16:14,982 INFO     209 Variables created
+2026-11-23 09:16:14,982 INFO     364 Operators created
+2026-11-23 09:16:14,982 INFO     Search start: blocksworld-11
+2026-11-23 09:16:14,982 INFO     Initial h value: 122.00
+2026-11-23 09:16:14,982 INFO     Found new best h: 103.00 after 1 expansions
+2026-11-23 09:16:14,982 INFO     Found new best h: 87.00 after 3 expansions
+2026-11-23 09:16:14,982 INFO     Found new best h: 73.00 after 5 expansions
+2026-11-23 09:16:14,982 INFO     Found new best h: 61.00 after 7 expansions
+2026-11-23 09:16:14,982 INFO     Found new best h: 51.00 after 9 expansions
+2026-11-23 09:16:14,982 INFO     Found new best h: 43.00 after 11 expansions
+2026-11-23 09:16:14,982 INFO     Found new best h: 37.00 after 13 expansions
+2026-11-23 09:16:14,982 INFO     Found new best h: 31.00 after 15 expansions
+2026-11-23 09:16:14,982 INFO     Found new best h: 27.00 after 17 expansions
+2026-11-23 09:16:14,982 INFO     Found new best h: 25.00 after 19 expansions
+2026-11-23 09:16:14,982 INFO     Found new best h: 23.00 after 21 expansions
+2026-11-23 09:16:14,991 INFO     Found new best h: 22.00 after 146 expansions
+2026-11-23 09:16:14,991 INFO     Found new best h: 21.00 after 147 expansions
+2026-11-23 09:16:14,991 INFO     Found new best h: 20.00 after 158 expansions
+2026-11-23 09:16:14,991 INFO     Found new best h: 19.00 after 159 expansions
+2026-11-23 09:16:14,999 INFO     Found new best h: 18.00 after 167 expansions
+2026-11-23 09:16:14,999 INFO     Found new best h: 17.00 after 168 expansions
+2026-11-23 09:16:14,999 INFO     Found new best h: 16.00 after 171 expansions
+2026-11-23 09:16:14,999 INFO     Found new best h: 15.00 after 172 expansions
+2026-11-23 09:16:14,999 INFO     Found new best h: 14.00 after 177 expansions
+2026-11-23 09:16:14,999 INFO     Found new best h: 13.00 after 178 expansions
+2026-11-23 09:16:14,999 INFO     Found new best h: 12.00 after 182 expansions
+2026-11-23 09:16:14,999 INFO     Found new best h: 11.00 after 183 expansions
+2026-11-23 09:16:15,001 INFO     Found new best h: 10.00 after 189 expansions
+2026-11-23 09:16:15,001 INFO     Found new best h: 9.00 after 190 expansions
+2026-11-23 09:16:15,001 INFO     Found new best h: 8.00 after 195 expansions
+2026-11-23 09:16:15,001 INFO     Found new best h: 7.00 after 196 expansions
+2026-11-23 09:16:15,001 INFO     Found new best h: 6.00 after 200 expansions
+2026-11-23 09:16:15,001 INFO     Found new best h: 5.00 after 201 expansions
+2026-11-23 09:16:15,002 INFO     Found new best h: 4.00 after 204 expansions
+2026-11-23 09:16:15,002 INFO     Found new best h: 3.00 after 205 expansions
+2026-11-23 09:16:15,002 INFO     Found new best h: 2.00 after 207 expansions
+2026-11-23 09:16:15,002 INFO     Found new best h: 1.00 after 208 expansions
+2026-11-23 09:16:15,002 INFO     Early goal reached via operator (stack b3 b6).
+2026-11-23 09:16:15,002 INFO     209 Nodes expanded
+2026-11-23 09:16:15,002 INFO     Max open list size: 1633
+2026-11-23 09:16:15,002 INFO     Search end: blocksworld-11
+2026-11-23 09:16:15,002 INFO     Search time: 0.02
+2026-11-23 09:16:15,002 INFO     Total time: 0.03
+2026-11-23 09:16:15,002 INFO     Plan length: 48
+2026-11-23 09:16:15,006 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-23 09:16:15,006 WARNING  warning: could not determine peak memory

@@ -1,0 +1,41 @@
+2026-11-23 09:30:35,902 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:30:35,902 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_mwei2zhl\domain.pddl
+2026-11-23 09:30:35,906 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:30:35,906 INFO     using heuristic: hFFHeuristic
+2026-11-23 09:30:35,906 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_mwei2zhl\domain.pddl
+2026-11-23 09:30:35,908 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_mwei2zhl\easy-p13.pddl
+2026-11-23 09:30:35,909 INFO     5 Predicates parsed
+2026-11-23 09:30:35,909 INFO     4 Actions parsed
+2026-11-23 09:30:35,909 INFO     15 Objects parsed
+2026-11-23 09:30:35,909 INFO     0 Constants parsed
+2026-11-23 09:30:35,909 INFO     Grounding start: blocksworld-13
+2026-11-23 09:30:35,911 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:30:35,911 INFO     Grounding end: blocksworld-13
+2026-11-23 09:30:35,911 INFO     271 Variables created
+2026-11-23 09:30:35,911 INFO     480 Operators created
+2026-11-23 09:30:35,911 INFO     Search start: blocksworld-13
+2026-11-23 09:30:35,911 INFO     Initial h value: 23.00
+2026-11-23 09:30:35,937 INFO     Found new best h: 22.00 after 15 expansions
+2026-11-23 09:30:35,941 INFO     Found new best h: 21.00 after 18 expansions
+2026-11-23 09:30:35,965 INFO     Found new best h: 20.00 after 30 expansions
+2026-11-23 09:30:35,972 INFO     Found new best h: 19.00 after 34 expansions
+2026-11-23 09:30:35,976 INFO     Found new best h: 17.00 after 36 expansions
+2026-11-23 09:30:36,545 INFO     Found new best h: 16.00 after 400 expansions
+2026-11-23 09:30:36,718 INFO     Found new best h: 14.00 after 524 expansions
+2026-11-23 09:30:36,722 INFO     Found new best h: 13.00 after 526 expansions
+2026-11-23 09:30:36,748 INFO     Found new best h: 12.00 after 543 expansions
+2026-11-23 09:30:37,680 INFO     Found new best h: 11.00 after 1246 expansions
+2026-11-23 09:30:37,682 INFO     Found new best h: 9.00 after 1248 expansions
+2026-11-23 09:30:37,690 INFO     Found new best h: 8.00 after 1258 expansions
+2026-11-23 09:30:37,692 INFO     Found new best h: 6.00 after 1260 expansions
+2026-11-23 09:30:37,741 INFO     Found new best h: 4.00 after 1362 expansions
+2026-11-23 09:30:37,743 INFO     Found new best h: 2.00 after 1377 expansions
+2026-11-23 09:30:37,743 INFO     Early goal reached via operator (stack b6 b12).
+2026-11-23 09:30:37,743 INFO     1379 Nodes expanded
+2026-11-23 09:30:37,743 INFO     Max open list size: 2407
+2026-11-23 09:30:37,747 INFO     Search end: blocksworld-13
+2026-11-23 09:30:37,747 INFO     Search time: 1.84
+2026-11-23 09:30:37,747 INFO     Total time: 1.84
+2026-11-23 09:30:37,747 INFO     Plan length: 76
+2026-11-23 09:30:37,753 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-23 09:30:37,753 WARNING  warning: could not determine peak memory

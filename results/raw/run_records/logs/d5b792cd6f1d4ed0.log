@@ -1,0 +1,179 @@
+2026-11-23 09:16:40,080 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:16:40,080 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_3emxkqqv\domain.pddl
+2026-11-23 09:16:40,085 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:16:40,085 INFO     using heuristic: blocksworld9Heuristic
+2026-11-23 09:16:40,085 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_3emxkqqv\domain.pddl
+2026-11-23 09:16:40,087 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_3emxkqqv\hard-p14.pddl
+2026-11-23 09:16:40,109 INFO     5 Predicates parsed
+2026-11-23 09:16:40,109 INFO     4 Actions parsed
+2026-11-23 09:16:40,109 INFO     307 Objects parsed
+2026-11-23 09:16:40,109 INFO     0 Constants parsed
+2026-11-23 09:16:40,109 INFO     Grounding start: blocksworld-14
+2026-11-23 09:16:42,425 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:16:42,500 INFO     Grounding end: blocksworld-14
+2026-11-23 09:16:42,500 INFO     95171 Variables created
+2026-11-23 09:16:42,500 INFO     189112 Operators created
+2026-11-23 09:16:42,500 INFO     Search start: blocksworld-14
+2026-11-23 09:16:42,500 INFO     Initial h value: 4194.00
+2026-11-23 09:16:42,740 INFO     Found new best h: 4145.00 after 1 expansions
+2026-11-23 09:16:42,820 INFO     Found new best h: 4099.00 after 3 expansions
+2026-11-23 09:16:42,897 INFO     Found new best h: 4055.00 after 5 expansions
+2026-11-23 09:16:43,017 INFO     Found new best h: 4011.00 after 8 expansions
+2026-11-23 09:16:43,098 INFO     Found new best h: 3969.00 after 10 expansions
+2026-11-23 09:16:43,218 INFO     Found new best h: 3927.00 after 13 expansions
+2026-11-23 09:16:43,298 INFO     Found new best h: 3887.00 after 15 expansions
+2026-11-23 09:16:43,420 INFO     Found new best h: 3886.00 after 18 expansions
+2026-11-23 09:16:43,459 INFO     Found new best h: 3845.00 after 19 expansions
+2026-11-23 09:16:43,601 INFO     Found new best h: 3805.00 after 22 expansions
+2026-11-23 09:16:43,706 INFO     Found new best h: 3767.00 after 24 expansions
+2026-11-23 09:16:43,919 INFO     Found new best h: 3729.00 after 28 expansions
+2026-11-23 09:16:44,075 INFO     Found new best h: 3691.00 after 31 expansions
+2026-11-23 09:16:44,175 INFO     Found new best h: 3655.00 after 33 expansions
+2026-11-23 09:16:44,386 INFO     Found new best h: 3619.00 after 37 expansions
+2026-11-23 09:16:44,527 INFO     Found new best h: 3583.00 after 40 expansions
+2026-11-23 09:16:44,608 INFO     Found new best h: 3549.00 after 42 expansions
+2026-11-23 09:16:44,765 INFO     Found new best h: 3515.00 after 46 expansions
+2026-11-23 09:16:44,902 INFO     Found new best h: 3481.00 after 49 expansions
+2026-11-23 09:16:45,009 INFO     Found new best h: 3449.00 after 51 expansions
+2026-11-23 09:16:45,235 INFO     Found new best h: 3417.00 after 56 expansions
+2026-11-23 09:16:45,444 INFO     Found new best h: 3385.00 after 60 expansions
+2026-11-23 09:16:45,595 INFO     Found new best h: 3353.00 after 63 expansions
+2026-11-23 09:16:45,712 INFO     Found new best h: 3323.00 after 65 expansions
+2026-11-23 09:16:46,067 INFO     Found new best h: 3293.00 after 71 expansions
+2026-11-23 09:16:46,324 INFO     Found new best h: 3263.00 after 76 expansions
+2026-11-23 09:16:46,516 INFO     Found new best h: 3233.00 after 80 expansions
+2026-11-23 09:16:46,669 INFO     Found new best h: 3203.00 after 83 expansions
+2026-11-23 09:16:46,770 INFO     Found new best h: 3175.00 after 85 expansions
+2026-11-23 09:16:47,079 INFO     Found new best h: 3174.00 after 91 expansions
+2026-11-23 09:16:47,133 INFO     Found new best h: 3145.00 after 92 expansions
+2026-11-23 09:16:47,446 INFO     Found new best h: 3144.00 after 98 expansions
+2026-11-23 09:16:47,509 INFO     Found new best h: 3115.00 after 99 expansions
+2026-11-23 09:16:47,828 INFO     Found new best h: 3087.00 after 105 expansions
+2026-11-23 09:16:48,099 INFO     Found new best h: 3059.00 after 110 expansions
+2026-11-23 09:16:48,330 INFO     Found new best h: 3031.00 after 114 expansions
+2026-11-23 09:16:48,504 INFO     Found new best h: 3003.00 after 117 expansions
+2026-11-23 09:16:48,620 INFO     Found new best h: 2977.00 after 119 expansions
+2026-11-23 09:16:49,102 INFO     Found new best h: 2976.00 after 127 expansions
+2026-11-23 09:16:49,163 INFO     Found new best h: 2949.00 after 128 expansions
+2026-11-23 09:16:49,632 INFO     Found new best h: 2923.00 after 136 expansions
+2026-11-23 09:16:50,039 INFO     Found new best h: 2897.00 after 143 expansions
+2026-11-23 09:16:50,344 INFO     Found new best h: 2871.00 after 149 expansions
+2026-11-23 09:16:51,185 INFO     Found new best h: 2845.00 after 154 expansions
+2026-11-23 09:16:51,421 INFO     Found new best h: 2819.00 after 158 expansions
+2026-11-23 09:16:51,605 INFO     Found new best h: 2793.00 after 161 expansions
+2026-11-23 09:16:51,715 INFO     Found new best h: 2769.00 after 163 expansions
+2026-11-23 09:16:51,818 INFO     Found new best h: 2768.00 after 165 expansions
+2026-11-23 09:16:51,869 INFO     Found new best h: 2743.00 after 166 expansions
+2026-11-23 09:16:52,172 INFO     Found new best h: 2742.00 after 172 expansions
+2026-11-23 09:16:52,222 INFO     Found new best h: 2717.00 after 173 expansions
+2026-11-23 09:16:52,696 INFO     Found new best h: 2693.00 after 181 expansions
+2026-11-23 09:16:53,127 INFO     Found new best h: 2669.00 after 188 expansions
+2026-11-23 09:16:53,496 INFO     Found new best h: 2645.00 after 194 expansions
+2026-11-23 09:16:53,806 INFO     Found new best h: 2621.00 after 199 expansions
+2026-11-23 09:16:54,069 INFO     Found new best h: 2597.00 after 203 expansions
+2026-11-23 09:16:54,256 INFO     Found new best h: 2573.00 after 206 expansions
+2026-11-23 09:16:54,384 INFO     Found new best h: 2551.00 after 208 expansions
+2026-11-23 09:16:54,695 INFO     Found new best h: 2550.00 after 213 expansions
+2026-11-23 09:16:54,760 INFO     Found new best h: 2527.00 after 214 expansions
+2026-11-23 09:16:55,231 INFO     Found new best h: 2526.00 after 222 expansions
+2026-11-23 09:16:55,296 INFO     Found new best h: 2503.00 after 223 expansions
+2026-11-23 09:16:55,882 INFO     Found new best h: 2481.00 after 232 expansions
+2026-11-23 09:16:56,343 INFO     Found new best h: 2459.00 after 240 expansions
+2026-11-23 09:16:56,766 INFO     Found new best h: 2437.00 after 247 expansions
+2026-11-23 09:16:57,121 INFO     Found new best h: 2415.00 after 253 expansions
+2026-11-23 09:16:57,432 INFO     Found new best h: 2393.00 after 258 expansions
+2026-11-23 09:16:57,691 INFO     Found new best h: 2371.00 after 262 expansions
+2026-11-23 09:16:57,893 INFO     Found new best h: 2349.00 after 265 expansions
+2026-11-23 09:16:58,020 INFO     Found new best h: 2329.00 after 267 expansions
+2026-11-23 09:16:58,154 INFO     Found new best h: 2328.00 after 269 expansions
+2026-11-23 09:16:58,213 INFO     Found new best h: 2307.00 after 270 expansions
+2026-11-23 09:16:58,337 INFO     Found new best h: 2306.00 after 272 expansions
+2026-11-23 09:16:58,400 INFO     Found new best h: 2285.00 after 273 expansions
+2026-11-23 09:16:58,584 INFO     Found new best h: 2284.00 after 276 expansions
+2026-11-23 09:16:58,644 INFO     Found new best h: 2263.00 after 277 expansions
+2026-11-23 09:16:59,229 INFO     Found new best h: 2243.00 after 286 expansions
+2026-11-23 09:16:59,769 INFO     Found new best h: 2223.00 after 294 expansions
+2026-11-23 09:17:00,217 INFO     Found new best h: 2203.00 after 301 expansions
+2026-11-23 09:17:00,573 INFO     Found new best h: 2183.00 after 307 expansions
+2026-11-23 09:17:00,867 INFO     Found new best h: 2163.00 after 312 expansions
+2026-11-23 09:17:01,098 INFO     Found new best h: 2143.00 after 316 expansions
+2026-11-23 09:17:01,283 INFO     Found new best h: 2123.00 after 319 expansions
+2026-11-23 09:17:01,420 INFO     Found new best h: 2105.00 after 321 expansions
+2026-11-23 09:17:02,175 INFO     Found new best h: 2087.00 after 334 expansions
+2026-11-23 09:17:02,940 INFO     Found new best h: 2069.00 after 346 expansions
+2026-11-23 09:17:03,567 INFO     Found new best h: 2051.00 after 357 expansions
+2026-11-23 09:17:04,154 INFO     Found new best h: 2033.00 after 367 expansions
+2026-11-23 09:17:04,635 INFO     Found new best h: 2015.00 after 376 expansions
+2026-11-23 09:17:05,120 INFO     Found new best h: 1997.00 after 384 expansions
+2026-11-23 09:17:05,496 INFO     Found new best h: 1979.00 after 391 expansions
+2026-11-23 09:17:05,839 INFO     Found new best h: 1961.00 after 397 expansions
+2026-11-23 09:17:06,143 INFO     Found new best h: 1943.00 after 402 expansions
+2026-11-23 09:17:06,356 INFO     Found new best h: 1925.00 after 406 expansions
+2026-11-23 09:17:06,522 INFO     Found new best h: 1907.00 after 409 expansions
+2026-11-23 09:17:06,648 INFO     Found new best h: 1891.00 after 411 expansions
+2026-11-23 09:17:06,705 INFO     Found new best h: 1890.00 after 412 expansions
+2026-11-23 09:17:06,761 INFO     Found new best h: 1873.00 after 413 expansions
+2026-11-23 09:17:07,172 INFO     Found new best h: 1872.00 after 419 expansions
+2026-11-23 09:17:07,249 INFO     Found new best h: 1855.00 after 420 expansions
+2026-11-23 09:17:07,670 INFO     Found new best h: 1854.00 after 426 expansions
+2026-11-23 09:17:07,740 INFO     Found new best h: 1837.00 after 427 expansions
+2026-11-23 09:17:08,300 INFO     Found new best h: 1836.00 after 435 expansions
+2026-11-23 09:17:08,373 INFO     Found new best h: 1819.00 after 436 expansions
+2026-11-23 09:17:08,994 INFO     Found new best h: 1803.00 after 445 expansions
+2026-11-23 09:17:09,572 INFO     Found new best h: 1787.00 after 453 expansions
+2026-11-23 09:17:10,086 INFO     Found new best h: 1771.00 after 460 expansions
+2026-11-23 09:17:10,520 INFO     Found new best h: 1755.00 after 466 expansions
+2026-11-23 09:17:10,893 INFO     Found new best h: 1739.00 after 471 expansions
+2026-11-23 09:17:11,164 INFO     Found new best h: 1723.00 after 475 expansions
+2026-11-23 09:17:11,357 INFO     Found new best h: 1707.00 after 478 expansions
+2026-11-23 09:17:11,494 INFO     Found new best h: 1693.00 after 480 expansions
+2026-11-23 09:17:11,624 INFO     Found new best h: 1692.00 after 482 expansions
+2026-11-23 09:17:11,691 INFO     Found new best h: 1677.00 after 483 expansions
+2026-11-23 09:17:12,156 INFO     Found new best h: 1676.00 after 490 expansions
+2026-11-23 09:17:12,220 INFO     Found new best h: 1661.00 after 491 expansions
+2026-11-23 09:17:13,031 INFO     Found new best h: 1647.00 after 503 expansions
+2026-11-23 09:17:13,701 INFO     Found new best h: 1633.00 after 514 expansions
+2026-11-23 09:17:14,326 INFO     Found new best h: 1619.00 after 524 expansions
+2026-11-23 09:17:14,963 INFO     Found new best h: 1605.00 after 533 expansions
+2026-11-23 09:17:15,502 INFO     Found new best h: 1591.00 after 541 expansions
+2026-11-23 09:17:15,938 INFO     Found new best h: 1577.00 after 548 expansions
+2026-11-23 09:17:16,356 INFO     Found new best h: 1563.00 after 554 expansions
+2026-11-23 09:17:16,672 INFO     Found new best h: 1549.00 after 559 expansions
+2026-11-23 09:17:16,927 INFO     Found new best h: 1535.00 after 563 expansions
+2026-11-23 09:17:17,134 INFO     Found new best h: 1521.00 after 566 expansions
+2026-11-23 09:17:17,247 INFO     Found new best h: 1509.00 after 568 expansions
+2026-11-23 09:17:17,532 INFO     Found new best h: 1508.00 after 573 expansions
+2026-11-23 09:17:17,605 INFO     Found new best h: 1495.00 after 574 expansions
+2026-11-23 09:17:18,338 INFO     Found new best h: 1494.00 after 585 expansions
+2026-11-23 09:17:18,401 INFO     Found new best h: 1481.00 after 586 expansions
+2026-11-23 09:17:19,369 INFO     Found new best h: 1469.00 after 600 expansions
+2026-11-23 09:17:20,297 INFO     Found new best h: 1457.00 after 613 expansions
+2026-11-23 09:17:21,193 INFO     Found new best h: 1445.00 after 625 expansions
+2026-11-23 09:17:22,033 INFO     Found new best h: 1433.00 after 636 expansions
+2026-11-23 09:17:22,754 INFO     Found new best h: 1421.00 after 646 expansions
+2026-11-23 09:17:23,343 INFO     Found new best h: 1409.00 after 655 expansions
+2026-11-23 09:17:23,947 INFO     Found new best h: 1397.00 after 663 expansions
+2026-11-23 09:17:24,470 INFO     Found new best h: 1385.00 after 670 expansions
+2026-11-23 09:17:24,892 INFO     Found new best h: 1373.00 after 676 expansions
+2026-11-23 09:17:25,261 INFO     Found new best h: 1361.00 after 681 expansions
+2026-11-23 09:17:26,445 INFO     Found new best h: 1349.00 after 685 expansions
+2026-11-23 09:17:26,658 INFO     Found new best h: 1337.00 after 688 expansions
+2026-11-23 09:17:26,810 INFO     Found new best h: 1327.00 after 690 expansions
+2026-11-23 09:17:26,954 INFO     Found new best h: 1326.00 after 692 expansions
+2026-11-23 09:17:27,031 INFO     Found new best h: 1315.00 after 693 expansions
+2026-11-23 09:17:27,226 INFO     Found new best h: 1314.00 after 696 expansions
+2026-11-23 09:17:27,291 INFO     Found new best h: 1303.00 after 697 expansions
+2026-11-23 09:17:28,609 INFO     Found new best h: 1293.00 after 715 expansions
+2026-11-23 09:17:29,944 INFO     Found new best h: 1283.00 after 732 expansions
+2026-11-23 09:17:31,163 INFO     Found new best h: 1273.00 after 748 expansions
+2026-11-23 09:17:32,279 INFO     Found new best h: 1263.00 after 763 expansions
+2026-11-23 09:17:33,360 INFO     Found new best h: 1253.00 after 777 expansions
+2026-11-23 09:17:34,368 INFO     Found new best h: 1243.00 after 790 expansions
+2026-11-23 09:17:35,313 INFO     Found new best h: 1233.00 after 802 expansions
+2026-11-23 09:17:36,201 INFO     Found new best h: 1223.00 after 813 expansions
+2026-11-23 09:17:36,982 INFO     Found new best h: 1213.00 after 823 expansions
+2026-11-23 09:17:37,685 INFO     Found new best h: 1203.00 after 832 expansions
+2026-11-23 09:17:38,296 INFO     Found new best h: 1193.00 after 840 expansions
+2026-11-23 09:17:38,810 INFO     Found new best h: 1183.00 after 847 expansions
+2026-11-23 09:17:39,292 INFO     Found new best h: 1173.00 after 853 expansions
+2026-11-23 09:17:39,683 INFO     Found new best h: 1163.00 after 858 expansions

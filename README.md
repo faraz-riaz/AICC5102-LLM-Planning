@@ -27,6 +27,8 @@ All runs: 90 test tasks (3 domains × 3 difficulty tiers × 10), 60 s / 4096 MiB
 
 Failure and guarantee audit: 0 invalid plans, 0 violated optimality or weight guarantees, every successful plan independently replayed (`results/derived/search_comparison/audit_summary.md`).
 
+Repeatability: the whole pipeline was re-run from scratch under identical settings (label `r2`, `tools/rerun_all.py`). Outputs are in `results/derived/r2/` and `results/figures/r2/`; `results/derived/r2/COMPARISON.md` lists every difference from the tables above (all within a few runs near the time limit). See `results/raw/README.md`.
+
 ## What is frozen here
 
 - Upstream source snapshot: [`4c3deabc058e3ab181250a742181412507920d18`](https://github.com/abcorrea/llm-generated-heuristics/commit/4c3deabc058e3ab181250a742181412507920d18)

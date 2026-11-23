@@ -1,0 +1,85 @@
+2026-11-23 09:43:04,763 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:43:04,763 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_hf0099h0\domain.pddl
+2026-11-23 09:43:04,773 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:43:04,773 INFO     using heuristic: blocksworldLLMHeuristic
+2026-11-23 09:43:04,773 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_hf0099h0\domain.pddl
+2026-11-23 09:43:04,779 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_hf0099h0\easy-p18.pddl
+2026-11-23 09:43:04,779 INFO     5 Predicates parsed
+2026-11-23 09:43:04,779 INFO     4 Actions parsed
+2026-11-23 09:43:04,779 INFO     19 Objects parsed
+2026-11-23 09:43:04,779 INFO     0 Constants parsed
+2026-11-23 09:43:04,779 INFO     Grounding start: blocksworld-18
+2026-11-23 09:43:04,779 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:43:04,779 INFO     Grounding end: blocksworld-18
+2026-11-23 09:43:04,779 INFO     419 Variables created
+2026-11-23 09:43:04,779 INFO     760 Operators created
+2026-11-23 09:43:04,779 INFO     Search start: blocksworld-18
+2026-11-23 09:43:04,779 INFO     Initial h value: 64.00
+2026-11-23 09:43:04,779 INFO     Found new best h: 63.00 after 1 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 62.00 after 2 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 61.00 after 3 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 60.00 after 4 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 59.00 after 5 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 58.00 after 6 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 57.00 after 7 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 56.00 after 8 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 55.00 after 9 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 54.00 after 10 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 53.00 after 11 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 52.00 after 12 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 51.00 after 13 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 50.00 after 14 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 49.00 after 15 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 48.00 after 16 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 47.00 after 17 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 46.00 after 18 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 45.00 after 19 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 44.00 after 20 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 43.00 after 21 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 42.00 after 22 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 41.00 after 23 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 40.00 after 24 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 39.00 after 25 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 38.00 after 26 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 37.00 after 27 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 36.00 after 28 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 35.00 after 29 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 34.00 after 30 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 31.00 after 31 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 30.00 after 32 expansions
+2026-11-23 09:43:04,779 INFO     Found new best h: 29.00 after 33 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 28.00 after 34 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 27.00 after 35 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 26.00 after 36 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 25.00 after 37 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 24.00 after 38 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 23.00 after 39 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 22.00 after 40 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 21.00 after 41 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 20.00 after 42 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 19.00 after 43 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 18.00 after 44 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 17.00 after 45 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 16.00 after 46 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 15.00 after 47 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 14.00 after 48 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 13.00 after 49 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 12.00 after 50 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 11.00 after 51 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 10.00 after 52 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 9.00 after 53 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 8.00 after 54 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 7.00 after 55 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 4.00 after 56 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 3.00 after 57 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 2.00 after 58 expansions
+2026-11-23 09:43:04,795 INFO     Found new best h: 1.00 after 59 expansions
+2026-11-23 09:43:04,795 INFO     Early goal reached via operator (stack b11 b14).
+2026-11-23 09:43:04,795 INFO     60 Nodes expanded
+2026-11-23 09:43:04,795 INFO     Max open list size: 456
+2026-11-23 09:43:04,795 INFO     Search end: blocksworld-18
+2026-11-23 09:43:04,795 INFO     Search time: 0.02
+2026-11-23 09:43:04,795 INFO     Total time: 0.02
+2026-11-23 09:43:04,795 INFO     Plan length: 60
+2026-11-23 09:43:04,795 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-23 09:43:04,795 WARNING  warning: could not determine peak memory

@@ -1,0 +1,29 @@
+2026-11-23 09:48:48,770 INFO     Python version: 3.12.12 (main, Feb 12 2026, 00:40:26) [MSC v.1944 64 bit (AMD64)]
+2026-11-23 09:48:48,770 INFO     Found domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_thbqm77o\domain.pddl
+2026-11-23 09:48:48,788 INFO     using search: gbfs_early_goal_test
+2026-11-23 09:48:48,788 INFO     using heuristic: miconicLLMHeuristic
+2026-11-23 09:48:48,788 INFO     Parsing Domain C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_thbqm77o\domain.pddl
+2026-11-23 09:48:48,791 INFO     Parsing Problem C:\Users\HMC-AD~1\AppData\Local\Temp\aicc_run_thbqm77o\easy-p02.pddl
+2026-11-23 09:48:48,791 INFO     6 Predicates parsed
+2026-11-23 09:48:48,791 INFO     4 Actions parsed
+2026-11-23 09:48:48,791 INFO     5 Objects parsed
+2026-11-23 09:48:48,791 INFO     0 Constants parsed
+2026-11-23 09:48:48,791 INFO     Grounding start: miconic-02
+2026-11-23 09:48:48,791 INFO     Relevance analysis removed 0 facts
+2026-11-23 09:48:48,793 INFO     Grounding end: miconic-02
+2026-11-23 09:48:48,793 INFO     10 Variables created
+2026-11-23 09:48:48,793 INFO     17 Operators created
+2026-11-23 09:48:48,793 INFO     Search start: miconic-02
+2026-11-23 09:48:48,793 INFO     Initial h value: 8.00
+2026-11-23 09:48:48,793 INFO     Found new best h: 5.00 after 1 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 4.00 after 2 expansions
+2026-11-23 09:48:48,793 INFO     Found new best h: 1.00 after 3 expansions
+2026-11-23 09:48:48,793 INFO     Early goal reached via operator (depart f1 p1).
+2026-11-23 09:48:48,793 INFO     4 Nodes expanded
+2026-11-23 09:48:48,793 INFO     Max open list size: 7
+2026-11-23 09:48:48,793 INFO     Search end: miconic-02
+2026-11-23 09:48:48,793 INFO     Search time: 0.00
+2026-11-23 09:48:48,793 INFO     Total time: 0.00
+2026-11-23 09:48:48,793 INFO     Plan length: 4
+2026-11-23 09:48:48,793 INFO     validate could not be found on the PATH so the plan can not be validated.
+2026-11-23 09:48:48,793 WARNING  warning: could not determine peak memory
