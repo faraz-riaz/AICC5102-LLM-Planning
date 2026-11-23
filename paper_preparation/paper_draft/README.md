@@ -2,7 +2,7 @@
 
 Open **AICC5102_Final_Paper_Draft.docx** for the written research paper. The PDF preview is rendered from that DOCX. **PENDING_CONTENT_CHECKLIST.md** lists each actual yellow Word highlight; **DRAFT_VALIDATION.md** records page counts, layout review, evidence checks and remaining submission steps.
 
-The editable prose source is **manuscript.md**. Its `@pending` directives pair with metadata in **build_docx.py**; they become real dark-text Word runs with yellow highlighting and bold `TO BE DONE`. Table directives read the existing prepared CSVs, and image directives embed the existing PNGs without redrawing them. Figure 3, Figure 6 and Table 8 are explicitly pending captions, not fabricated displays. Populated tables are numbered in order of appearance, independently of preparation file IDs.
+The editable prose source is **manuscript.md**. Its `@pending` directives pair with metadata in **build_docx.py**; they become real dark-text Word runs with yellow highlighting and bold `TO BE DONE`. Table directives read the prepared CSVs (and, for Table 8, results/derived/heuristic_reliability), and image directives embed existing PNGs without redrawing them, including the heuristic-reliability figures from results/figures/heuristic_reliability. Only three author-supplied items remain highlighted. Populated tables are numbered in order of appearance, independently of preparation file IDs.
 
 ## Rebuild
 
@@ -24,4 +24,4 @@ python paper_preparation/paper_draft/review_pdf.py
 
 The reviewer checks the rendered page geometry, full-size image bounds, captions, main/reference boundary and pending count, saves ignored page images for inspection, and publishes the PDF as **AICC5102_Final_Paper_Draft_Preview.pdf**. Regeneration requires the original prepared inputs and raw evidence; it never invokes the planner, an exact-state solver or an LLM.
 
-Final author, contribution and AI-use declarations need confirmation against actual records. This is a nearly complete draft of the verified experiments, not a completed independent-generation study or final LaTeX submission.
+The draft covers all completed experiments with the final 8-worker results. Author details, the contribution statement and per-person AI-use declarations need confirmation by the authors. The submission itself must be transferred to the NeurIPS 2026 LaTeX template.
