@@ -8,8 +8,8 @@ Summarize in main text to save space; actual sidecars override historical provis
 | Split | 99 training tasks/domain; select on training only; freeze before testing |
 | Heuristics | Archived selected DeepSeek-R1; hmax; hFF for reproduction only |
 | Search | GBFS, A*, WA* weights 1.5 and 2; IDA* easy30 only; w=1 correctness check |
-| Budget | 60 s wall; 4096 MiB process-tree committed memory; 3 workers |
+| Budget | 60 s wall; 4096 MiB process-tree committed memory; 8 workers |
 | Seeds | Task-scoped hash seeds, base 5102; historical M1 used run-scoped seeds |
-| Trials | One deterministic run/configuration; 3 new independent generation trials PENDING |
+| Trials | One deterministic run/configuration; 3 independent generation trials (Gemini 3.1 Pro), same contract |
 | References | 17/90 proven, all easy: BW 2, Miconic 10, Transport 5 |
 | Machine | Windows 11, CPython 3.12.12; machine-f922a64c5235; 24 logical CPUs |

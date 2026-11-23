@@ -6,16 +6,16 @@
 \begin{longtable}{>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}}
 \hline
 domain & heuristic & tested & solved & timeout & memory limit \\ \hline\endhead
-blocksworld & hff & 30 & 8 & 22 & 0 \\
+blocksworld & hff & 30 & 7 & 23 & 0 \\
 blocksworld & hmax & 30 & 5 & 25 & 0 \\
-blocksworld & llm-r1 & 30 & 20 & 8 & 2 \\
+blocksworld & llm-r1 & 30 & 20 & 10 & 0 \\
 miconic & hff & 30 & 20 & 10 & 0 \\
 miconic & hmax & 30 & 9 & 21 & 0 \\
-miconic & llm-r1 & 30 & 29 & 0 & 1 \\
+miconic & llm-r1 & 30 & 27 & 3 & 0 \\
 transport & hff & 30 & 10 & 20 & 0 \\
 transport & hmax & 30 & 5 & 25 & 0 \\
 transport & llm-r1 & 30 & 15 & 15 & 0 \\
 \hline
 \end{longtable}
 \endgroup
-% 270 same-machine rows, including 180 GBFS rows already in M2; do not sum these as independent experiments. Historical Amina raw results unavailable.
+% 270 final 8-worker GBFS rows, including the 180 R1/hmax GBFS rows of the search comparison; do not sum these as independent experiments.

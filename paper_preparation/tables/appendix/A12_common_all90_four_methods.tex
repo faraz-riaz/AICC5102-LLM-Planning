@@ -6,14 +6,14 @@
 \begin{longtable}{>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}}
 \hline
 heuristic & method & common solved n & gap n & gap mean pct & gap median pct \\ \hline\endhead
-deepseek-r1 & gbfs & 63 & 17 & 3.31 & 0 \\
-deepseek-r1 & astar & 63 & 17 & 2.79 & 0 \\
-deepseek-r1 & weighted\_\allowbreak{}astar-w1.5 & 63 & 17 & 2.79 & 0 \\
-deepseek-r1 & weighted\_\allowbreak{}astar-w2 & 63 & 17 & 2.79 & 0 \\
-hmax & gbfs & 14 & 14 & 5.94 & 5.44 \\
-hmax & astar & 14 & 14 & 0 & 0 \\
-hmax & weighted\_\allowbreak{}astar-w1.5 & 14 & 14 & 0 & 0 \\
-hmax & weighted\_\allowbreak{}astar-w2 & 14 & 14 & 1.74 & 0 \\
+deepseek-r1 & gbfs & 61 & 17 & 3.31 & 0 \\
+deepseek-r1 & astar & 61 & 17 & 2.79 & 0 \\
+deepseek-r1 & weighted\_\allowbreak{}astar-w1.5 & 61 & 17 & 2.79 & 0 \\
+deepseek-r1 & weighted\_\allowbreak{}astar-w2 & 61 & 17 & 2.79 & 0 \\
+hmax & gbfs & 13 & 13 & 5.85 & 5 \\
+hmax & astar & 13 & 13 & 0 & 0 \\
+hmax & weighted\_\allowbreak{}astar-w1.5 & 13 & 13 & 0 & 0 \\
+hmax & weighted\_\allowbreak{}astar-w2 & 13 & 13 & 1.87 & 0 \\
 \hline
 \end{longtable}
 \endgroup
@@ -22,14 +22,14 @@ hmax & weighted\_\allowbreak{}astar-w2 & 14 & 14 & 1.74 & 0 \\
 \begin{longtable}{>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.166667\linewidth-2\tabcolsep\relax}}
 \hline
 heuristic & method & optimal n & median nodes expanded & median nodes generated & median search time s \\ \hline\endhead
-deepseek-r1 & gbfs & 11 & 128 & -- & -- \\
-deepseek-r1 & astar & 12 & 162 & 7.12e+03 & 0.122 \\
-deepseek-r1 & weighted\_\allowbreak{}astar-w1.5 & 12 & 125 & 3.13e+03 & 0.0527 \\
-deepseek-r1 & weighted\_\allowbreak{}astar-w2 & 12 & 125 & 2.73e+03 & 0.0527 \\
-hmax & gbfs & 6 & 166 & -- & -- \\
-hmax & astar & 14 & 1.48e+03 & 6.76e+03 & 0.153 \\
-hmax & weighted\_\allowbreak{}astar-w1.5 & 14 & 1.41e+03 & 6.29e+03 & 0.138 \\
-hmax & weighted\_\allowbreak{}astar-w2 & 12 & 1.01e+03 & 4.81e+03 & 0.125 \\
+deepseek-r1 & gbfs & 11 & 122 & -- & -- \\
+deepseek-r1 & astar & 12 & 149 & 5.99e+03 & 0.144 \\
+deepseek-r1 & weighted\_\allowbreak{}astar-w1.5 & 12 & 120 & 2.73e+03 & 0.0624 \\
+deepseek-r1 & weighted\_\allowbreak{}astar-w2 & 12 & 120 & 2.65e+03 & 0.0591 \\
+hmax & gbfs & 6 & 151 & -- & -- \\
+hmax & astar & 13 & 583 & 4.86e+03 & 0.124 \\
+hmax & weighted\_\allowbreak{}astar-w1.5 & 13 & 583 & 4.86e+03 & 0.129 \\
+hmax & weighted\_\allowbreak{}astar-w2 & 11 & 509 & 4.26e+03 & 0.0769 \\
 \hline
 \end{longtable}
 \endgroup
@@ -38,14 +38,14 @@ hmax & weighted\_\allowbreak{}astar-w2 & 12 & 1.01e+03 & 4.81e+03 & 0.125 \\
 \begin{longtable}{>{\raggedright\arraybackslash}p{\dimexpr 0.250000\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.250000\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.250000\linewidth-2\tabcolsep\relax}>{\raggedright\arraybackslash}p{\dimexpr 0.250000\linewidth-2\tabcolsep\relax}}
 \hline
 heuristic & method & median wall time s & total nodes expanded \\ \hline\endhead
-deepseek-r1 & gbfs & 0.252 & 2.7e+04 \\
-deepseek-r1 & astar & 0.3 & 4.15e+04 \\
-deepseek-r1 & weighted\_\allowbreak{}astar-w1.5 & 0.214 & 2.69e+04 \\
-deepseek-r1 & weighted\_\allowbreak{}astar-w2 & 0.218 & 2.68e+04 \\
-hmax & gbfs & 0.191 & 6.03e+04 \\
-hmax & astar & 0.266 & 4.91e+05 \\
-hmax & weighted\_\allowbreak{}astar-w1.5 & 0.255 & 4.81e+05 \\
-hmax & weighted\_\allowbreak{}astar-w2 & 0.233 & 4.61e+05 \\
+deepseek-r1 & gbfs & 0.238 & 2.45e+04 \\
+deepseek-r1 & astar & 0.455 & 3.9e+04 \\
+deepseek-r1 & weighted\_\allowbreak{}astar-w1.5 & 0.236 & 2.44e+04 \\
+deepseek-r1 & weighted\_\allowbreak{}astar-w2 & 0.248 & 2.44e+04 \\
+hmax & gbfs & 0.185 & 2.98e+04 \\
+hmax & astar & 0.271 & 1.58e+05 \\
+hmax & weighted\_\allowbreak{}astar-w1.5 & 0.262 & 1.49e+05 \\
+hmax & weighted\_\allowbreak{}astar-w2 & 0.207 & 1.33e+05 \\
 \hline
 \end{longtable}
 \endgroup
