@@ -153,7 +153,7 @@ No expensive experiments or external LLM calls run in CI.
 
 ## Reproduce the results
 
-Run every command from the repository root after the [setup](#setup) above. The commands are the same in PowerShell and in bash. Nothing below needs an LLM API key, and none of it overwrites the committed results.
+Steps 1–3 below each give one or more `uv run` commands to type in a terminal. Run them from the repository root (the folder containing this README), after the [setup](#setup) above. They work unchanged in PowerShell and in bash, need no LLM API key, and never overwrite the committed results.
 
 ### The three experiments
 
@@ -274,7 +274,6 @@ results/
   derived/                        final tables (reproduction, search_*, heuristic_reliability)
   derived/history/                earlier 3-worker results and pilots (not used for reporting)
   figures/                        final figures, same structure as derived/
-paper_preparation/                paper tables, figures and draft
 tests/                            planner, search algorithm, runner and analysis tests
 tools/                            verify_all.py, benchmark selection/verification, plan validation, machine profile
 docs/                             protocol, reproducibility notes, logs and integration status

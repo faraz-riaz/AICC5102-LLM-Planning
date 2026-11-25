@@ -64,7 +64,7 @@ The winner is copied to `artifacts/m3/selected/<trial>/<domain>_<trialNN>.py`
 (for example `selected/trial-01/blocksworld_trial01.py`), and
 one row is added to `artifacts/m3/heuristic_manifest.csv`. The row records the
 model, provider, prompt hash, settings, training-set hash, file path, SHA-256 and
-freeze time, using the columns proposed in `paper_preparation/RELIABILITY_INTEGRATION_SPEC.md`.
+freeze time.
 A frozen file is never overwritten; the script refuses to re-freeze. Test-task
 runs may start only after all nine files are frozen.
 

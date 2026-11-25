@@ -15,7 +15,7 @@ All three workstreams are complete and merged into `main`. Shared planner code, 
 - A*, Weighted A* and IDA* (`src/pyperplan/search/`) with correctness tests.
 - Proven optimal plan costs per task and per sampled state (`compute_optimal_costs.py`, `compute_state_optimal_costs.py`).
 - Search comparison analysis, paired comparisons, completeness checks and the failure/guarantee audit.
-- Final 8-worker run of the reproduction and search matrix; paper preparation (`paper_preparation/`).
+- Final 8-worker run of the reproduction and search matrix; paper preparation.
 
 ## Ranem: heuristic reliability
 
