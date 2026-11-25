@@ -153,69 +153,103 @@ No expensive experiments or external LLM calls run in CI.
 
 ## Reproduce the results
 
-Run every command from the repository root after the setup above.
+Run every command from the repository root after the [setup](#setup) above. The commands are the same in PowerShell and in bash. Nothing below needs an LLM API key, and none of it overwrites the committed results.
 
-**Verify everything with one command (about 2 minutes).** This re-checks every reported number from the committed data. It checks the benchmark and heuristic hashes, confirms every planned run exists exactly once with the right limits and seed, replays every saved plan, rebuilds the run tables, and recomputes all result tables R1–R9 to compare them with the committed ones. It prints PASS/FAIL per check and exits with code 1 if anything differs:
+### The three experiments
+
+| # | Experiment | What it is for | Results | Committed outputs |
+|---|---|---|---|---|
+| 1 | **Reproduction** | Checks that the paper's main claim holds on our 90-task subset: GBFS with the authors' archived DeepSeek-R1 heuristics solves more tasks than GBFS with hFF or hmax. | R1, R2 | tables `results/derived/reproduction/`, figure `results/figures/reproduction/` |
+| 2 | **Search algorithms** | Asks whether the same LLM heuristics stay useful beyond GBFS: A*, Weighted A* (w = 1.5, 2) and IDA* (easy tasks), against hmax. Proven optimal plan costs give the optimality gap of every plan. | R3, R4, R5 | `results/derived/search_analysis_all_tasks/`, `results/derived/search_analysis_easy_tasks/`, `results/derived/search_comparison/` (paired comparisons, failure and guarantee audit); figures in the matching `results/figures/` folders |
+| 3 | **Heuristic reliability** | Asks whether the result depends on one lucky set of heuristics. It uses three new, independently generated heuristic sets (Gemini 3.1 Pro, frozen in `artifacts/m3/`), run with every algorithm. It also measures how often each heuristic overestimates the exact remaining cost on sampled states with a proven h*(s) (305 in the reported results). | R6, R7, R8, R9 | `results/derived/heuristic_reliability/`, `results/figures/heuristic_reliability/` |
+
+The raw data behind all three is in `results/raw/`. That folder holds one JSON record, log and plan per run in `run_records/`, the proven optimal costs in `optimal_costs.csv`, and the state sample with its exact h*(s) in `sampled_states/`.
+
+### Step 1: Check the committed results (about 5 minutes)
 
 ```bash
 uv run --frozen python tools/verify_all.py
 ```
 
-To regenerate individual results, there are two levels.
+No planner is run. The script checks the benchmark and heuristic hashes, confirms that every planned run exists exactly once with the right limits and seed, and replays every saved plan with an independent validator. It then rebuilds the run tables and recomputes every result table (R1–R9) from the raw records, comparing each with the committed version. It prints PASS/FAIL per check, ends with `16/16 checks passed.`, and exits with code 1 if anything differs.
 
-### 1. Recompute every table and figure from the committed run records (minutes)
+### Step 2: Smoke test the planners (about 1 minute)
 
-No planner is run. The scripts refuse to overwrite existing outputs, so the commands below write to `results/derived/check/` and `results/figures/check/`. Compare the outputs with the committed ones.
+Each command runs one easy Blocksworld task, so you can confirm that every experiment's code runs on your machine before starting the long re-run. Each one should print `blocksworld  1/1`. The records go to `results/raw/run_records/` under the `smoke-` label. The analysis ignores that label, and the files are ignored by Git.
 
 ```bash
-S=experiments/search_algorithms
-R=experiments/reproduction
-H=experiments/heuristic_reliability
+uv run --frozen python experiments/reproduction/run_reproduction.py --batch smoke-gbfs --heuristic llm-upstream --domain blocksworld --difficulty easy --limit 1
+uv run --frozen python experiments/reproduction/run_search_algorithms.py --batch smoke-astar --algorithm astar --heuristic hmax --domain blocksworld --difficulty easy --limit 1
+uv run --frozen python experiments/reproduction/run_search_algorithms.py --batch smoke-wastar --algorithm weighted_astar --weight 1.5 --heuristic llm-upstream --domain blocksworld --difficulty easy --limit 1
+uv run --frozen python experiments/reproduction/run_search_algorithms.py --batch smoke-idastar --algorithm ida_star --heuristic llm-upstream --domain blocksworld --difficulty easy --limit 1
+uv run --frozen python experiments/reproduction/run_reproduction.py --batch smoke-trial --heuristic artifacts/m3/selected/trial-01/blocksworld_trial01.py --heuristic-set-id m3-gemini-3.1-pro --trial-id trial-01 --domain blocksworld --difficulty easy --limit 1
 ```
+
+The first command is experiment 1 (GBFS with the archived LLM heuristic). The next three are experiment 2 (A*, Weighted A*, IDA*). The last is experiment 3 (GBFS with a frozen trial-01 heuristic).
+
+### Step 3: Re-run all experiments from scratch (about 3 hours with 8 workers)
+
+```bash
+uv run --frozen python tools/rerun_all.py --label mine --workers 8
+```
+
+This single command re-runs every experiment with the frozen settings (60 s / 4096 MiB per run, per-task hash seeds) and then recomputes every table and figure. Use any new label in place of `mine`, except `r2`, which is taken by our own re-run. Set `--workers` to at most the number of CPU cores. Fewer workers is slower but gives cleaner timings. The script resumes after an interruption: run the same command again and finished batches are skipped.
+
+Nothing that is already committed is touched. Every new run gets a batch label starting with `mine-`, and every output goes to a separate folder:
+
+| Output | Location |
+|---|---|
+| Per-run records, logs and plans (2,160 runs) | `results/raw/run_records/` (batch files `results/raw/run_records/batches/mine-*.json`) |
+| Proven optimal costs | `results/raw/mine/optimal_costs.csv` |
+| State sample and exact h*(s) | `results/raw/mine/sampled_states/` |
+| Experiment 1 tables (R1, R2) | `results/derived/mine/reproduction/` |
+| Experiment 2 tables (R3–R5) | `results/derived/mine/search_analysis_all_tasks/`, `results/derived/mine/search_analysis_easy_tasks/`, `results/derived/mine/search_comparison/` |
+| Experiment 3 tables (R6–R9) | `results/derived/mine/heuristic_reliability/` |
+| Figures | `results/figures/mine/` (same subfolders) |
+| Cell-by-cell comparison with the committed results | `results/derived/mine/COMPARISON.md` |
+
+To run one experiment at a time, pass `--steps`. The steps run in this order:
+
+| Step | Experiment | What it runs | Runs |
+|---|---|---|---:|
+| `refs` | 2, 3 | Proven optimal plan costs: A* + hmax, cross-checked with uniform-cost search (easy and medium tasks) | 120 |
+| `search` | 1, 2 | GBFS with LLM / hFF / hmax (90 tasks each); A*, WA* 1.5 and WA* 2 with LLM / hmax (90 tasks each); IDA* with LLM / hmax (30 easy tasks each) | 870 |
+| `trials` | 3 | The 9 frozen trial heuristics (3 trials × 3 domains) with GBFS, A*, WA* 1.5, WA* 2 (30 tasks per domain) and IDA* (10 easy tasks per domain) | 1,170 |
+| `states` | 3 | Samples states from tasks with a proven optimal cost, searches for their exact h*(s), and evaluates every heuristic on them. Needs `refs` first. | ~345 searches |
+| `analysis` | all | Run tables, completeness check, every table and figure, `COMPARISON.md`. Needs all steps above. | — |
+
+For example, to re-run experiments 1 and 2 only:
+
+```bash
+uv run --frozen python tools/rerun_all.py --label mine --workers 8 --steps refs search
+```
+
+Then run `--steps trials states` and finally `--steps analysis` with the same label.
+
+**Expect small differences.** Runs that finish close to the 60 s limit depend on machine speed and load, so a few tasks can flip between solved and timeout. Our own full re-run (label `r2`, committed in `results/derived/r2/`) matched R1/R2 exactly, and its R3 coverage differed by at most one task per cell. `results/derived/r2/COMPARISON.md` lists every change. The state sample is seeded, so it is identical whenever the optimal-cost table is. A different number of proven optimal costs or h*(s) values changes which states count in R6, and this is where most of r2's R6–R8 differences come from.
+
+### Optional: recompute individual tables from the committed records
+
+`tools/verify_all.py` already does all of this in one go. These commands are for inspecting one result on its own. No planner is run, and outputs go to `results/derived/check/`.
 
 | Result | Command |
 |---|---|
-| Run table for R1–R5 | `uv run --frozen python $S/build_run_table.py --batches w8-m2- w8-gbfs- --output results/derived/check/search_runs.csv` |
-| Completeness and plan replay | `uv run --frozen python $S/check_run_completeness.py --batches w8-m2- --matrix official --out-dir results/derived/check/completeness` |
-| R1/R2 reproduction tables | `uv run --frozen python $R/summarize_reproduction.py --out-dir results/derived/check/reproduction --skip-batch-prefix smoke --skip-batch-prefix m1- --skip-batch-prefix m2- --skip-batch-prefix m3- --skip-batch-prefix faraz-` |
-| R3/R4/R5, all 90 tasks | `uv run --frozen python $S/analyze_search_results.py --runs results/derived/search_comparison/search_runs.csv --tag check/search_analysis_all_tasks --methods gbfs astar weighted_astar-w1.5 weighted_astar-w2 --scope "90 tasks"` |
-| R3/R4/R5, easy tasks incl. IDA* | `uv run --frozen python $S/analyze_search_results.py --runs results/derived/search_comparison/search_runs.csv --tag check/search_analysis_easy_tasks --difficulties easy --scope "easy tasks"` |
-| R5 paired comparisons | `uv run --frozen python $S/paired_method_comparison.py --runs results/derived/search_comparison/search_runs.csv --out-dir results/derived/check/paired` |
-| Failure and guarantee audit | `uv run --frozen python $S/audit_failures_and_guarantees.py --runs results/derived/search_comparison/search_runs.csv --tag check/audit` |
-| R6 overestimation summary | `uv run --frozen python $H/overestimation_study.py summary` |
-| R7/R8/R9 tables | `uv run --frozen python $H/trial_analysis.py` (rewrites `results/derived/heuristic_reliability/` with identical values) |
-| R6–R9 figures | `uv run --frozen python $H/reliability_figures.py` (rewrites `results/figures/heuristic_reliability/`) |
-| Trial heuristics provenance | `uv run --frozen python $H/verify_trial_heuristics.py` |
+| Run table for R1–R5 | `uv run --frozen python experiments/search_algorithms/build_run_table.py --batches w8-m2- w8-gbfs- --output results/derived/check/search_runs.csv` |
+| Completeness and plan replay | `uv run --frozen python experiments/search_algorithms/check_run_completeness.py --batches w8-m2- --matrix official --out-dir results/derived/check/completeness` |
+| R1/R2 reproduction tables | `uv run --frozen python experiments/reproduction/summarize_reproduction.py --out-dir results/derived/check/reproduction --skip-batch-prefix m1- --skip-batch-prefix m2- --skip-batch-prefix m3- --skip-batch-prefix faraz- --skip-batch-prefix r2-` |
+| R3/R4/R5, all 90 tasks | `uv run --frozen python experiments/search_algorithms/analyze_search_results.py --runs results/derived/search_comparison/search_runs.csv --tag check/search_analysis_all_tasks --methods gbfs astar weighted_astar-w1.5 weighted_astar-w2 --scope "90 tasks"` |
+| R3/R4/R5, easy tasks incl. IDA* | `uv run --frozen python experiments/search_algorithms/analyze_search_results.py --runs results/derived/search_comparison/search_runs.csv --tag check/search_analysis_easy_tasks --difficulties easy --scope "easy tasks"` |
+| R5 paired comparisons | `uv run --frozen python experiments/search_algorithms/paired_method_comparison.py --runs results/derived/search_comparison/search_runs.csv --out-dir results/derived/check/paired` |
+| Failure and guarantee audit | `uv run --frozen python experiments/search_algorithms/audit_failures_and_guarantees.py --runs results/derived/search_comparison/search_runs.csv --tag check/audit` |
+| Trial heuristics provenance | `uv run --frozen python experiments/heuristic_reliability/verify_trial_heuristics.py` |
 
-`summarize_reproduction.py` writes the tables, then stops before the figure if `results/figures/reproduction/coverage.png` already exists.
+`summarize_reproduction.py` writes the tables and then exits with `refusing to overwrite ... coverage.png`, because it will not replace the committed figure. The tables are complete at that point.
 
-### 2. Re-run the experiments (hours)
-
-These commands produce new run records under `results/raw/run_records/`. Use a new `--batch` label; existing records are never overwritten. Runtimes near the 60 s limit can vary between machines, so coverage may differ by a few tasks.
-
-```bash
-# R1/R2 GBFS baselines (repeat with --heuristic hff and --heuristic hmax)
-uv run --frozen python experiments/reproduction/run_reproduction.py --batch my-gbfs-llm --heuristic llm-upstream --workers 8 --hash-seed-scope task
-
-# R3–R5 search algorithms (A*; for Weighted A* add --algorithm weighted_astar --weight 1.5 or 2.0;
-# for IDA* use --algorithm ida_star --difficulty easy; repeat with --heuristic hmax)
-uv run --frozen python experiments/reproduction/run_search_algorithms.py --batch my-astar-llm --algorithm astar --heuristic llm-upstream --workers 8 --hash-seed-scope task
-
-# Proven optimal costs (A* + hmax, uniform-cost cross-check)
-uv run --frozen python experiments/search_algorithms/compute_optimal_costs.py --jobs 4 --batch-id my-optimal-costs --output results/raw/my_optimal_costs.csv
-
-# R6–R9: the 9 frozen trial heuristics with every algorithm (gbfs, astar, wa, ida)
-uv run --frozen python experiments/heuristic_reliability/run_trial_heuristics.py gbfs --workers 8
-
-# R6 state sample, exact h*(s) and heuristic estimates
-uv run --frozen python experiments/heuristic_reliability/overestimation_study.py sample
-uv run --frozen python experiments/heuristic_reliability/overestimation_study.py hstar --workers 3
-uv run --frozen python experiments/heuristic_reliability/overestimation_study.py evaluate
-```
+The R6–R9 scripts (`overestimation_study.py summary`, `trial_analysis.py`, `reliability_figures.py` in `experiments/heuristic_reliability/`) have no output-folder option. They rewrite the committed `heuristic_reliability` tables and figures in place, with byte-identical tables. `verify_all.py` checks the same tables without writing anything.
 
 Generating new heuristic trials needs a Gemini API key (see the LLM provider section) and is described in [`experiments/heuristic_reliability/README.md`](experiments/heuristic_reliability/README.md).
 
-Batch labels inside the committed records (for example `w8-m2-…`, `m3-t01-…`, `faraz-…`, `m2-official-…`) are the original labels written when the runs were made. They are kept unchanged so that every record still matches its batch file.
+Batch labels inside the committed records (for example `w8-m2-…`, `m3-t01-…`, `faraz-…`, `m2-official-…`, `r2-…`) are the original labels written when the runs were made. They are kept unchanged so that every record still matches its batch file.
 
 ## Repository layout
 
@@ -245,10 +279,6 @@ tests/                            planner, search algorithm, runner and analysis
 tools/                            verify_all.py, benchmark selection/verification, plan validation, machine profile
 docs/                             protocol, reproducibility notes, logs and integration status
 ```
-
-Who did what: [`docs/TEAM_RESPONSIBILITIES.md`](docs/TEAM_RESPONSIBILITIES.md). Integration history (earlier three-worker numbers; final rerun in §7): [`docs/INTEGRATION_STATUS.md`](docs/INTEGRATION_STATUS.md).
-
-The manifest is the single source of truth. Do not enumerate benchmark files independently in experiment code.
 
 ## Reproducibility conventions
 
